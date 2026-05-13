@@ -1,0 +1,38 @@
+{
+  "name": "ultimate-animations",
+  "displayName": "Ultimate Animation Skill Pack",
+  "description": "Production-grade animation system with 12 modules covering CSS keyframes, GSAP ScrollTrigger, Framer Motion, Three.js/R3F, GLSL shaders, particles, smooth scroll (Lenis), Lottie/Rive, Theatre.js, and glassmorphism. From micro-interactions to full 3D.",
+  "version": "2.0.0",
+  "author": "deepe",
+  "license": "MIT",
+  "keywords": [
+    "animation",
+    "GSAP",
+    "framer-motion",
+    "three.js",
+    "shaders",
+    "GLSL",
+    "particles",
+    "scroll",
+    "glassmorphism",
+    "Theatre.js",
+    "Lottie",
+    "Rive",
+    "Lenis",
+    "micro-interactions",
+    "keyframes",
+    "parallax"
+  ],
+  "platforms": [
+    "claude",
+    "cursor",
+    "windsurf",
+    "antigravity",
+    "opencode",
+    "gemini"
+  ],
+  "entryPoint": "SKILL.md",
+  "modules": 12,
+  "templates": 25,
+  "totalFiles": 44
+}

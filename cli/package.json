@@ -1,0 +1,28 @@
+{
+  "name": "ultimate-anim",
+  "version": "2.0.0",
+  "description": "CLI installer for the Ultimate Animation Skill Pack — install animation skills for any AI coding assistant",
+  "bin": {
+    "ultimate-anim": "./bin/cli.js"
+  },
+  "keywords": [
+    "animation",
+    "skill",
+    "ai-skill",
+    "gsap",
+    "framer-motion",
+    "three.js",
+    "shaders",
+    "glassmorphism",
+    "cli"
+  ],
+  "author": "deepe",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin/",
+    "assets/"
+  ]
+}

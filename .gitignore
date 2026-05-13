@@ -1,0 +1,18 @@
+node_modules/
+reference_repo/
+chibi-parts/
+
+# Demo/test files
+*.html
+wolf.png
+chibi.png
+ChatGPT*.png
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# CLI bundled assets (regenerated via sync)
+cli/assets/
+cli/test-project/
