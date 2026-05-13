@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "CLI installer for the Ultimate Animation Skill Pack — install animation skills for any AI coding assistant",
   "bin": {
-    "ultimate-anim": "./bin/cli.js"
+    "ultimate-anim": "bin/cli.js"
   },
   "keywords": [
     "animation",
