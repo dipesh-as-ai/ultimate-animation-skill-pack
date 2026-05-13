@@ -53,15 +53,22 @@ triggers:
 2. **Use the Decision Tree below** — find what you need → it points you to the right module
 3. **Read that module's `.md` file** — every module has one (e.g. `gsap/GSAP.md`)
 4. **Copy templates** from the `templates/` folder inside each module
-5. **Use `presets/`** for consistent easing and timing across all animations
+5. **Use `presets/`** for consistent easing, timing, colors, and themes
+6. **Read `RECIPES.md`** for full-page composition blueprints
 
 ### If you are an AI AGENT reading this skill pack:
 
-1. Parse the **Decision Tree** to select the right animation approach
-2. Read the target module's `.md` file for rules, patterns, and constraints
-3. Reference `templates/*.tsx` for drop-in React components
-4. Import easing tokens from `presets/easings.js` — never hardcode easing values
-5. Follow the **5 Laws** below — they apply to every animation in every module
+1. **Check `presets/animation-meta.json`** — structured metadata for intelligent pattern selection
+2. Parse the **Decision Tree** to select the right animation approach
+3. Read the target module's `.md` file for rules, patterns, and constraints
+4. Reference `templates/*.tsx` for drop-in React components
+5. Import tokens from `presets/` — never hardcode easing, color, or timing values:
+   - `presets/easings.js` — easing curves
+   - `presets/colors.js` — color palette
+   - `presets/themes.js` — dark/light theme tokens
+   - `presets/responsive-motion.ts` — mobile-adaptive values
+6. **Read `RECIPES.md`** for full-page composition (which templates to combine)
+7. Follow the **5 Laws** below — they apply to every animation in every module
 
 ### The 3 Tiers — Start at Tier 1, go deeper as needed:
 
@@ -78,21 +85,34 @@ triggers:
 
 | User / Prompt Says | Start From |
 |---------------------|------------|
-| "Add a hover effect" / "button animation" | `css/CSS.md` → Micro-interactions |
-| "Make this scroll-triggered" / "reveal on scroll" | `gsap/GSAP.md` → ScrollTrigger |
+| "Build me a landing page" / "full animated page" | `RECIPES.md` → Full-page composition blueprints |
+| "Add a hover effect" / "button animation" | `css/templates/micro-interactions.tsx` |
+| "Make this scroll-triggered" / "reveal on scroll" | `gsap/templates/scroll-reveal.tsx` |
 | "Stagger these cards" / "animate a grid" | `gsap/` or `framer/` → Stagger Grid templates |
 | "Split this text" / "animate each letter" | `gsap/templates/text-split.tsx` |
+| "Masked headline reveal" / "clip text" | `gsap/templates/text-mask-reveal.tsx` |
+| "Running text" / "marquee" / "scrolling banner" | `gsap/templates/text-marquee.tsx` |
+| "Animated number" / "counter" / "stats" | `gsap/templates/text-counter.tsx` |
+| "Logo carousel" / "trusted by" / "brand strip" | `css/templates/logo-marquee.tsx` |
 | "Add page transitions" / "animate between routes" | `framer/templates/page-transition.tsx` |
 | "Make a glassmorphism card" / "frosted glass" | `glass/GLASS.md` → full design system |
-| "Add smooth scroll" / "buttery scroll" | `scroll/SCROLL.md` → Lenis |
-| "Make the background alive" / "animated background" | `shaders/` or `particles/` |
-| "Add particles" / "constellation dots" / "snow" | `particles/PARTICLES.md` → TSParticles |
+| "Add smooth scroll" / "buttery scroll" | `scroll/templates/use-smooth-scroll.tsx` |
+| "Make the background alive" / "animated background" | `css/templates/ambient-background.tsx` |
+| "Add particles" / "constellation dots" / "snow" | `particles/templates/particle-background.tsx` |
 | "Liquid effect" / "noise gradient" / "dissolve" | `shaders/SHADERS.md` → GLSL templates |
 | "3D scene" / "floating objects" / "WebGL" | `threejs/THREEJS.md` → R3F |
 | "Cinematic sequence" / "timeline multiple objects" | `theatre/THEATRE.md` → Theatre.js |
-| "Lottie animation" / "After Effects export" | `lottie-rive/LOTTIE-RIVE.md` → Lottie |
+| "Lottie animation" / "After Effects export" | `lottie-rive/templates/lottie-player.tsx` |
 | "Interactive animation with states" / "Rive" | `lottie-rive/LOTTIE-RIVE.md` → Rive |
+| "Image reveal" / "clip-path wipe" | `gsap/templates/image-reveal.tsx` |
+| "Stacking cards" / "pinned scroll" | `gsap/templates/sticky-cards.tsx` |
+| "Scroll video" / "Apple-style video scrub" | `gsap/templates/scroll-video.tsx` |
+| "Morphing blob" / "SVG shape animation" | `framer/templates/morphing-shape.tsx` |
+| "Interactive animation with states" / "Rive" | `lottie-rive/templates/rive-interactive.tsx` |
 | "What easing should I use?" | `presets/easings.js` |
+| "What colors should I use?" | `presets/colors.js` |
+| "Mobile safe animation" / "responsive" | `presets/responsive-motion.ts` |
+| "Dark mode / light mode" / "theme tokens" | `presets/themes.js` |
 
 ---
 
@@ -245,10 +265,15 @@ Every animation must answer: **why does this move?**
 ```
 ultimate-animations-skill/
 │
-├── SKILL.md                          ← YOU ARE HERE
+├── SKILL.md                          ← YOU ARE HERE (master index)
+├── RECIPES.md                        ← Full-page composition blueprints ★ NEW
 │
 ├── css/
-│   └── CSS.md                        ← Keyframes, micro-interactions, backgrounds, text effects
+│   ├── CSS.md                        ← Keyframes, micro-interactions, backgrounds, text effects
+│   └── templates/
+│       ├── ambient-background.tsx     ← Living gradient orb background ★ NEW
+│       ├── micro-interactions.tsx     ← ButtonPress, CardLift, SpotlightCard ★ NEW
+│       └── logo-marquee.tsx           ← Infinite logo carousel ★ NEW
 │
 ├── gsap/
 │   ├── GSAP.md                       ← ScrollTrigger, timelines, text, loaders, magnetic cursor
@@ -256,8 +281,14 @@ ultimate-animations-skill/
 │       ├── scroll-reveal.tsx          ← useReveal() hook
 │       ├── stagger-grid.tsx           ← Batch stagger cards
 │       ├── text-split.tsx             ← Character/word split entrance
+│       ├── text-mask-reveal.tsx       ← Clip-path line-by-line reveal ★ NEW
+│       ├── text-marquee.tsx           ← Infinite scrolling text banner ★ NEW
+│       ├── text-counter.tsx           ← Scroll-triggered number counter ★ NEW
+│       ├── image-reveal.tsx           ← Masked image wipe reveal ★ NEW
+│       ├── sticky-cards.tsx           ← Scroll-pinned card stacking ★ NEW
+│       ├── scroll-video.tsx           ← Apple-style scroll-scrubbed video ★ NEW
 │       ├── magnetic-button.tsx        ← Cursor-follow button
-│       ├── custom-cursor.tsx          ← Custom cursor follower
+│       ├── custom-cursor.tsx          ← Custom cursor follower (desktop only)
 │       └── horizontal-scroll.tsx      ← Horizontal scroll section
 │
 ├── framer/
@@ -268,7 +299,8 @@ ultimate-animations-skill/
 │       ├── page-transition.tsx        ← Next.js route transitions
 │       ├── tilt-card.tsx              ← 3D tilt hover card
 │       ├── expand-card.tsx            ← Click-to-expand layout animation
-│       └── animated-list.tsx          ← AnimatePresence list add/remove
+│       ├── animated-list.tsx          ← AnimatePresence list add/remove
+│       └── morphing-shape.tsx         ← SVG path morphing blobs ★ NEW
 │
 ├── glass/
 │   ├── GLASS.md                      ← Full glassmorphism design system
@@ -293,10 +325,15 @@ ultimate-animations-skill/
 │       └── scroll-scrub.tsx           ← Scroll-driven timeline hook
 │
 ├── scroll/
-│   └── SCROLL.md                     ← Lenis smooth scroll + GSAP parallax + snap
+│   ├── SCROLL.md                     ← Lenis smooth scroll + GSAP parallax + snap
+│   └── templates/
+│       └── use-smooth-scroll.tsx      ← Drop-in Lenis + GSAP hook ★ NEW
 │
 ├── lottie-rive/
-│   └── LOTTIE-RIVE.md                ← Lottie (AE export) + Rive (state machines)
+│   ├── LOTTIE-RIVE.md                ← Lottie (AE export) + Rive (state machines)
+│   └── templates/
+│       ├── lottie-player.tsx          ← Configurable Lottie component ★ NEW
+│       └── rive-interactive.tsx       ← Rive state machine component ★ NEW
 │
 ├── shaders/
 │   ├── SHADERS.md                    ← GLSL patterns, noise, liquid, holographic, dissolve
@@ -306,11 +343,18 @@ ultimate-animations-skill/
 │       └── dissolve-plane.tsx         ← Scroll-driven dissolve transition
 │
 ├── particles/
-│   └── PARTICLES.md                  ← TSParticles presets + Vanta.js backgrounds
+│   ├── PARTICLES.md                  ← TSParticles presets + Vanta.js backgrounds
+│   └── templates/
+│       └── particle-background.tsx    ← 5-preset particle component ★ NEW
 │
 └── presets/
     ├── easings.js                    ← All easing curves
-    └── variants.js                   ← Reusable Framer Motion variants
+    ├── variants.js                   ← Reusable Framer Motion variants
+    ├── colors.js                     ← Unified color palette ★ NEW
+    ├── themes.js                     ← Dark/light theme tokens ★ NEW
+    ├── responsive-motion.ts          ← Mobile-adaptive animation values ★ NEW
+    ├── reduced-motion.ts             ← Accessibility hooks
+    └── animation-meta.json           ← AI decision metadata ★ NEW
 ```
 
 ---

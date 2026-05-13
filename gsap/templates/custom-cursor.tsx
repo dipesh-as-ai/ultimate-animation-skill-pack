@@ -4,6 +4,11 @@
  * Dual-element cursor: a small dot that follows instantly
  * and a larger ring that follows with lag. Scales up on hoverable elements.
  *
+ * ⚠️ MOBILE: This component is DESKTOP ONLY.
+ * It auto-detects touch devices and skips initialization entirely.
+ * Use `useResponsiveMotion().enableCursor` from `presets/responsive-motion.ts`
+ * to conditionally render cursor DOM elements.
+ *
  * Requires: gsap
  *
  * Add this CSS to your globals:
@@ -43,6 +48,13 @@ import { gsap } from "gsap"
  */
 export function useCustomCursor() {
   useEffect(() => {
+    // ── MOBILE GUARD: skip entirely on touch devices ──
+    const isTouchDevice =
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches
+    if (isTouchDevice) return
+
     const dot = document.querySelector<HTMLElement>(".cursor-dot")
     const ring = document.querySelector<HTMLElement>(".cursor-ring")
 
