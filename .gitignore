@@ -1,6 +1,7 @@
 node_modules/
 reference_repo/
 chibi-parts/
+Full Web design/
 
 # Demo/test files (root level only — NOT references/)
 /*.html

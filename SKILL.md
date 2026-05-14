@@ -62,10 +62,11 @@ triggers:
 > you have FAILED. Every output must look like it could win an Awwwards SOTD.
 
 #### The Default Tech Stack 🛠️
-Unless the user explicitly requests otherwise, **ALWAYS default to React + Vite + Tailwind CSS**.
-1. **Initialize:** `npx create-vite@latest ./ --template react-ts`
-2. **Install Core Animation Stack:** `npm install gsap framer-motion lenis clsx tailwind-merge`
-3. *(Only if doing 3D)*: `npm install three @react-three/fiber @react-three/drei`
+Unless the user explicitly requests otherwise, **ALWAYS default to Vanilla HTML + CDN**. This guarantees 60fps GSAP performance without Virtual DOM interference.
+1. **Structure:** Single `index.html` file (or separated CSS/JS if requested).
+2. **Styling:** Use Tailwind CSS via CDN (`<script src="https://cdn.tailwindcss.com"></script>`).
+3. **Animation:** Load GSAP and Lenis via CDN.
+*Note: If the user specifically asks for a "Web App", "Dashboard", or "React Component", then fallback to React + Vite + Framer Motion.*
 
 #### Phase 0 — Mandatory Study (BEFORE writing any code):
 

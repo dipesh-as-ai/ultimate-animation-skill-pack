@@ -23,15 +23,18 @@
 ## Quick Start
 
 ### The Default Tech Stack 🛠️
-While this skill pack works with Vanilla HTML/JS or Next.js, the **assumed default** for new projects is **React + Vite + Tailwind CSS**.
-```bash
-# 1. Initialize a new project
-npx create-vite@latest my-app --template react-ts
-cd my-app
+For marketing sites, portfolios, and landing pages (where 60fps animation is the primary goal), the **assumed default is Vanilla HTML + CDN**. This completely eliminates Virtual DOM interference with GSAP.
 
-# 2. Install Core Animation Dependencies
-npm install gsap framer-motion lenis clsx tailwind-merge
+```html
+<!-- 1. Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- 2. Core Animation Stack via CDN -->
+<script src="https://unpkg.com/lenis@1.1.9/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 ```
+*(If building a SaaS Dashboard or Web App with state, you may explicitly request React + Vite + Framer Motion).*
 
 ### Usage Steps
 1. Read `SKILL.md` — the master decision tree tells you which module to use
