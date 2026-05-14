@@ -15,7 +15,8 @@
 ## PHASE 1: The Skeleton (DOM Structure)
 * **Goal:** Build the raw HTML semantic structure.
 * **Rules:**
-  - Create the layout using clean, semantic HTML5 tags (`<section>`, `<article>`, `<main>`).
+  - **Default Stack:** If the user doesn't specify a framework, default to **React + Vite + Tailwind CSS**.
+  - Create the layout using clean, semantic tags (`<section>`, `<article>`, `<main>`).
   - Do not apply heavy CSS styling yet.
   - Wrap elements that will be animated later in specific target classes (e.g., `.gs-reveal`, `.gs-parallax`).
   - *Checkpoint:* If CSS is turned off, the page should still make logical sense.

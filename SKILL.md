@@ -61,6 +61,12 @@ triggers:
 > ⚠️ **ZERO-TOLERANCE RULE:** If you produce a basic, cheap, Bootstrap-looking website,
 > you have FAILED. Every output must look like it could win an Awwwards SOTD.
 
+#### The Default Tech Stack 🛠️
+Unless the user explicitly requests otherwise, **ALWAYS default to React + Vite + Tailwind CSS**.
+1. **Initialize:** `npx create-vite@latest ./ --template react-ts`
+2. **Install Core Animation Stack:** `npm install gsap framer-motion lenis clsx tailwind-merge`
+3. *(Only if doing 3D)*: `npm install three @react-three/fiber @react-three/drei`
+
 #### Phase 0 — Mandatory Study (BEFORE writing any code):
 
 1. **Read `references/AI_CORE_BUILD_LOGIC.md` FIRST** — The "Anti-Ugly" Manifesto. Contains zero-tolerance build rules, industry-specific logic, and known issue fixes.

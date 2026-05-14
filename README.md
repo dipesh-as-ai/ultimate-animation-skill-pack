@@ -22,8 +22,20 @@
 
 ## Quick Start
 
+### The Default Tech Stack 🛠️
+While this skill pack works with Vanilla HTML/JS or Next.js, the **assumed default** for new projects is **React + Vite + Tailwind CSS**.
+```bash
+# 1. Initialize a new project
+npx create-vite@latest my-app --template react-ts
+cd my-app
+
+# 2. Install Core Animation Dependencies
+npm install gsap framer-motion lenis clsx tailwind-merge
+```
+
+### Usage Steps
 1. Read `SKILL.md` — the master decision tree tells you which module to use
-2. Install dependencies for your chosen modules (see SKILL.md)
+2. Install additional module dependencies if needed (e.g., Three.js, Rive)
 3. Import templates directly or use them as reference patterns
 4. Import easings/variants from `presets/` for consistent animation feel
 
