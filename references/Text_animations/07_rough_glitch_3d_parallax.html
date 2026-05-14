@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rough Glitch 3D Parallax</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Anton', sans-serif; /* Massive, heavy, brutalist font */
+            overflow: hidden;
+            /* A rough, gritty noise overlay */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            perspective: 800px; /* Stronger perspective for extreme 3D */
+        }
+
+        .text-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+            /* Aerobic rhythmic pulsing */
+            animation: breathe 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1) translateZ(0); }
+            100% { transform: scale(1.05) translateZ(20px); }
+        }
+
+        /* Base text styling */
+        .text {
+            font-size: 12rem;
+            text-transform: uppercase;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            letter-spacing: 5px;
+            mix-blend-mode: screen; /* Makes overlapping colors pop like crazy */
+        }
+
+        /* 
+         * LAYER SETTINGS 
+         * Stacking them in 3D space immediately, giving them acid/neon colors.
+         */
+
+        .text:nth-child(1) {
+            color: #ff003c; /* Acid Red */
+            transform: translate(-50%, -50%) translateZ(-90px);
+            opacity: 0.8;
+            -webkit-text-stroke: 2px #ff003c;
+        }
+
+        .text:nth-child(2) {
+            color: #00ff00; /* Acid Green */
+            transform: translate(-50%, -50%) translateZ(-45px);
+            opacity: 0.8;
+            -webkit-text-stroke: 2px #00ff00;
+        }
+
+        .text:nth-child(3) {
+            color: #003cff; /* Acid Blue */
+            transform: translate(-50%, -50%) translateZ(45px);
+            opacity: 0.8;
+            -webkit-text-stroke: 2px #003cff;
+        }
+
+        .text:nth-child(4) {
+            color: #ffffff; /* Core White */
+            transform: translate(-50%, -50%) translateZ(90px);
+            -webkit-text-stroke: 4px #000; /* Black border to make it punch out */
+            text-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+        }
+
+        /* --- THE ROUGH GLITCH ON HOVER --- */
+        
+        .container:hover .text-wrapper {
+            animation: none; /* Stop breathing */
+        }
+
+        .container:hover .text:nth-child(1) {
+            animation: rough-glitch-1 0.15s infinite linear alternate-reverse;
+        }
+        
+        .container:hover .text:nth-child(2) {
+            animation: rough-glitch-2 0.2s infinite linear alternate;
+        }
+
+        .container:hover .text:nth-child(3) {
+            animation: rough-glitch-1 0.1s infinite linear alternate-reverse;
+        }
+
+        .container:hover .text:nth-child(4) {
+            animation: rough-glitch-core 0.25s infinite steps(2);
+        }
+
+        /* Violent X/Y shaking, heavy skewing, and random clip-path slicing */
+        @keyframes rough-glitch-1 {
+            0% { transform: translate(-50%, -50%) translateZ(-120px) translateX(-20px) skewX(20deg); clip-path: polygon(0 0, 100% 0, 100% 25%, 0 25%); }
+            20% { transform: translate(-50%, -50%) translateZ(-100px) translateX(10px) skewX(-10deg); clip-path: polygon(0 15%, 100% 15%, 100% 50%, 0 50%); }
+            40% { transform: translate(-50%, -50%) translateZ(-80px) translateX(-15px) skewX(5deg); clip-path: polygon(0 40%, 100% 40%, 100% 75%, 0 75%); }
+            60% { transform: translate(-50%, -50%) translateZ(-110px) translateX(25px) skewX(-20deg); clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); }
+            80% { transform: translate(-50%, -50%) translateZ(-90px) translateX(-5px) skewX(15deg); clip-path: polygon(0 30%, 100% 30%, 100% 60%, 0 60%); }
+            100% { transform: translate(-50%, -50%) translateZ(-130px) translateX(15px) skewX(-5deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+
+        @keyframes rough-glitch-2 {
+            0% { transform: translate(-50%, -50%) translateZ(-60px) translateY(-15px) skewY(5deg); clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+            25% { transform: translate(-50%, -50%) translateZ(-40px) translateY(10px) skewY(-5deg); clip-path: polygon(0 50%, 100% 50%, 100% 80%, 0 80%); }
+            50% { transform: translate(-50%, -50%) translateZ(-70px) translateY(-20px) skewY(10deg); clip-path: polygon(0 20%, 100% 20%, 100% 45%, 0 45%); }
+            75% { transform: translate(-50%, -50%) translateZ(-30px) translateY(15px) skewY(-10deg); clip-path: polygon(0 70%, 100% 70%, 100% 100%, 0 100%); }
+            100% { transform: translate(-50%, -50%) translateZ(-50px) translateY(-5px) skewY(0deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+
+        @keyframes rough-glitch-core {
+            0% { transform: translate(-50%, -50%) translateZ(120px) translateX(-5px); }
+            33% { transform: translate(-50%, -50%) translateZ(90px) translateX(5px) skewX(5deg); }
+            66% { transform: translate(-50%, -50%) translateZ(150px) translateY(-5px); }
+            100% { transform: translate(-50%, -50%) translateZ(100px) translateY(5px) skewX(-5deg); }
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: #fff;
+            font-family: sans-serif;
+            letter-spacing: 2px;
+            opacity: 0.5;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <!-- We use JS to apply mouse parallax to the wrapper, just like in your favorite #4 -->
+        <div class="text-wrapper" id="wrapper">
+            <div class="text">KINETIC</div>
+            <div class="text">KINETIC</div>
+            <div class="text">KINETIC</div>
+            <div class="text">KINETIC</div>
+        </div>
+    </div>
+    
+    <div class="hint">Move mouse. Hover to smash.</div>
+
+    <script>
+        const container = document.getElementById('container');
+        const wrapper = document.getElementById('wrapper');
+
+        // Apply the 3D mouse tracking you loved from #4
+        document.addEventListener('mousemove', (e) => {
+            // Stronger multiplier for a more aggressive rotation
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 15; 
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 15;
+            
+            // Apply 3D rotation based on mouse
+            wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Snap back when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            wrapper.style.transition = 'transform 0.3s ease-out';
+            wrapper.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            setTimeout(() => {
+                wrapper.style.transition = 'none';
+            }, 300);
+        });
+        
+        // Remove smooth transition during active movement for a raw, energetic feel
+        document.addEventListener('mouseenter', () => {
+            wrapper.style.transition = 'none';
+        });
+    </script>
+</body>
+</html>

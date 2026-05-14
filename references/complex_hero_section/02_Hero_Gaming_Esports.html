@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Gaming Hero Section</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #050505;
+            --neon-magenta: #FF0055;
+            --neon-cyan: #00F0FF;
+            --neon-lime: #CCFF00;
+            --text-light: #FFFFFF;
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* Glitch Noise Background Overlay */
+        .noise-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.08"/%3E%3C/svg%3E');
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* Diagonal Slash Lines */
+        .slash-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slash {
+            position: absolute;
+            width: 200%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            transform-origin: center;
+            transform: rotate(-15deg);
+        }
+        
+        .slash:nth-child(1) { top: 20%; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
+        .slash:nth-child(2) { top: 60%; background: linear-gradient(90deg, transparent, var(--neon-magenta), transparent); }
+        .slash:nth-child(3) { top: 80%; }
+
+        /* HUD Elements */
+        .hud-element {
+            position: absolute;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            z-index: 5;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        .hud-top-left { top: 2rem; left: 2rem; }
+        .hud-top-right { top: 2rem; right: 2rem; text-align: right; }
+        .hud-bottom-right { bottom: 2rem; right: 2rem; }
+        
+        .crosshair-corner {
+            position: absolute;
+            width: 30px; height: 30px;
+            border: 2px solid var(--neon-lime);
+        }
+        
+        .tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        /* Main Hero Content */
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4rem;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        /* The Glitch Text */
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 12vw, 10rem);
+            font-weight: 900;
+            line-height: 0.85;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--text-light);
+        }
+
+        .hero-title::before, .hero-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            -webkit-text-stroke: 0px;
+            opacity: 0.8;
+        }
+
+        .hero-title::before {
+            color: var(--neon-cyan);
+            z-index: -1;
+            animation: glitch-anim-1 3s infinite linear alternate-reverse;
+        }
+
+        .hero-title::after {
+            color: var(--neon-magenta);
+            z-index: -2;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 2px); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translate(2px, 2px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, -2px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -2px); }
+            100% { clip-path: inset(30% 0 50% 0); transform: translate(-2px, 2px); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, -2px); }
+            20% { clip-path: inset(30% 0 20% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, -2px); }
+            60% { clip-path: inset(20% 0 50% 0); transform: translate(2px, 2px); }
+            80% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, 2px); }
+            100% { clip-path: inset(5% 0 80% 0); transform: translate(2px, -2px); }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--neon-lime);
+            margin-bottom: 4rem;
+            background: #000;
+            padding: 5px 15px;
+            border: 1px solid var(--neon-lime);
+            box-shadow: 0 0 10px rgba(204, 255, 0, 0.3);
+            transform: skewX(-15deg);
+        }
+
+        .hero-subtitle span {
+            display: inline-block;
+            transform: skewX(15deg); /* Un-skew text */
+        }
+
+        /* Aggressive Skewed Button */
+        .btn-play {
+            position: relative;
+            background: var(--neon-magenta);
+            color: var(--text-light);
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 1.5rem 4rem;
+            border: none;
+            cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            transition: all 0.3s;
+        }
+
+        .btn-play::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--neon-cyan);
+            z-index: -1;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .btn-play:hover {
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        .btn-play:hover::before {
+            transform: translateX(0);
+        }
+
+        /* Center character mockup image (Floating) */
+        .character-mockup {
+            position: absolute;
+            bottom: -10%;
+            right: 5%;
+            width: 45vw;
+            max-width: 600px;
+            height: auto;
+            z-index: 5;
+            filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.4));
+            pointer-events: none;
+        }
+
+        /* Marquee Bar */
+        .marquee-container {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            background: var(--neon-lime);
+            color: #000;
+            padding: 10px 0;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            z-index: 20;
+            transform: skewY(-2deg);
+            transform-origin: left bottom;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marqueeScroll 15s linear infinite;
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .marquee-content span {
+            padding: 0 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero-container { padding: 0 2rem; }
+            .character-mockup { width: 80vw; right: 10%; bottom: -20%; opacity: 0.5; z-index: -1;}
+            .hud-element { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise-bg"></div>
+
+    <!-- HUD Elements -->
+    <div class="crosshair-corner tl"></div>
+    <div class="crosshair-corner tr"></div>
+    <div class="crosshair-corner bl"></div>
+    <div class="crosshair-corner br"></div>
+
+    <div class="hud-element hud-top-left">SYS.INIT // 204.88.9<br>SECURE CONNECTION...</div>
+    <div class="hud-element hud-top-right">SERVER: ONLINE<br>LATENCY: 12MS</div>
+    <div class="hud-element hud-bottom-right">X: 144.5 Y: -99.2 Z: 0.0<br>TARGET ACQUIRED</div>
+
+    <!-- Slashes Background -->
+    <div class="slash-container">
+        <div class="slash gs-slash"></div>
+        <div class="slash gs-slash"></div>
+        <div class="slash gs-slash"></div>
+    </div>
+
+    <!-- The Character (Placeholder SVG since we can't use external images easily) -->
+    <svg class="character-mockup gs-char" viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M150 600L200 200L280 150L350 250L300 600H150Z" fill="url(#paint0_linear)"/>
+        <path d="M220 180C250 180 270 150 270 120C270 90 250 70 220 70C190 70 170 90 170 120C170 150 190 180 220 180Z" fill="#00F0FF"/>
+        <defs>
+            <linearGradient id="paint0_linear" x1="250" y1="150" x2="250" y2="600" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1A1A1A"/>
+                <stop offset="1" stop-color="#050505"/>
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <main class="hero-container">
+        
+        <div class="hero-content">
+            <div class="hero-subtitle gs-impact">
+                <span>Phase 03 Closed Beta</span>
+            </div>
+            
+            <!-- data-text is critical for the CSS glitch effect -->
+            <h1 class="hero-title gs-smash" data-text="NEURO">NEURO</h1>
+            <h1 class="hero-title gs-smash" data-text="LINK" style="color: #fff; -webkit-text-stroke: 0;">LINK</h1>
+            
+            <button class="btn-play gs-pop">Deploy Now</button>
+        </div>
+
+    </main>
+
+    <div class="marquee-container gs-marquee">
+        <div class="marquee-content">
+            <span>WARNING: HIGH VOLTAGE AREA</span> • <span>SERVER 09 ONLINE</span> • <span>RANKED SEASON BEGINS IN 48 HOURS</span> • <span>WARNING: HIGH VOLTAGE AREA</span> • <span>SERVER 09 ONLINE</span> • <span>RANKED SEASON BEGINS IN 48 HOURS</span>
+        </div>
+    </div>
+
+    <script>
+        // High-octane, aggressive entrance animations
+        const tl = gsap.timeline({ delay: 0.1 });
+
+        // HUD elements snap in
+        tl.from(".crosshair-corner", {
+            scale: 0, opacity: 0, duration: 0.4, stagger: 0.1, ease: "power4.out"
+        })
+        .from(".hud-element", {
+            opacity: 0, filter: "blur(10px)", duration: 0.5, stagger: 0.1
+        }, "-=0.2")
+        
+        // Slashes cut across the screen
+        .from(".gs-slash", {
+            scaleX: 0, transformOrigin: "left center", duration: 0.8, stagger: 0.1, ease: "expo.inOut"
+        }, "-=0.5")
+
+        // The subtitle drops in hard
+        .from(".gs-impact", {
+            y: -100, opacity: 0, rotation: 10, duration: 0.6, ease: "bounce.out"
+        }, "-=0.4")
+
+        // The massive title smashes into place
+        .from(".gs-smash", {
+            scale: 3, opacity: 0, filter: "blur(20px)", duration: 0.8, stagger: 0.15, ease: "expo.out"
+        }, "-=0.2")
+
+        // The button pops
+        .from(".gs-pop", {
+            scale: 0.5, opacity: 0, duration: 0.5, ease: "back.out(2)"
+        }, "-=0.4")
+
+        // The Marquee and character slide in
+        .from(".gs-char", {
+            x: 200, opacity: 0, duration: 1.2, ease: "power3.out"
+        }, "-=0.8")
+        .from(".gs-marquee", {
+            y: 100, duration: 0.8, ease: "power2.out"
+        }, "-=1");
+
+        // Subtle character breathing animation
+        gsap.to(".gs-char", {
+            y: -20, duration: 2, yoyo: true, repeat: -1, ease: "sine.inOut"
+        });
+
+        // Add extreme mouse parallax to background slashes and character
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+            
+            gsap.to(".gs-slash:nth-child(1)", { x: x * 2, y: y * 2, duration: 1, ease: "power2.out" });
+            gsap.to(".gs-slash:nth-child(2)", { x: -x * 1.5, y: -y * 1.5, duration: 1, ease: "power2.out" });
+            gsap.to(".gs-char", { x: -x * 3, y: -y * 3, duration: 1, ease: "power2.out" });
+        });
+    </script>
+</body>
+</html>

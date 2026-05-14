@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-End Gacha Game Hero</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0A0A1A;
+            --gold-primary: #D4AF37;
+            --gold-light: #FBF5B7;
+            --gold-dark: #8A6D1C;
+            --magic-blue: #4D7BFF;
+            --magic-purple: #B533FF;
+            --ui-glass: rgba(10, 10, 26, 0.6);
+            --font-title: 'Cinzel', serif;
+            --font-ui: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #FFF;
+            font-family: var(--font-ui);
+            height: 100vh;
+            overflow: hidden;
+            cursor: none; /* Custom magic cursor */
+        }
+
+        /* --- Background Effects --- */
+        .bg-layer {
+            position: absolute; inset: 0;
+            background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80') center/cover;
+            opacity: 0.3;
+            z-index: 0;
+            filter: blur(4px);
+            transform: scale(1.1); /* For parallax */
+        }
+
+        /* Magic Circle SVG */
+        .magic-circle {
+            position: absolute;
+            top: 50%; left: 70%;
+            transform: translate(-50%, -50%);
+            width: 800px; height: 800px;
+            z-index: 1;
+            opacity: 0.4;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: spin 40s linear infinite;
+        }
+        
+        .magic-circle-inner {
+            position: absolute;
+            top: 50%; left: 70%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            z-index: 1;
+            opacity: 0.6;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: spin-reverse 20s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: translate(-50%, -50%) rotate(-360deg); } }
+
+        /* HTML5 Canvas for Stardust */
+        #particleCanvas {
+            position: absolute; inset: 0;
+            z-index: 2; pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* Main Character Splash */
+        .character-splash {
+            position: absolute;
+            top: 10%; right: 5%;
+            height: 110vh;
+            width: auto;
+            z-index: 5;
+            pointer-events: none;
+            filter: drop-shadow(0 0 50px rgba(77, 123, 255, 0.4));
+            transform-origin: bottom center;
+        }
+
+        /* --- UI Elements --- */
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            width: 100%; height: 100%;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        header {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 2rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 20;
+        }
+
+        .game-logo {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.3));
+        }
+
+        /* Navigation Diamond Nodes */
+        .nav-nodes { display: flex; gap: 2rem; }
+        .node {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            cursor: none;
+        }
+        .diamond {
+            width: 12px; height: 12px;
+            background: var(--ui-glass);
+            border: 1px solid var(--gold-primary);
+            transform: rotate(45deg);
+            transition: all 0.3s;
+        }
+        .node:hover .diamond {
+            background: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-primary);
+        }
+        .node-text { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #AAA; transition: color 0.3s;}
+        .node:hover .node-text { color: var(--gold-light); }
+
+        /* Left Content Typography */
+        .content-box {
+            max-width: 600px;
+            position: relative;
+        }
+
+        .update-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2), transparent);
+            border-left: 2px solid var(--gold-primary);
+            padding: 8px 16px;
+            font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 2rem;
+            color: var(--gold-light);
+        }
+
+        .title {
+            font-family: var(--font-title);
+            font-size: clamp(4rem, 6vw, 6rem);
+            line-height: 1;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .title span { display: block; }
+        .title .accent {
+            background: linear-gradient(to right, #FFF, var(--magic-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .desc {
+            font-size: 1rem; line-height: 1.8; color: #CCC;
+            margin-bottom: 3rem; text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+
+        /* High-End Gacha Button */
+        .gacha-btn {
+            position: relative;
+            background: var(--ui-glass);
+            border: 1px solid var(--gold-dark);
+            padding: 1.2rem 3rem;
+            color: var(--gold-light);
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: none;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .gacha-btn::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .gacha-btn:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            text-shadow: 0 0 10px var(--gold-light);
+        }
+
+        .gacha-btn:hover::before { transform: translateX(100%); }
+
+        .btn-diamond {
+            width: 10px; height: 10px; background: var(--gold-primary); transform: rotate(45deg);
+        }
+
+        /* Custom Magic Cursor */
+        .cursor-orb {
+            position: fixed; top: 0; left: 0;
+            width: 20px; height: 20px;
+            background: radial-gradient(circle, #FFF, var(--magic-blue));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            filter: blur(2px);
+            box-shadow: 0 0 20px var(--magic-blue), 0 0 40px var(--magic-purple);
+        }
+        
+        .cursor-trail {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
+            pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+        }
+
+        /* Screen Flash for Entrance */
+        .flash-bang {
+            position: fixed; inset: 0; background: #FFF; z-index: 99999; pointer-events: none;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-container { padding: 2rem; justify-content: flex-end; padding-bottom: 5rem;}
+            header { padding: 1.5rem 2rem; }
+            .nav-nodes { display: none; }
+            .character-splash { right: -20%; top: 5%; height: 80vh; opacity: 0.6; z-index: 0; }
+            .content-box { z-index: 10; }
+            body { cursor: auto; }
+            .cursor-orb, .cursor-trail { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Entrance Flash -->
+    <div class="flash-bang" id="flash"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-orb"></div>
+    <div class="cursor-trail"></div>
+
+    <!-- Background Layers -->
+    <div class="bg-layer gs-bg"></div>
+    
+    <!-- Complex SVG Magic Circles -->
+    <svg class="magic-circle gs-spin" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="none" stroke="var(--gold-primary)" stroke-width="0.5" opacity="0.5"/>
+        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--magic-blue)" stroke-width="1" stroke-dasharray="4 4"/>
+        <polygon points="100,5 190,150 10,150" fill="none" stroke="var(--gold-primary)" stroke-width="0.5"/>
+        <polygon points="100,195 10,50 190,50" fill="none" stroke="var(--gold-primary)" stroke-width="0.5"/>
+        <circle cx="100" cy="100" r="45" fill="none" stroke="var(--gold-light)" stroke-width="0.5"/>
+    </svg>
+    
+    <svg class="magic-circle-inner gs-spin-rev" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--magic-purple)" stroke-width="2" stroke-dasharray="10 20"/>
+        <polygon points="100,10 178,145 22,145" fill="none" stroke="var(--gold-primary)" stroke-width="1"/>
+    </svg>
+
+    <!-- Stardust Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Character Image (Using a placeholder fantasy character) -->
+    <img src="https://images.unsplash.com/photo-1620061595168-ebf8d951e7fb?auto=format&fit=crop&q=80" alt="Character" class="character-splash gs-char" style="mix-blend-mode: lighten; filter: drop-shadow(0 0 20px #4D7BFF) contrast(1.2);">
+
+    <header class="gs-ui">
+        <div class="game-logo">ASTRAL<br>ECHOES</div>
+        <div class="nav-nodes">
+            <div class="node hover-target">
+                <div class="diamond"></div>
+                <span class="node-text">Home</span>
+            </div>
+            <div class="node hover-target">
+                <div class="diamond"></div>
+                <span class="node-text">Characters</span>
+            </div>
+            <div class="node hover-target">
+                <div class="diamond"></div>
+                <span class="node-text">Top-Up</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="hero-container">
+        
+        <div class="content-box">
+            <div class="update-badge gs-up">
+                <div class="btn-diamond"></div>
+                Version 3.2 Update
+            </div>
+
+            <h1 class="title">
+                <span class="gs-up">Requiem of</span>
+                <span class="gs-up accent">The Heavens</span>
+            </h1>
+
+            <p class="desc gs-up">
+                The celestial gates have opened. Summon the 5-Star Archon 'Lyra' and forge your destiny in the shattered realms. Pre-register now to claim 10 Intertwined Fates.
+            </p>
+
+            <div class="gs-up">
+                <button class="gacha-btn hover-target">
+                    <div class="btn-diamond"></div>
+                    Initiate Wish
+                    <div class="btn-diamond"></div>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- Custom Cursor ---
+        const orb = document.querySelector('.cursor-orb');
+        const trail = document.querySelector('.cursor-trail');
+        const hovers = document.querySelectorAll('.hover-target');
+
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(orb, { x: e.clientX, y: e.clientY, duration: 0 });
+            gsap.to(trail, { x: e.clientX, y: e.clientY, duration: 0.2, ease: "power2.out" });
+        });
+
+        hovers.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(trail, { width: 60, height: 60, borderColor: 'var(--gold-primary)', duration: 0.3 });
+                gsap.to(orb, { scale: 1.5, backgroundColor: 'var(--gold-light)', duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(trail, { width: 40, height: 40, borderColor: 'rgba(255,255,255,0.3)', duration: 0.3 });
+                gsap.to(orb, { scale: 1, backgroundColor: '#FFF', duration: 0.3 });
+            });
+        });
+
+        // --- HTML5 Canvas Stardust Particles ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 0.5,
+                    speedY: Math.random() * -1 - 0.5,
+                    speedX: (Math.random() - 0.5) * 1,
+                    alpha: Math.random(),
+                    color: Math.random() > 0.5 ? '#FBF5B7' : '#4D7BFF'
+                });
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.alpha -= 0.005;
+                if(p.y < 0 || p.alpha <= 0) {
+                    p.y = height;
+                    p.x = Math.random() * width;
+                    p.alpha = Math.random();
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.fill();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        animateCanvas();
+
+        // --- GSAP Entrance & Flash Bang ---
+        const tl = gsap.timeline();
+
+        // 1. Flash Bang fades out
+        tl.to("#flash", {
+            opacity: 0,
+            duration: 1.5,
+            ease: "power2.inOut"
+        })
+        // 2. Magic Circles burst in
+        .from(".gs-spin, .gs-spin-rev", {
+            scale: 0,
+            opacity: 0,
+            rotation: 180,
+            duration: 2,
+            ease: "back.out(1.2)"
+        }, "-=1")
+        // 3. Character sweeps in from right
+        .from(".gs-char", {
+            x: 200,
+            opacity: 0,
+            filter: "blur(20px)",
+            duration: 1.5,
+            ease: "power3.out"
+        }, "-=1.5")
+        // 4. UI drops in
+        .from(".gs-ui", {
+            y: -50,
+            opacity: 0,
+            duration: 1,
+            ease: "power2.out"
+        }, "-=1")
+        // 5. Typography staggers up
+        .from(".gs-up", {
+            y: 40,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out"
+        }, "-=1");
+
+        // --- Deep 2.5D Mouse Parallax ---
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            // Background shifts slightly
+            gsap.to(".gs-bg", { x: -x * 20, y: -y * 20, duration: 1, ease: "power2.out" });
+            
+            // Magic circles shift a bit more
+            gsap.to(".gs-spin", { x: -x * 40, y: -y * 40, duration: 1.2, ease: "power2.out" });
+            gsap.to(".gs-spin-rev", { x: -x * 60, y: -y * 60, duration: 1.2, ease: "power2.out" });
+
+            // Character shifts aggressively in opposite direction to create 3D pop
+            gsap.to(".gs-char", { x: x * 50, y: y * 50, rotationY: x * 5, duration: 0.8, ease: "power2.out" });
+        });
+
+    </script>
+</body>
+</html>

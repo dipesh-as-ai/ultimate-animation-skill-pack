@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Distortion Hover (SVG Filter)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: #111; overflow: hidden;
+        }
+
+        .img-container {
+            width: 600px; height: 400px;
+            position: relative; overflow: hidden; cursor: pointer;
+            border-radius: 10px;
+        }
+
+        /* Base and Hover images */
+        .img-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+        }
+
+        .img-1 { background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80'); z-index: 1; }
+        .img-2 { background-image: url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80'); z-index: 2; opacity: 0; }
+
+        /* The SVG filter application */
+        .distort {
+            /* We apply the filter defined in the hidden SVG below */
+            filter: url(#liquid-filter);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hidden SVG to define the Displacement Map Filter -->
+    <svg style="display: none;">
+        <defs>
+            <filter id="liquid-filter">
+                <!-- 
+                    feTurbulence generates a noise pattern. 
+                    baseFrequency determines the "size" of the ripples.
+                -->
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" result="noise" />
+                
+                <!-- 
+                    feDisplacementMap uses the noise to distort the SourceGraphic (the image).
+                    scale determines the intensity of the distortion. We will animate this with GSAP.
+                -->
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" id="displacement" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="img-container">
+        <!-- We apply the distort class to wrap the images -->
+        <div class="distort" style="width:100%; height:100%;">
+            <div class="img-layer img-1"></div>
+            <div class="img-layer img-2" id="imgHover"></div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.img-container');
+        const imgHover = document.getElementById('imgHover');
+        const displacementNode = document.getElementById('displacement');
+        
+        // We use a dummy object to animate the scale property of the SVG filter
+        // because GSAP can't animate SVG attributes directly out-of-the-box without the AttrPlugin
+        const filterState = { scale: 0 };
+
+        container.addEventListener('mouseenter', () => {
+            // Animate opacity of the second image
+            gsap.to(imgHover, { opacity: 1, duration: 0.8, ease: "power2.out" });
+            
+            // Animate the SVG Displacement Map scale up then down (creates the liquid ripple transition)
+            gsap.to(filterState, {
+                scale: 60, // Peak distortion intensity
+                duration: 0.4,
+                ease: "power2.in",
+                onUpdate: () => { displacementNode.setAttribute('scale', filterState.scale); },
+                onComplete: () => {
+                    // Settle back to 0
+                    gsap.to(filterState, {
+                        scale: 0,
+                        duration: 0.4,
+                        ease: "power2.out",
+                        onUpdate: () => { displacementNode.setAttribute('scale', filterState.scale); }
+                    });
+                }
+            });
+        });
+
+        container.addEventListener('mouseleave', () => {
+            // Fade out second image
+            gsap.to(imgHover, { opacity: 0, duration: 0.8, ease: "power2.out" });
+            
+            // Ripple effect again on mouse leave
+            gsap.to(filterState, {
+                scale: 60,
+                duration: 0.4,
+                ease: "power2.in",
+                onUpdate: () => { displacementNode.setAttribute('scale', filterState.scale); },
+                onComplete: () => {
+                    gsap.to(filterState, {
+                        scale: 0,
+                        duration: 0.4,
+                        ease: "power2.out",
+                        onUpdate: () => { displacementNode.setAttribute('scale', filterState.scale); }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

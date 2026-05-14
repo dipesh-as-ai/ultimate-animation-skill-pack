@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Architecture Contact</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500&display=swap');
+        
+        :root {
+            --bg-color: #E8E8E8; /* Concrete light */
+            --grid-color: rgba(0,0,0,0.06);
+            --text-dark: #111111;
+            --accent: #B24C38; /* Rust/Terracotta */
+            --font-display: 'Syncopate', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 100px 100px;
+            background-position: center center;
+        }
+
+        .container {
+            width: 100%; max-width: 1400px;
+            height: 80vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #fff;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Left Side: Editorial Typography */
+        .brand-col {
+            padding: 5rem;
+            border-right: 1px solid var(--grid-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-col h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .brand-col h1 span {
+            display: inline-block;
+        }
+        
+        .brand-col h1 .dot {
+            color: var(--accent);
+        }
+
+        .project-details {
+            margin-top: auto;
+        }
+
+        .project-details p {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-details h4 {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        /* Right Side: Structural Form */
+        .form-col {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .form-row {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--grid-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Structural highlight on hover */
+        .form-row::before {
+            content: ''; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: #F9F9F9;
+            z-index: 0;
+            transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .form-row:hover::before,
+        .form-row:focus-within::before {
+            left: 0;
+        }
+
+        .input-label {
+            width: 150px;
+            padding: 0 3rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+            position: relative;
+            z-index: 2;
+        }
+
+        .arch-input {
+            flex: 1;
+            height: 100%;
+            background: transparent;
+            border: none;
+            padding: 0 3rem 0 0;
+            font-family: var(--font-body);
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            outline: none;
+            position: relative;
+            z-index: 2;
+            transition: color 0.3s;
+        }
+
+        .arch-input::placeholder {
+            color: #CCC;
+            font-weight: 300;
+        }
+        
+        .arch-input:focus {
+            color: var(--accent);
+        }
+
+        /* Massive Submit Block */
+        .btn-submit {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            background: var(--text-dark);
+            color: #fff;
+            border: none;
+            font-family: var(--font-display);
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+            transition: color 0.3s;
+        }
+
+        .btn-submit::after {
+            content: ''; position: absolute;
+            bottom: -100%; left: 0; width: 100%; height: 100%;
+            background: var(--accent);
+            z-index: -1;
+            transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-submit:hover::after {
+            bottom: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .container { grid-template-columns: 1fr; height: auto; max-height: none; }
+            .brand-col { padding: 4rem 2rem; border-right: none; border-bottom: 1px solid var(--grid-color); }
+            .form-row { flex-direction: column; align-items: flex-start; padding: 2rem 0; }
+            .input-label { padding: 0 2rem; margin-bottom: 1rem; }
+            .arch-input { padding: 0 2rem; width: 100%; }
+            .btn-submit { padding: 3rem; }
+            body { background-size: 50px 50px; overflow-y: auto;}
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container gs-container">
+        
+        <div class="brand-col">
+            <h1 class="gs-text">
+                <span style="display:block;">Design</span>
+                <span style="display:block;">Inquiry<span class="dot">.</span></span>
+            </h1>
+            
+            <div class="project-details gs-fade">
+                <p>Current Availability</p>
+                <h4>Q3 2026 - Q1 2027</h4>
+            </div>
+        </div>
+
+        <form class="form-col" action="#" onsubmit="event.preventDefault();">
+            
+            <div class="form-row gs-row">
+                <label class="input-label">Client</label>
+                <input type="text" class="arch-input" placeholder="Full Name or Company" required>
+            </div>
+
+            <div class="form-row gs-row">
+                <label class="input-label">Location</label>
+                <input type="text" class="arch-input" placeholder="City, Country" required>
+            </div>
+
+            <div class="form-row gs-row">
+                <label class="input-label">Contact</label>
+                <input type="email" class="arch-input" placeholder="Email Address" required>
+            </div>
+
+            <div class="form-row gs-row" style="flex: 1.5;">
+                <label class="input-label">Brief</label>
+                <input type="text" class="arch-input" placeholder="Project Scale & Scope..." required>
+            </div>
+
+            <button type="submit" class="btn-submit gs-row">
+                Submit Project
+            </button>
+
+        </form>
+
+    </main>
+
+    <script>
+        // High-end Architectural Animations (Slow, precise, masking)
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        // The container expands like a blueprint
+        tl.from(".gs-container", {
+            clipPath: "inset(50% 50% 50% 50%)",
+            duration: 1.5,
+            ease: "power3.inOut"
+        })
+        // Text slides up from its own mask
+        .from(".gs-text span", {
+            y: "100%",
+            duration: 1,
+            stagger: 0.1,
+            ease: "power3.out"
+        }, "-=0.5")
+        // Form rows slide in horizontally
+        .from(".gs-row", {
+            x: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out"
+        }, "-=0.8")
+        .from(".gs-fade", {
+            opacity: 0,
+            duration: 1
+        }, "-=0.5");
+    </script>
+</body>
+</html>

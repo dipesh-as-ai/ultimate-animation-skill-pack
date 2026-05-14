@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Loot Core</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05050A;
+            --armor: #1A1A24;
+            --armor-light: #2A2A3A;
+            --energy-color: #FF5500; /* Glowing orange/red */
+            --cube-size: 200px;
+            --z-depth: 100px; /* Half of cube size */
+        }
+
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #111 0%, var(--bg) 100%);
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+        }
+
+        /* --- 3D Scene Setup --- */
+        .scene {
+            width: 400px; height: 400px;
+            perspective: 2000px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* The master container for the cube */
+        .loot-crate {
+            width: var(--cube-size); height: var(--cube-size);
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        /* --- Cube Faces (The Armor Shell) --- */
+        .face {
+            position: absolute; top: 0; left: 0;
+            width: var(--cube-size); height: var(--cube-size);
+            background: var(--armor);
+            border: 4px solid var(--armor-light);
+            /* Sci-Fi texture */
+            background-image: 
+                linear-gradient(45deg, transparent 40%, var(--armor-light) 40%, var(--armor-light) 60%, transparent 60%);
+            background-size: 20px 20px;
+            /* Glowing seams */
+            box-shadow: inset 0 0 30px rgba(255, 85, 0, 0.2), 0 0 10px rgba(255, 85, 0, 0.5);
+            display: flex; align-items: center; justify-content: center;
+            /* Prevent user selecting */
+            user-select: none;
+            /* The transform is set by JS so we can animate the explosion */
+        }
+
+        /* A glowing ring on each face */
+        .face::after {
+            content: ''; position: absolute; width: 100px; height: 100px;
+            border: 4px dashed var(--energy-color); border-radius: 50%;
+            box-shadow: 0 0 15px var(--energy-color), inset 0 0 15px var(--energy-color);
+            animation: spin 10s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- The Legendary Core (Inside the Box) --- */
+        .core-prize {
+            position: absolute; top: 50%; left: 50%;
+            width: 100px; height: 100px; margin: -50px 0 0 -50px;
+            background: #FFF;
+            border-radius: 50%;
+            /* Intense glow */
+            box-shadow: 
+                0 0 50px #FFF,
+                0 0 100px var(--energy-color),
+                0 0 200px var(--energy-color);
+            transform-style: preserve-3d;
+            opacity: 0; /* Hidden until box opens */
+            pointer-events: none;
+        }
+
+        /* Spinning energy rings around the core */
+        .core-ring {
+            position: absolute; top: -50px; left: -50px;
+            width: 200px; height: 200px;
+            border: 2px solid #FFF; border-radius: 50%;
+            box-shadow: 0 0 20px var(--energy-color);
+        }
+        .cr1 { transform: rotateX(70deg) rotateY(0deg); animation: ringSpin1 4s linear infinite; }
+        .cr2 { transform: rotateX(70deg) rotateY(60deg); animation: ringSpin2 4s linear infinite; }
+        .cr3 { transform: rotateX(70deg) rotateY(120deg); animation: ringSpin3 4s linear infinite; }
+
+        @keyframes ringSpin1 { 100% { transform: rotateX(70deg) rotateY(360deg); } }
+        @keyframes ringSpin2 { 100% { transform: rotateX(70deg) rotateY(420deg); } }
+        @keyframes ringSpin3 { 100% { transform: rotateX(70deg) rotateY(480deg); } }
+
+        /* --- UI Instructions --- */
+        .instruction {
+            position: absolute; bottom: 50px; left: 0; width: 100%; text-align: center;
+            color: #FFF; font-size: 1.5rem; letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--energy-color);
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scene" id="scene">
+        <div class="loot-crate" id="crate">
+            <!-- The 6 Armor Plates -->
+            <div class="face front" id="f-front"></div>
+            <div class="face back" id="f-back"></div>
+            <div class="face right" id="f-right"></div>
+            <div class="face left" id="f-left"></div>
+            <div class="face top" id="f-top"></div>
+            <div class="face bottom" id="f-bottom"></div>
+
+            <!-- The Glowing Prize inside -->
+            <div class="core-prize" id="core">
+                <div class="core-ring cr1"></div>
+                <div class="core-ring cr2"></div>
+                <div class="core-ring cr3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="instruction" id="instruction">CLICK TO UNSEAL</div>
+
+    <script>
+        // Set the initial positions of the 6 faces to form the 200x200 box
+        // translateZ is 100px (half the size)
+        gsap.set("#f-front",  { rotationY: 0,   z: 100 });
+        gsap.set("#f-back",   { rotationY: 180, z: 100 });
+        gsap.set("#f-right",  { rotationY: 90,  z: 100 });
+        gsap.set("#f-left",   { rotationY: -90, z: 100 });
+        gsap.set("#f-top",    { rotationX: 90,  z: 100 });
+        gsap.set("#f-bottom", { rotationX: -90, z: 100 });
+
+        const crate = document.getElementById('crate');
+        const core = document.getElementById('core');
+        const instruction = document.getElementById('instruction');
+
+        // Initial continuous tumble animation
+        let tumble = gsap.to(crate, {
+            rotationX: 360,
+            rotationY: 720,
+            duration: 20,
+            ease: "none",
+            repeat: -1
+        });
+
+        let isOpen = false;
+
+        crate.addEventListener('mouseenter', () => {
+            if(isOpen) return;
+            // Speed up tumble on hover to build anticipation
+            gsap.to(tumble, { timeScale: 3, duration: 1 });
+            // Pulse the glowing seams
+            gsap.to('.face', { boxShadow: "inset 0 0 50px rgba(255, 85, 0, 0.5), 0 0 30px rgba(255, 85, 0, 0.8)", duration: 0.5 });
+        });
+
+        crate.addEventListener('mouseleave', () => {
+            if(isOpen) return;
+            // Slow back down
+            gsap.to(tumble, { timeScale: 1, duration: 1 });
+            gsap.to('.face', { boxShadow: "inset 0 0 30px rgba(255, 85, 0, 0.2), 0 0 10px rgba(255, 85, 0, 0.5)", duration: 0.5 });
+        });
+
+        // The "Unseal" Interaction
+        crate.addEventListener('click', () => {
+            if(isOpen) return; // Only open once
+            isOpen = true;
+
+            // Kill tumbling completely to prevent conflicts
+            tumble.kill();
+            gsap.to(crate, {
+                rotationX: 30,
+                rotationY: -45,
+                duration: 1,
+                ease: "power2.out",
+                overwrite: "auto",
+                onComplete: () => {
+                    // Only attach mousemove AFTER the lock animation finishes to prevent glitchy fights
+                    const scene = document.getElementById('scene');
+                    scene.addEventListener('mousemove', (e) => {
+                        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+                        gsap.to(crate, {
+                            rotationX: 30 + (-y * 15),
+                            rotationY: -45 + (x * 15),
+                            duration: 0.5,
+                            ease: "power2.out",
+                            overwrite: "auto"
+                        });
+                    });
+                }
+            });
+
+            instruction.innerText = "LEGENDARY CORE ACQUIRED";
+            gsap.to(instruction, { color: "#FFF", textShadow: "0 0 20px #FFF", duration: 0.5 });
+
+            // EXPLODE THE SHELL
+            // By increasing the translateZ value of every face, the box mechanically expands outwards.
+            // We push them out to 300px instead of 100px.
+            const explodeEase = "elastic.out(1, 0.5)";
+            const explodeDur = 1.5;
+
+            gsap.to("#f-front",  { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+            gsap.to("#f-back",   { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+            gsap.to("#f-right",  { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+            gsap.to("#f-left",   { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+            gsap.to("#f-top",    { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+            gsap.to("#f-bottom", { z: 300, opacity: 0.5, duration: explodeDur, ease: explodeEase });
+
+            // REVEAL THE CORE
+            gsap.to(core, {
+                opacity: 1,
+                scale: 1.5,
+                duration: 2,
+                ease: "elastic.out(1, 0.3)",
+                delay: 0.2
+            });
+
+            // Mousemove logic is now handled in the onComplete callback above
+        });
+
+    </script>
+</body>
+</html>

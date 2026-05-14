@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Glass Shatter Text</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            /* We make the body very tall so the user has space to scroll and scrub the timeline */
+            height: 400vh; 
+            font-family: 'Cinzel', serif; /* A sharp, elegant, glass-like font */
+            overflow-x: hidden;
+        }
+
+        /* Fixed container so the animation stays on screen while scrolling */
+        .fixed-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none; /* Let scroll pass through */
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Scroll instructions */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+        
+        .scroll-indicator span {
+            display: block;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+            40% { transform: translate(-50%, -10px); }
+            60% { transform: translate(-50%, -5px); }
+        }
+        
+        /* A beautiful light beam that shines on the text */
+        .light-beam {
+            position: fixed;
+            top: -50%;
+            left: 50%;
+            width: 800px;
+            height: 200vh;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(200, 240, 255, 0.05) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-50%) rotate(15deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="light-beam" id="lightBeam"></div>
+
+    <div class="fixed-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+        Scroll Down
+        <span>↓</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimize for no transparency on base canvas
+        
+        let width, height;
+        let shards = [];
+        
+        const TEXT = "FRAGILE";
+        const FONT_SIZE = 180;
+        
+        // Offscreen canvas to hold the pristine text
+        const textCanvas = document.createElement('canvas');
+        const textCtx = textCanvas.getContext('2d');
+
+        function init() {
+            width = canvas.width = textCanvas.width = window.innerWidth;
+            height = canvas.height = textCanvas.height = window.innerHeight;
+            
+            // Draw the pristine text
+            textCtx.clearRect(0, 0, width, height);
+            
+            // Add a glass-like glow/shadow to the text
+            textCtx.shadowColor = 'rgba(0, 200, 255, 0.6)';
+            textCtx.shadowBlur = 20;
+            textCtx.fillStyle = '#ffffff';
+            textCtx.font = `900 ${FONT_SIZE}px "Cinzel", serif`;
+            textCtx.textAlign = 'center';
+            textCtx.textBaseline = 'middle';
+            textCtx.fillText(TEXT, width / 2, height / 2);
+            
+            // Add an inner core for the glass
+            textCtx.shadowBlur = 0;
+            textCtx.fillStyle = '#e0f7fa';
+            textCtx.fillText(TEXT, width / 2, height / 2);
+
+            generateShards();
+        }
+
+        function generateShards() {
+            shards = [];
+            const cx = width / 2;
+            const cy = height / 2;
+            const R = Math.max(width, height) * 1.5; // Radius extending way past screen
+
+            // 1. Create random angles around the center
+            let angles = [];
+            let currentAngle = 0;
+            while(currentAngle < Math.PI * 2) {
+                angles.push(currentAngle);
+                // Random slice width
+                currentAngle += Math.random() * 0.4 + 0.1; 
+            }
+            angles.push(Math.PI * 2); // Close the circle
+
+            // 2. Break each slice into chunks to make glass shards
+            for(let i = 0; i < angles.length - 1; i++) {
+                let a1 = angles[i];
+                let a2 = angles[i+1];
+                
+                let numChunks = Math.floor(Math.random() * 4) + 2; // 2 to 5 chunks per slice
+                let rStep = R / numChunks;
+                
+                let prevR1 = 0;
+                let prevR2 = 0;
+                
+                for(let j = 0; j < numChunks; j++) {
+                    // Randomize the radius slightly so the cuts are jagged
+                    let r1 = prevR1 + rStep + (Math.random() - 0.5) * 100;
+                    let r2 = prevR2 + rStep + (Math.random() - 0.5) * 100;
+                    if(j === numChunks - 1) { r1 = R; r2 = R; } // Last chunk goes to edge
+                    
+                    let p1 = {x: cx + Math.cos(a1)*prevR1, y: cy + Math.sin(a1)*prevR1};
+                    let p2 = {x: cx + Math.cos(a2)*prevR2, y: cy + Math.sin(a2)*prevR2};
+                    let p3 = {x: cx + Math.cos(a2)*r2, y: cy + Math.sin(a2)*r2};
+                    let p4 = {x: cx + Math.cos(a1)*r1, y: cy + Math.sin(a1)*r1};
+                    
+                    // Calculate centroid of the quad to use as the origin for physics
+                    let centroidX = (p1.x + p2.x + p3.x + p4.x) / 4;
+                    let centroidY = (p1.y + p2.y + p3.y + p4.y) / 4;
+                    
+                    // Determine how fast this shard flies out based on its distance from center
+                    let distFromCenter = Math.sqrt(Math.pow(centroidX - cx, 2) + Math.pow(centroidY - cy, 2));
+                    let explosionForce = (1 - (distFromCenter / R)) * 2; // Pieces closer to center fly faster
+                    
+                    shards.push({
+                        points: [p1, p2, p3],
+                        centroid: { x: (p1.x + p2.x + p3.x)/3, y: (p1.y + p2.y + p3.y)/3 },
+                        rotationSpeed: (Math.random() - 0.5) * 4, // radians per scroll unit
+                        forceX: Math.cos((a1+a2)/2) * explosionForce * 1000,
+                        forceY: Math.sin((a1+a2)/2) * explosionForce * 1000,
+                        zForce: Math.random() * 2 // Parallax zoom effect
+                    });
+                    
+                    shards.push({
+                        points: [p1, p3, p4],
+                        centroid: { x: (p1.x + p3.x + p4.x)/3, y: (p1.y + p3.y + p4.y)/3 },
+                        rotationSpeed: (Math.random() - 0.5) * 4,
+                        forceX: Math.cos((a1+a2)/2) * explosionForce * 1000,
+                        forceY: Math.sin((a1+a2)/2) * explosionForce * 1000,
+                        zForce: Math.random() * 2
+                    });
+                    
+                    prevR1 = r1;
+                    prevR2 = r2;
+                }
+            }
+        }
+
+        // We use requestAnimationFrame and smooth out the scroll progress
+        let targetScroll = 0;
+        let currentScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            // Calculate scroll percentage from 0 to 1
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            targetScroll = window.scrollY / maxScroll;
+            
+            // Fade out the indicator once they start scrolling
+            if (targetScroll > 0.05) {
+                document.getElementById('scrollIndicator').style.opacity = '0';
+            } else {
+                document.getElementById('scrollIndicator').style.opacity = '1';
+            }
+        });
+
+        function render() {
+            // Smooth interpolation (Lerp) for buttery scrubbing
+            currentScroll += (targetScroll - currentScroll) * 0.1;
+            
+            // Fill background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, width, height);
+
+            // Phase 1: Advanced Fading (0.0 to 0.15 scroll)
+            let fadeInProgress = Math.min(Math.max(currentScroll / 0.15, 0), 1);
+            
+            // Phase 2: The Shatter Explosion (0.2 to 1.0 scroll)
+            let shatterProgress = Math.min(Math.max((currentScroll - 0.2) / 0.8, 0), 1);
+            
+            // Apply exponential easing to shatter for explosive start
+            let easeShatter = Math.pow(shatterProgress, 1.5); 
+
+            // If not shattered yet, draw the whole text with fade
+            if (shatterProgress <= 0) {
+                ctx.globalAlpha = fadeInProgress;
+                
+                // Add a cinematic blur as it fades in
+                let blurAmount = (1 - fadeInProgress) * 20;
+                ctx.filter = `blur(${blurAmount}px)`;
+                
+                ctx.drawImage(textCanvas, 0, 0);
+                
+                ctx.filter = 'none';
+                ctx.globalAlpha = 1.0;
+            } 
+            // If shattered, render the individual glass shards
+            else {
+                for (let i = 0; i < shards.length; i++) {
+                    let s = shards[i];
+                    
+                    // Physics math for the shard based on scroll progress
+                    let offsetX = s.forceX * easeShatter;
+                    // Add gravity to Y (falls exponentially faster)
+                    let offsetY = s.forceY * easeShatter + (2000 * Math.pow(easeShatter, 2)); 
+                    let rotation = s.rotationSpeed * easeShatter;
+                    
+                    // Scale simulates shards flying towards or away from camera
+                    let scale = 1 + (s.zForce * easeShatter);
+                    
+                    ctx.save();
+                    
+                    // Move canvas to the shard's centroid
+                    ctx.translate(s.centroid.x + offsetX, s.centroid.y + offsetY);
+                    // Rotate and scale
+                    ctx.rotate(rotation);
+                    ctx.scale(scale, scale);
+                    // Move canvas back
+                    ctx.translate(-s.centroid.x, -s.centroid.y);
+                    
+                    // Draw the shard shape
+                    ctx.beginPath();
+                    ctx.moveTo(s.points[0].x, s.points[0].y);
+                    ctx.lineTo(s.points[1].x, s.points[1].y);
+                    ctx.lineTo(s.points[2].x, s.points[2].y);
+                    ctx.closePath();
+                    
+                    // Clip the context to the triangle
+                    ctx.clip();
+                    
+                    // Draw the original text image into the clipped area
+                    ctx.drawImage(textCanvas, 0, 0);
+                    
+                    // Draw a subtle white rim on the glass shards for realism
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 * (1 - easeShatter)})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    
+                    ctx.restore();
+                }
+            }
+            
+            // Move the light beam based on scroll
+            document.getElementById('lightBeam').style.opacity = (fadeInProgress * (1 - easeShatter)).toString();
+            
+            requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', () => {
+            init();
+        });
+
+        // Make sure font is loaded before drawing
+        document.fonts.ready.then(() => {
+            init();
+            render();
+        });
+    </script>
+</body>
+</html>

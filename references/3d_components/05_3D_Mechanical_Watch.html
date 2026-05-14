@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Premium 3D Mechanical Chronograph</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #05050A;
+            --rose-gold: #D4AF37; /* Switched to a cleaner gold */
+            --rose-gold-dark: #997A00;
+            --dial-bg: #0A0A10;
+        }
+
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1A1A24 0%, var(--bg-dark) 100%);
+            overflow: hidden; font-family: 'Helvetica Neue', sans-serif;
+            perspective: 2000px;
+        }
+
+        /* --- 3D SCENE --- */
+        .scene {
+            width: 500px; height: 500px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .watch-assembly {
+            width: 400px; height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(20deg) rotateY(-20deg); /* Initial showcase tilt */
+            transition: transform 0.1s ease-out;
+        }
+
+        /* --- THE CASE / BEZEL --- */
+        .bezel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            /* Multiple shadows to create 3D thickness */
+            box-shadow: 
+                inset 0 0 0 15px var(--rose-gold),
+                inset 0 0 20px 20px rgba(0,0,0,0.8),
+                0 0 0 5px var(--rose-gold-dark),
+                0 10px 30px rgba(0,0,0,0.8),
+                0 20px 60px rgba(0,0,0,0.9);
+            background: linear-gradient(135deg, #222 0%, #050505 100%);
+            transform: translateZ(-10px);
+        }
+
+        /* The ridged edge of the bezel */
+        .bezel::after {
+            content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
+            border-radius: 50%; z-index: -1;
+            background: repeating-conic-gradient(var(--rose-gold-dark) 0 2deg, var(--rose-gold) 2deg 4deg);
+            transform: translateZ(-20px);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        /* --- THE DIAL (Inner Face) --- */
+        .dial {
+            position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); height: calc(100% - 40px);
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #151520 0%, var(--dial-bg) 80%);
+            transform: translateZ(-5px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,1);
+            overflow: hidden;
+        }
+
+        /* Subtle mechanical pattern on the dial */
+        .dial::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: repeating-radial-gradient(circle, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);
+        }
+
+        /* --- EXPOSED GEARS (Tourbillon feel) --- */
+        .tourbillon {
+            position: absolute; bottom: 40px; left: 50%;
+            width: 120px; height: 120px; margin-left: -60px;
+            border-radius: 50%;
+            border: 2px solid var(--rose-gold-dark);
+            background: rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .gear {
+            position: absolute;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" fill="none" stroke="%23D4AF37" stroke-width="4" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="30"/><path d="M50 0 L50 20 M50 80 L50 100 M0 50 L20 50 M80 50 L100 50 M15 15 L30 30 M70 70 L85 85 M15 85 L30 70 M70 30 L85 15"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        .gear-1 { width: 100px; height: 100px; animation: spin 10s linear infinite; }
+        .gear-2 { width: 60px; height: 60px; top: 10px; right: 10px; animation: spin 5s linear infinite reverse; stroke: #888; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- TICK MARKS --- */
+        .ticks-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            transform: translateZ(5px); pointer-events: none;
+        }
+        .tick {
+            position: absolute; top: 0; left: 50%; width: 4px; height: 100%;
+            margin-left: -2px;
+        }
+        .tick::before {
+            content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 20px;
+            background: var(--rose-gold);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        /* Make 12, 3, 6, 9 larger */
+        .tick.major::before { height: 35px; width: 6px; left: -1px; background: #FFF; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        /* --- HANDS --- */
+        .hands-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            transform-style: preserve-3d;
+        }
+        
+        .hand {
+            position: absolute; bottom: 50%; left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px 4px 0 0;
+            /* Give hands physical depth with drop shadows */
+            box-shadow: -5px 10px 10px rgba(0,0,0,0.5);
+        }
+
+        .hour-hand {
+            width: 8px; height: 100px; margin-left: -4px;
+            background: linear-gradient(to right, #FFF 0%, #CCC 100%);
+            transform: translateZ(15px); /* Highest up */
+        }
+        
+        .min-hand {
+            width: 6px; height: 150px; margin-left: -3px;
+            background: linear-gradient(to right, var(--rose-gold) 0%, var(--rose-gold-dark) 100%);
+            transform: translateZ(20px);
+        }
+
+        .sec-hand {
+            width: 2px; height: 170px; margin-left: -1px;
+            background: #FF3333;
+            transform: translateZ(25px);
+        }
+        /* Counter-balance for second hand */
+        .sec-hand::after {
+            content: ''; position: absolute; top: 100%; left: -2px; width: 6px; height: 40px;
+            background: #FF3333; border-radius: 10px;
+        }
+
+        .center-pin {
+            position: absolute; top: 50%; left: 50%; width: 16px; height: 16px;
+            margin: -8px 0 0 -8px; border-radius: 50%;
+            background: radial-gradient(circle, #FFF, var(--rose-gold-dark));
+            transform: translateZ(30px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.8);
+        }
+
+        /* --- BRANDING --- */
+        .brand {
+            position: absolute; top: 80px; left: 0; width: 100%; text-align: center;
+            color: var(--rose-gold); font-size: 1.2rem; font-weight: 800; letter-spacing: 4px;
+            transform: translateZ(2px); text-transform: uppercase;
+        }
+        .brand-sub {
+            font-size: 0.6rem; color: #888; letter-spacing: 2px; margin-top: 5px;
+        }
+
+        /* --- THE SAPPHIRE CRYSTAL GLASS DOME --- */
+        .glass {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border-radius: 50%;
+            transform: translateZ(40px); /* Sits above everything */
+            /* Complex sweeping gradient to simulate domed glass reflection */
+            background: linear-gradient(
+                105deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0) 40%, 
+                rgba(255,255,255,0.2) 45%, 
+                rgba(255,255,255,0.6) 50%, 
+                rgba(255,255,255,0.2) 55%, 
+                rgba(255,255,255,0) 60%, 
+                rgba(255,255,255,0) 100%
+            );
+            pointer-events: none;
+            mix-blend-mode: screen;
+            transition: background-position 0.1s ease-out;
+            background-size: 200% 200%;
+            background-position: 100% 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scene" id="scene">
+        <div class="watch-assembly" id="watch">
+            
+            <div class="bezel"></div>
+            
+            <div class="dial">
+                <div class="tourbillon">
+                    <div class="gear gear-1"></div>
+                    <div class="gear gear-2"></div>
+                </div>
+                
+                <div class="brand">
+                    CHRONOS
+                    <div class="brand-sub">AUTOMATIC • 24 JEWELS</div>
+                </div>
+            </div>
+
+            <!-- Ticks generated via JS -->
+            <div class="ticks-container" id="ticks"></div>
+
+            <div class="hands-container">
+                <div class="hand hour-hand" id="hr"></div>
+                <div class="hand min-hand" id="min"></div>
+                <div class="hand sec-hand" id="sec"></div>
+                <div class="center-pin"></div>
+            </div>
+
+            <!-- The refractive 3D glass -->
+            <div class="glass" id="glass"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. Generate the 12 hour ticks
+        const ticksContainer = document.getElementById('ticks');
+        for (let i = 0; i < 12; i++) {
+            const tick = document.createElement('div');
+            tick.className = 'tick';
+            if (i % 3 === 0) tick.classList.add('major'); // 12, 3, 6, 9
+            tick.style.transform = `rotate(${i * 30}deg)`;
+            ticksContainer.appendChild(tick);
+        }
+
+        // 2. Real-time Clock Logic
+        const hrHand = document.getElementById('hr');
+        const minHand = document.getElementById('min');
+        const secHand = document.getElementById('sec');
+
+        function updateClock() {
+            const now = new Date();
+            const ms = now.getMilliseconds();
+            const s = now.getSeconds() + (ms / 1000); // Smooth sweep seconds
+            const m = now.getMinutes() + (s / 60);
+            const h = (now.getHours() % 12) + (m / 60);
+
+            // GSAP for smooth setting (translateZ maintains 3D depth)
+            gsap.set(secHand, { rotation: s * 6, transformOrigin: "bottom center", z: 25 });
+            gsap.set(minHand, { rotation: m * 6, transformOrigin: "bottom center", z: 20 });
+            gsap.set(hrHand, { rotation: h * 30, transformOrigin: "bottom center", z: 15 });
+            
+            requestAnimationFrame(updateClock);
+        }
+        updateClock();
+
+        // 3. Ultra-Premium 3D Mouse Parallax
+        const scene = document.getElementById('scene');
+        const watch = document.getElementById('watch');
+        const glass = document.getElementById('glass');
+
+        scene.addEventListener('mousemove', (e) => {
+            const rect = scene.getBoundingClientRect();
+            // -1 to 1 based on mouse position
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+            
+            // Tilt the entire watch assembly in 3D
+            gsap.to(watch, {
+                rotateX: -y * 30, // 30 deg max tilt
+                rotateY: x * 30,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+
+            // Move the sapphire glass glare dynamically based on tilt
+            // Calculate percentage 0-100%
+            const glareX = (x + 1) * 50; 
+            const glareY = (y + 1) * 50;
+            gsap.to(glass, {
+                backgroundPosition: `${glareX}% ${glareY}%`,
+                duration: 0.2
+            });
+        });
+
+        scene.addEventListener('mouseleave', () => {
+            // Smoothly return to default showcase angle
+            gsap.to(watch, {
+                rotateX: 20,
+                rotateY: -20,
+                duration: 1.5,
+                ease: "elastic.out(1, 0.4)"
+            });
+            gsap.to(glass, {
+                backgroundPosition: "100% 100%",
+                duration: 1.5
+            });
+        });
+
+    </script>
+</body>
+</html>

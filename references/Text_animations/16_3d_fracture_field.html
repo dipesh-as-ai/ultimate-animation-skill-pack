@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Fracture Field</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050508;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Syncopate', sans-serif;
+            overflow: hidden;
+            /* Premium dark gradient */
+            background: radial-gradient(circle at center, #1a1a24 0%, #000000 100%);
+        }
+
+        .container {
+            perspective: 1200px; /* Deep perspective for the 3D explosion */
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .parallax-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Smooth 3D mouse tracking */
+            /* Width and height bound the text area */
+            width: 80vw;
+            height: 40vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The solid core that glows from underneath */
+        .core-text {
+            position: absolute;
+            font-size: 10vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: rgba(255, 255, 255, 0.1);
+            -webkit-text-stroke: 2px #00f3ff;
+            text-shadow: 0 0 30px rgba(0, 243, 255, 0.8), 0 0 80px rgba(255, 0, 234, 0.5);
+            transform: translateZ(-50px); /* Sits deep in the background */
+            white-space: nowrap;
+        }
+
+        /* The glass layer that will be fractured */
+        .shatter-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: translateZ(50px); /* Sits closer to the user */
+            pointer-events: none; /* Let mouse events pass to container */
+        }
+
+        /* Individual glass shards */
+        .shard {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(0px) rotateX(0deg) rotateY(0deg);
+            font-size: 10vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            white-space: nowrap;
+            color: #ffffff;
+            
+            /* The transition determines how fast the glass explodes and snaps back */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <div class="parallax-wrapper" id="wrapper">
+            <!-- The glowing core -->
+            <div class="core-text">FRACTURE</div>
+            
+            <!-- The glass layer -->
+            <div class="shatter-layer" id="shatterLayer">
+                <!-- JS will inject the 144 glass shards here -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="hint">Smash the glass with your mouse</div>
+
+    <script>
+        const wrapper = document.getElementById('wrapper');
+        const shatterLayer = document.getElementById('shatterLayer');
+        const container = document.getElementById('container');
+        
+        const TEXT = "FRACTURE";
+        const ROWS = 6;
+        const COLS = 12;
+        const shards = [];
+
+        // 1. Generate the geometric glass shards using CSS clip-path
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                let left = (c / COLS) * 100;
+                let right = ((c + 1) / COLS) * 100;
+                let top = (r / ROWS) * 100;
+                let bottom = ((r + 1) / ROWS) * 100;
+
+                // Create two triangles per grid cell to form realistic diamond glass shatters
+                let t1 = document.createElement('div');
+                let t2 = document.createElement('div');
+                t1.className = 'shard';
+                t2.className = 'shard';
+                t1.innerText = TEXT;
+                t2.innerText = TEXT;
+
+                // Alternate the diagonal cut for an organic shatter pattern
+                if ((r + c) % 2 === 0) {
+                    t1.style.clipPath = `polygon(${left}% ${top}%, ${right}% ${top}%, ${right}% ${bottom}%)`;
+                    t2.style.clipPath = `polygon(${left}% ${top}%, ${right}% ${bottom}%, ${left}% ${bottom}%)`;
+                } else {
+                    t1.style.clipPath = `polygon(${left}% ${top}%, ${right}% ${top}%, ${left}% ${bottom}%)`;
+                    t2.style.clipPath = `polygon(${right}% ${top}%, ${right}% ${bottom}%, ${left}% ${bottom}%)`;
+                }
+                
+                shatterLayer.appendChild(t1);
+                shatterLayer.appendChild(t2);
+
+                // Calculate the physical center of the grid cell relative to the wrapper
+                // This allows us to calculate the distance from the mouse exactly
+                let centerXPercent = left + (right - left) / 2;
+                let centerYPercent = top + (bottom - top) / 2;
+
+                // Store shard data for the physics engine
+                shards.push({
+                    el: t1,
+                    cx: centerXPercent,
+                    cy: centerYPercent,
+                    rotXDir: Math.random() > 0.5 ? 1 : -1,
+                    rotYDir: Math.random() > 0.5 ? 1 : -1
+                });
+                shards.push({
+                    el: t2,
+                    cx: centerXPercent,
+                    cy: centerYPercent,
+                    rotXDir: Math.random() > 0.5 ? 1 : -1,
+                    rotYDir: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        // 2. The Physics Engine
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let wrapperRect = wrapper.getBoundingClientRect();
+
+        // Update bounds on resize
+        window.addEventListener('resize', () => {
+            wrapperRect = wrapper.getBoundingClientRect();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // --- Apply the 3D Parallax to the entire wrapper (Inspired by #4) ---
+            const xAxis = (window.innerWidth / 2 - mouseX) / 25; 
+            const yAxis = (window.innerHeight / 2 - mouseY) / 25;
+            wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+
+            // --- Apply the localized 3D Shatter explosion (Inspired by #11) ---
+            // Calculate mouse position relative to the wrapper in percentages
+            let relX = ((mouseX - wrapperRect.left) / wrapperRect.width) * 100;
+            let relY = ((mouseY - wrapperRect.top) / wrapperRect.height) * 100;
+
+            const explosionRadius = 20; // Radius in percentage of wrapper
+
+            shards.forEach(shard => {
+                // Calculate distance from mouse to shard center
+                let dx = relX - shard.cx;
+                let dy = relY - shard.cy;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < explosionRadius) {
+                    // The closer to the mouse, the harder it shatters
+                    let force = 1 - (distance / explosionRadius); // 0 to 1
+                    
+                    // Push the shard deep into the screen (Z axis) and violently rotate it
+                    let translateZ = -force * 300; 
+                    let rotateX = force * 90 * shard.rotXDir;
+                    let rotateY = force * 90 * shard.rotYDir;
+                    
+                    shard.el.style.transform = `translate(-50%, -50%) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    shard.el.style.opacity = 1 - (force * 0.8); // Fades out slightly as it falls back
+                    
+                    // Add a glowing rim to the glass shard when it explodes
+                    shard.el.style.textShadow = `0 0 20px rgba(255, 255, 255, 0.8)`;
+                } else {
+                    // Snap back into place using the CSS cubic-bezier transition
+                    shard.el.style.transform = `translate(-50%, -50%) translateZ(0px) rotateX(0deg) rotateY(0deg)`;
+                    shard.el.style.opacity = 1;
+                    shard.el.style.textShadow = `none`;
+                }
+            });
+        });
+
+        // Snap the entire wrapper back when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            wrapper.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            shards.forEach(shard => {
+                shard.el.style.transform = `translate(-50%, -50%) translateZ(0px) rotateX(0deg) rotateY(0deg)`;
+                shard.el.style.opacity = 1;
+            });
+        });
+    </script>
+</body>
+</html>

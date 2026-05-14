@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning E-Sports Gaming UI</title>
+    
+    <!-- Bold, Condensed Typography for that aggressive E-Sports feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --c-dark: #0F1923;      /* Deep Slate/Navy */
+            --c-red: #FF4655;       /* Aggressive Neon Red */
+            --c-light: #ECE8E1;     /* Bone White */
+            --c-grey: #1F2326;      /* Slightly lighter slate */
+            --c-border: rgba(236, 232, 225, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--c-dark);
+            color: var(--c-light);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .esports-font {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- Global Structural Elements --- */
+        .angled-cut {
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+        }
+        
+        .angled-cut-alt {
+            clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%, 0 20px);
+        }
+
+        .primary-btn {
+            background-color: var(--c-red);
+            color: var(--c-light);
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.5rem;
+            padding: 15px 40px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s, background-color 0.2s;
+            display: inline-block;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .primary-btn:hover {
+            background-color: #ff5e6b;
+            transform: translateY(-5px);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(15, 25, 35, 0.9) 0%, rgba(15, 25, 35, 0) 100%);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--c-red);
+            letter-spacing: 2px;
+        }
+
+        .nav-links a {
+            color: var(--c-light);
+            text-decoration: none;
+            margin-left: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--c-red);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--c-dark);
+        }
+
+        /* Massive Background Typography Parallax */
+        .hero-bg-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Oswald', sans-serif;
+            font-size: 25vw;
+            color: rgba(236, 232, 225, 0.03);
+            white-space: nowrap;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            width: 50%;
+        }
+
+        .hero-title {
+            font-size: 7rem;
+            line-height: 0.9;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            max-width: 400px;
+            margin-bottom: 40px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Massive Character Render Placeholder */
+        .hero-character {
+            position: absolute;
+            bottom: -50px; /* Bleeds off the bottom */
+            right: 5%;
+            width: 800px;
+            height: 900px;
+            z-index: 5;
+            background: rgba(255, 70, 85, 0.1);
+            border: 2px dashed var(--c-red);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--c-red);
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            transform-origin: bottom center;
+        }
+
+        /* --- The GSAP Horizontal Scroll Pin Section --- */
+        .roster-container {
+            background-color: var(--c-light);
+            color: var(--c-dark);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden; /* Hide horizontal overflow */
+            position: relative;
+        }
+
+        .roster-header {
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            font-size: 4rem;
+            z-index: 100;
+            color: var(--c-dark);
+        }
+
+        .roster-header span {
+            color: var(--c-red);
+        }
+
+        /* The wrapper that will slide horizontally */
+        .horizontal-scroll-wrapper {
+            display: flex;
+            gap: 50px;
+            padding: 0 10%;
+            margin-top: 100px; /* Push down below header */
+            /* Width must be larger than 100vw to allow scrolling */
+            width: max-content; 
+        }
+
+        /* --- 3D Interactive Hover Cards --- */
+        .agent-card {
+            width: 400px;
+            height: 600px;
+            background-color: var(--c-grey);
+            position: relative;
+            cursor: pointer;
+            /* Required for the JS 3D Tilt effect */
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Smooth snapping for JS */
+        }
+
+        .card-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, var(--c-grey) 0%, #000 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 4rem;
+            color: rgba(255,255,255,0.1);
+            font-weight: 900;
+            /* Pop out in 3D */
+            transform: translateZ(50px);
+        }
+
+        .card-name {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            font-size: 3rem;
+            color: var(--c-light);
+            /* Pop out in 3D further */
+            transform: translateZ(80px);
+        }
+
+        .card-role {
+            position: absolute;
+            bottom: 90px;
+            left: 30px;
+            color: var(--c-red);
+            font-weight: 700;
+            letter-spacing: 2px;
+            transform: translateZ(60px);
+        }
+
+        .card-image-placeholder {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 70%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #888;
+            font-weight: 700;
+            /* The image pops out the most! */
+            transform: translateZ(100px);
+        }
+
+        /* Decorational element */
+        .card-decor {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 5px;
+            background: var(--c-red);
+            transform: translateZ(40px);
+        }
+
+        /* --- Footer CTA Banner --- */
+        .cta-banner {
+            background-color: var(--c-red);
+            color: var(--c-light);
+            padding: 100px 5%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner h2 {
+            font-size: 5rem;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-banner-bg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Oswald', sans-serif;
+            font-size: 20vw;
+            color: rgba(0,0,0,0.1);
+            white-space: nowrap;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo esports-font">PROJECT // ZERO</div>
+        <div class="nav-links">
+            <a href="#">Game Info</a>
+            <a href="#">Media</a>
+            <a href="#">News</a>
+            <a href="#">Leaderboards</a>
+            <a href="#" style="color: var(--c-red);">Support</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg-text" id="parallaxText">DEFY LIMITS</div>
+
+        <div class="hero-content">
+            <h1 class="hero-title">A 5v5<br><span style="color: var(--c-red);">TACTICAL</span><br>SHOOTER</h1>
+            <p class="hero-subtitle">
+                Blend your style and experience on a global, competitive stage. You have 13 rounds to attack and defend your side using sharp gunplay and tactical abilities.
+            </p>
+            <a href="#" class="primary-btn angled-cut">PLAY FOR FREE</a>
+        </div>
+
+        <div class="hero-character angled-cut-alt">
+            TRANSPARENT 3D CHARACTER RENDER (800x900)
+        </div>
+    </section>
+
+    <!-- GSAP Horizontal Scroll Section -->
+    <!-- The container that gets pinned to the screen -->
+    <section class="roster-container" id="rosterPin">
+        <h2 class="roster-header">MEET THE <span>AGENTS</span></h2>
+
+        <!-- The wrapper that slides sideways as you scroll down -->
+        <div class="horizontal-scroll-wrapper" id="horizontalScroll">
+            
+            <div class="agent-card angled-cut-alt">
+                <div class="card-bg angled-cut-alt"></div>
+                <div class="card-decor"></div>
+                <div class="card-number">01</div>
+                <div class="card-image-placeholder">DUELIST RENDER</div>
+                <div class="card-role">// DUELIST</div>
+                <div class="card-name">PHOENIX</div>
+            </div>
+
+            <div class="agent-card angled-cut-alt">
+                <div class="card-bg angled-cut-alt"></div>
+                <div class="card-decor"></div>
+                <div class="card-number">02</div>
+                <div class="card-image-placeholder">CONTROLLER RENDER</div>
+                <div class="card-role">// CONTROLLER</div>
+                <div class="card-name">OMEN</div>
+            </div>
+
+            <div class="agent-card angled-cut-alt">
+                <div class="card-bg angled-cut-alt"></div>
+                <div class="card-decor"></div>
+                <div class="card-number">03</div>
+                <div class="card-image-placeholder">INITIATOR RENDER</div>
+                <div class="card-role">// INITIATOR</div>
+                <div class="card-name">SOVA</div>
+            </div>
+
+            <div class="agent-card angled-cut-alt">
+                <div class="card-bg angled-cut-alt"></div>
+                <div class="card-decor"></div>
+                <div class="card-number">04</div>
+                <div class="card-image-placeholder">SENTINEL RENDER</div>
+                <div class="card-role">// SENTINEL</div>
+                <div class="card-name">CYPHER</div>
+            </div>
+
+            <div class="agent-card angled-cut-alt">
+                <div class="card-bg angled-cut-alt"></div>
+                <div class="card-decor"></div>
+                <div class="card-number">05</div>
+                <div class="card-image-placeholder">DUELIST RENDER</div>
+                <div class="card-role">// DUELIST</div>
+                <div class="card-name">JETT</div>
+            </div>
+
+            <!-- Empty space at the end so the last card reaches the center before unpinning -->
+            <div style="width: 20vw;"></div>
+
+        </div>
+    </section>
+
+    <!-- Footer Banner -->
+    <section class="cta-banner">
+        <div class="cta-banner-bg">DOMINATE</div>
+        <h2>ARE YOU READY?</h2>
+        <a href="#" class="primary-btn" style="background-color: var(--c-dark);">DOWNLOAD GAME</a>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Hero Entrance Animations ---
+        const tl = gsap.timeline();
+        
+        tl.from(".hero-title", { x: -100, opacity: 0, duration: 1, ease: "power4.out", delay: 0.2 })
+          .from(".hero-subtitle", { x: -50, opacity: 0, duration: 0.8, ease: "power2.out" }, "-=0.6")
+          .from(".primary-btn", { y: 20, opacity: 0, duration: 0.6, ease: "back.out(1.7)" }, "-=0.4")
+          .from(".hero-character", { x: 200, opacity: 0, duration: 1.5, ease: "expo.out" }, "-=1.2");
+
+        // Subtle Parallax for the giant background text when moving mouse
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.clientX) / 50;
+            const y = (window.innerHeight / 2 - e.clientY) / 50;
+            gsap.to("#parallaxText", { x: "-50%" + x, y: "-50%" + y, duration: 1, ease: "power2.out" });
+        });
+
+        // --- 2. The Badass Horizontal Scroll Pinning ---
+        const scrollWrapper = document.getElementById("horizontalScroll");
+        
+        // Pin the roster container, and animate the inner wrapper sideways
+        gsap.to(scrollWrapper, {
+            // Calculate exactly how far left we need to pull the wrapper to see all cards
+            x: () => -(scrollWrapper.scrollWidth - window.innerWidth) + "px",
+            ease: "none", // Linear movement tied exactly to scroll
+            scrollTrigger: {
+                trigger: "#rosterPin",
+                pin: true, // PIN IT! (Stops scrolling down)
+                scrub: 1, // Smooth scrubbing taking 1 second to catch up
+                // The duration of the pin is equal to the width of the cards. 
+                // A wider wrapper = more scrolling required to unpin.
+                end: () => "+=" + scrollWrapper.scrollWidth
+            }
+        });
+
+        // --- 3. The 3D Interactive Hover Cards ---
+        const cards = document.querySelectorAll('.agent-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                // Get the bounding box of the specific card
+                let rect = card.getBoundingClientRect();
+                
+                // Get mouse position relative to the card's top-left corner
+                let x = e.clientX - rect.left; 
+                let y = e.clientY - rect.top;  
+                
+                // Calculate center
+                let centerX = rect.width / 2;
+                let centerY = rect.height / 2;
+                
+                // Calculate rotation (max 15 degrees)
+                // If mouse is on the right, rotate Y positive. If bottom, rotate X negative.
+                let rotateX = ((y - centerY) / centerY) * -15; 
+                let rotateY = ((x - centerX) / centerX) * 15;
+                
+                // Apply the transformation
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                
+                // Change border color to red on hover for that extra pop
+                card.style.borderColor = "var(--c-red)";
+                card.style.boxShadow = "0 20px 50px rgba(255, 70, 85, 0.2)";
+            });
+            
+            // Snap back when mouse leaves
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                card.style.borderColor = "transparent";
+                card.style.boxShadow = "none";
+            });
+        });
+
+    </script>
+</body>
+</html>

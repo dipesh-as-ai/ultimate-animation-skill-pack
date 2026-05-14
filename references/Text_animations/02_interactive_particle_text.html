@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Particle Disintegration Text</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="overlay">Hover your mouse over the text</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        let width, height;
+        let particles = [];
+        let mouse = { x: -1000, y: -1000, radius: 100 };
+        
+        const TEXT = "AWWWARDS";
+        const FONT_SIZE = 150;
+        
+        // Colors for particles
+        const colors = ['#ff0055', '#00ffaa', '#00aaff', '#ffaa00', '#ffffff'];
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            
+            // Draw text to get pixel data
+            ctx.fillStyle = 'white';
+            ctx.font = `900 ${FONT_SIZE}px "Helvetica Neue", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(TEXT, width / 2, height / 2);
+            
+            const textCoordinates = ctx.getImageData(0, 0, width, height);
+            ctx.clearRect(0, 0, width, height);
+            
+            particles = [];
+            
+            // Scan through image data and create particles where pixels exist
+            // Step determines density (lower = more particles)
+            const step = 4;
+            
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    const index = (y * width + x) * 4;
+                    // Check alpha channel
+                    if (textCoordinates.data[index + 3] > 128) {
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        particles.push(new Particle(x, y, color));
+                    }
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = Math.random() * width; // Start randomly scattered
+                this.y = Math.random() * height;
+                this.baseX = x; // Target X
+                this.baseY = y; // Target Y
+                this.size = Math.random() * 2 + 1.5;
+                this.color = color;
+                this.density = (Math.random() * 30) + 5;
+                this.friction = 0.85;
+                this.ease = 0.05;
+                this.vx = 0;
+                this.vy = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            update() {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Repel from mouse
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < mouse.radius) {
+                    this.vx -= directionX;
+                    this.vy -= directionY;
+                } else {
+                    // Return to original position
+                    this.vx += (this.baseX - this.x) * this.ease;
+                    this.vy += (this.baseY - this.y) * this.ease;
+                }
+                
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+        }
+
+        function animate() {
+            // Slight trail effect
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        window.addEventListener('touchmove', (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = -1000;
+            mouse.y = -1000;
+        });
+
+        window.addEventListener('resize', () => {
+            init();
+        });
+
+        // Start
+        init();
+        animate();
+    </script>
+</body>
+</html>

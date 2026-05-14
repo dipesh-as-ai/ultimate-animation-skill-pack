@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Effect 01 — Cipher Reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#060606;
+  --cream:#F0EBE1;
+  --lime:#D4F53C;
+  --muted:rgba(240,235,225,0.38);
+  --muted2:rgba(240,235,225,0.10);
+}
+
+html,body{
+  width:100%;height:100%;
+  background:var(--bg);
+  color:var(--cream);
+  overflow:hidden;
+  font-family:'DM Mono',monospace;
+  cursor:none;
+  user-select:none;
+}
+
+/* ── Film Grain ── */
+body::before{
+  content:'';
+  position:fixed;inset:-100%;
+  width:300%;height:300%;
+  background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='250' height='250' filter='url(%23n)' opacity='1'/></svg>");
+  opacity:0.04;
+  pointer-events:none;
+  z-index:900;
+  animation:grain 0.45s steps(1) infinite;
+}
+@keyframes grain{
+  0%  {transform:translate(0,0);}
+  11% {transform:translate(-4%,-6%);}
+  22% {transform:translate(-9%,4%);}
+  33% {transform:translate(5%,-11%);}
+  44% {transform:translate(-4%,14%);}
+  55% {transform:translate(-11%,4%);}
+  66% {transform:translate(14%,0%);}
+  77% {transform:translate(0%,9%);}
+  88% {transform:translate(-14%,0%);}
+  99% {transform:translate(9%,4%);}
+}
+
+/* ── Stage ── */
+.stage{
+  width:100vw;height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  padding:0 8vw;
+  position:relative;
+}
+
+/* ── Eyebrow ── */
+.eyebrow{
+  font-size:clamp(9px,1.1vw,13px);
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  color:var(--lime);
+  margin-bottom:2.2rem;
+  overflow:hidden;
+}
+.eyebrow span{
+  display:block;
+  transform:translateY(110%);
+}
+
+/* ── Divider ── */
+.divider{
+  width:0;
+  height:1px;
+  background:linear-gradient(90deg,var(--lime),transparent);
+  margin-bottom:2.6rem;
+}
+
+/* ── Headline ── */
+.headline{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(88px,13vw,200px);
+  line-height:0.88;
+  letter-spacing:-0.01em;
+  margin-bottom:3rem;
+}
+
+.line{display:block;overflow:hidden;}
+
+.word{display:inline-block;}
+.word + .word{margin-left:0.25em;}
+
+/* each char is clipped by the .char-wrap */
+.char-wrap{
+  display:inline-block;
+  overflow:hidden;
+  vertical-align:top;
+}
+.char{
+  display:inline-block;
+  transform:translateY(115%);
+  will-change:transform;
+}
+
+/* ── Subtitle ── */
+.subtitle{
+  overflow:hidden;
+  max-width:42ch;
+}
+.subtitle span{
+  display:block;
+  font-size:clamp(11px,1.4vw,15px);
+  color:var(--muted);
+  letter-spacing:0.06em;
+  line-height:1.65;
+  transform:translateY(110%);
+}
+
+/* ── Corner Labels ── */
+.corner{
+  position:fixed;
+  font-size:10px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--muted);
+  overflow:hidden;
+}
+.corner span{display:block;transform:translateY(110%);}
+.corner--tl{top:5vh;left:8vw;}
+.corner--tr{top:5vh;right:8vw;text-align:right;}
+.corner--bl{bottom:5vh;left:8vw;}
+.corner--br{bottom:5vh;right:8vw;text-align:right;}
+
+/* ── Vertical Line (right side accent) ── */
+.v-line{
+  position:fixed;
+  right:5vw;
+  top:50%;
+  transform:translateY(-50%);
+  width:1px;
+  height:0;
+  background:var(--muted2);
+}
+
+/* ── Custom Cursor ── */
+.cursor{
+  position:fixed;
+  top:0;left:0;
+  pointer-events:none;
+  z-index:9999;
+  mix-blend-mode:difference;
+}
+.cursor-dot{
+  position:absolute;
+  width:7px;height:7px;
+  background:var(--cream);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .25s,height .25s,background .25s;
+}
+.cursor-ring{
+  position:absolute;
+  width:38px;height:38px;
+  border:1px solid var(--cream);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .4s cubic-bezier(.16,1,.3,1),
+             height .4s cubic-bezier(.16,1,.3,1);
+}
+
+/* ── Replay ── */
+.replay-btn{
+  position:fixed;
+  bottom:5vh;right:8vw;
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--muted);
+  background:none;border:none;
+  cursor:none;
+  padding:0;
+  transition:color .3s;
+  overflow:hidden;
+}
+.replay-btn span{display:block;transform:translateY(110%);}
+.replay-btn:hover{color:var(--lime);}
+
+/* ── Ticker (bottom center) ── */
+.ticker{
+  position:fixed;
+  bottom:5vh;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:1.2rem;
+  overflow:hidden;
+}
+.ticker span{
+  display:block;
+  font-size:10px;
+  letter-spacing:0.2em;
+  color:var(--muted);
+  transform:translateY(110%);
+}
+.ticker-dot{
+  width:4px;height:4px;
+  border-radius:50%;
+  background:var(--lime);
+  transform:scale(0);
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor">
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot"  id="cursorDot"></div>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+
+  <div class="eyebrow"><span id="eyebrow">Text Animation — 01</span></div>
+
+  <div class="divider" id="divider"></div>
+
+  <h1 class="headline" id="headline" aria-label="Craft the Moment">
+    <span class="line" data-text="CRAFT"></span>
+    <span class="line" data-text="THE"></span>
+    <span class="line" data-text="MOMENT"></span>
+  </h1>
+
+  <div class="subtitle">
+    <span id="subtitle">Motion is the language of intent.<br>Every frame earns its place.</span>
+  </div>
+
+</div>
+
+<!-- Corner Labels -->
+<div class="corner corner--tl"><span id="c-tl">©&nbsp;2025</span></div>
+<div class="corner corner--tr"><span id="c-tr">Cipher&nbsp;Reveal</span></div>
+<div class="corner corner--bl"><span id="c-bl">Effect&nbsp;No.&nbsp;01</span></div>
+
+<!-- Vertical accent line -->
+<div class="v-line" id="vLine"></div>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-dot" id="tickerDot"></div>
+  <span id="tickerLabel">GSAP&nbsp;·&nbsp;CLIP&nbsp;MASK&nbsp;·&nbsp;SCRAMBLE</span>
+</div>
+
+<!-- Replay -->
+<button class="replay-btn" id="replayBtn" aria-label="Replay animation">
+  <span>↺&nbsp;&nbsp;Replay</span>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* ─────────────────────────────────────────────
+   CIPHER REVEAL — Effect 01
+   Clip-path mask wipe + character scramble
+───────────────────────────────────────────── */
+
+const SCRAMBLE_CHARS = '!<>-_\\/[]{}—=+*^?#@$%&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+/* ── 1. Split headline into char spans ── */
+function buildCharSpans(){
+  const lines = document.querySelectorAll('.headline .line');
+  lines.forEach(line => {
+    const text = line.dataset.text;
+    line.innerHTML = '';
+    text.split('').forEach(ch => {
+      const wrap = document.createElement('span');
+      wrap.className = 'char-wrap';
+      const inner = document.createElement('span');
+      inner.className = 'char';
+      inner.dataset.final = ch;
+      inner.textContent = ch;
+      wrap.appendChild(inner);
+      line.appendChild(wrap);
+    });
+  });
+}
+
+/* ── 2. Scramble a single char element ── */
+function scrambleChar(el, delay){
+  const final = el.dataset.final;
+  if(final === ' '){return;}
+
+  const totalDuration = 680;
+  const interval      = 38;
+  const totalSteps    = Math.floor(totalDuration / interval);
+  let step = 0;
+
+  setTimeout(() => {
+    const tick = setInterval(() => {
+      const progress = step / totalSteps;
+      // Past 60% of scramble → weighted toward final char
+      if(progress > 0.6 && Math.random() > 0.4){
+        el.textContent = final;
+      } else {
+        el.textContent = SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+      }
+      step++;
+      if(step >= totalSteps){
+        clearInterval(tick);
+        el.textContent = final;
+      }
+    }, interval);
+  }, delay);
+}
+
+/* ── 3. Master Timeline ── */
+function runTimeline(){
+  buildCharSpans();
+
+  const tl = gsap.timeline({ defaults:{ ease:'expo.out' } });
+
+  // Eyebrow
+  tl.to('#eyebrow', { translateY:'0%', duration:1, ease:'expo.out' }, 0.1);
+
+  // Divider line
+  tl.to('#divider', { width:'12vw', duration:1.1, ease:'expo.out' }, 0.35);
+
+  // Headline chars — stagger wipe up
+  const chars = document.querySelectorAll('.headline .char');
+  const charDelay = 0.042;
+
+  chars.forEach((ch, i) => {
+    const startAt = 0.65 + i * charDelay;
+    // Clip wipe
+    tl.to(ch, {
+      translateY:'0%',
+      duration: 0.82,
+      ease: 'expo.out'
+    }, startAt);
+    // Scramble (fires via setTimeout, synced with wipe)
+    tl.call(() => scrambleChar(ch, 0), [], startAt);
+  });
+
+  const totalCharTime = 0.65 + chars.length * charDelay;
+
+  // Subtitle
+  tl.to('#subtitle', { translateY:'0%', duration:1, ease:'expo.out' }, totalCharTime - 0.1);
+
+  // Corners
+  tl.to(['#c-tl','#c-tr','#c-bl'], {
+    translateY:'0%', duration:0.9, ease:'expo.out', stagger:0.1
+  }, totalCharTime + 0.05);
+
+  // Vertical accent line
+  tl.to('#vLine', { height:'30vh', duration:1.2, ease:'expo.out' }, totalCharTime + 0.2);
+
+  // Ticker
+  tl.to('#tickerDot', { scale:1, duration:0.5, ease:'back.out(2)' }, totalCharTime + 0.3);
+  tl.to('#tickerLabel', { translateY:'0%', duration:0.8, ease:'expo.out' }, totalCharTime + 0.35);
+
+  // Replay button
+  tl.to('.replay-btn span', { translateY:'0%', duration:0.8, ease:'expo.out' }, totalCharTime + 0.5);
+}
+
+/* ── 4. Custom Cursor ── */
+const ring = document.getElementById('cursorRing');
+const dot  = document.getElementById('cursorDot');
+let mx=0,my=0, rx=0,ry=0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  gsap.to(dot, { x:mx, y:my, duration:0, overwrite:true });
+});
+
+// Lerp ring behind cursor
+(function lerp(){
+  rx += (mx - rx) * 0.115;
+  ry += (my - ry) * 0.115;
+  gsap.set(ring, { x:rx, y:ry });
+  requestAnimationFrame(lerp);
+})();
+
+// Cursor expand on headline hover
+document.querySelector('.headline').addEventListener('mouseenter', () => {
+  gsap.to(ring, { width:70, height:70, duration:0.4, ease:'expo.out' });
+  gsap.to(dot,  { width:4, height:4, duration:0.25 });
+});
+document.querySelector('.headline').addEventListener('mouseleave', () => {
+  gsap.to(ring, { width:38, height:38, duration:0.4, ease:'expo.out' });
+  gsap.to(dot,  { width:7, height:7, duration:0.25 });
+});
+
+/* ── 5. Replay ── */
+document.getElementById('replayBtn').addEventListener('click', () => {
+  // Reset all
+  gsap.killTweensOf('*');
+  document.querySelectorAll('.headline .line').forEach(l => l.innerHTML = l.dataset.text.split('').map(()=>'<span class="char-wrap"><span class="char" style="transform:translateY(115%)">?</span></span>').join(''));
+  gsap.set('#eyebrow',        { translateY:'110%' });
+  gsap.set('#divider',        { width:0 });
+  gsap.set('#subtitle',       { translateY:'110%' });
+  gsap.set(['#c-tl','#c-tr','#c-bl'], { translateY:'110%' });
+  gsap.set('#vLine',          { height:0 });
+  gsap.set('#tickerDot',      { scale:0 });
+  gsap.set('#tickerLabel',    { translateY:'110%' });
+  gsap.set('.replay-btn span',{ translateY:'110%' });
+  setTimeout(runTimeline, 80);
+});
+
+/* ── 6. Init ── */
+runTimeline();
+</script>
+</body>
+</html>

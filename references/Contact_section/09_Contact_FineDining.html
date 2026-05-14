@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine Dining Reservation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0C0C0C;
+            --gold: #C5A880;
+            --gold-dim: rgba(197, 168, 128, 0.3);
+            --text-light: #E8E6E1;
+            --text-dim: #888888;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Lato', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Subtle vignette/candlelight effect */
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0c0c0c 100%);
+        }
+
+        .dining-container {
+            width: 100%; max-width: 1000px;
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Elegant Typography */
+        .subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .subtitle::before, .subtitle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 1px;
+            background: var(--gold);
+        }
+        .subtitle::before { left: -45px; }
+        .subtitle::after { right: -45px; }
+
+        .title {
+            font-family: var(--font-serif);
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .title i {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .description {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            color: var(--text-dim);
+            max-width: 500px;
+            margin: 0 auto 4rem auto;
+            line-height: 1.5;
+        }
+
+        /* The Reservation Form */
+        .reservation-form {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(197, 168, 128, 0.15);
+            padding: 4rem;
+            position: relative;
+            /* Soft candlelight glow */
+            box-shadow: 0 0 50px rgba(197, 168, 128, 0.03), inset 0 0 20px rgba(197, 168, 128, 0.02);
+        }
+
+        /* Corner accents for elegance */
+        .corner {
+            position: absolute;
+            width: 15px; height: 15px;
+            border: 1px solid var(--gold);
+            opacity: 0.5;
+        }
+        .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+        }
+
+        .input-group { position: relative; }
+        .input-group.full { grid-column: span 2; }
+
+        .input-control {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.4s;
+        }
+
+        .input-control:focus {
+            border-bottom-color: var(--gold);
+        }
+
+        /* Customizing the select dropdown and date picker for dark mode elegance */
+        select.input-control, input[type="date"].input-control, input[type="time"].input-control {
+            color: var(--text-dim);
+            cursor: pointer;
+        }
+        select.input-control:focus, input[type="date"].input-control:focus {
+            color: var(--text-light);
+        }
+        
+        textarea.input-control {
+            min-height: 80px;
+            resize: none;
+        }
+
+        .input-label {
+            position: absolute;
+            top: 0.5rem; left: 0;
+            color: var(--text-dim);
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-style: italic;
+            pointer-events: none;
+            transition: 0.4s ease;
+        }
+
+        /* Floating Label Logic */
+        .input-control:focus ~ .input-label,
+        .input-control:not(:placeholder-shown) ~ .input-label {
+            top: -20px;
+            font-size: 0.9rem;
+            color: var(--gold);
+            font-family: var(--font-sans);
+            font-style: normal;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-submit {
+            grid-column: span 2;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 1.2rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:hover {
+            background: var(--gold);
+            color: var(--bg-deep);
+            box-shadow: 0 0 20px rgba(197, 168, 128, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .input-group.full { grid-column: span 1; }
+            .btn-submit { grid-column: span 1; }
+            .reservation-form { padding: 3rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="dining-container">
+        
+        <div class="gs-reveal">
+            <span class="subtitle">Reservations</span>
+            <h1 class="title">An Evening of <i>Elegance</i></h1>
+            <p class="description">Secure your table at our establishment. For parties larger than six, please contact the maître d' directly.</p>
+        </div>
+
+        <div class="reservation-form gs-fade-up">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+
+            <form class="form-grid" onsubmit="event.preventDefault();">
+                
+                <div class="input-group">
+                    <input type="text" class="input-control" placeholder=" " required>
+                    <label class="input-label">Guest Name</label>
+                </div>
+                
+                <div class="input-group">
+                    <input type="tel" class="input-control" placeholder=" " required>
+                    <label class="input-label">Phone Number</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="date" class="input-control" required>
+                    <!-- Label is omitted for date/time to let native placeholder work cleanly, or styled carefully -->
+                </div>
+
+                <div class="input-group">
+                    <input type="time" class="input-control" required>
+                </div>
+
+                <div class="input-group full">
+                    <select class="input-control" required>
+                        <option value="" disabled selected>Party Size</option>
+                        <option value="1">1 Guest</option>
+                        <option value="2">2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4 Guests</option>
+                        <option value="5">5 Guests</option>
+                        <option value="6">6 Guests</option>
+                    </select>
+                </div>
+
+                <div class="input-group full">
+                    <textarea class="input-control" placeholder=" "></textarea>
+                    <label class="input-label">Dietary Restrictions & Special Requests</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Request Table</button>
+
+            </form>
+        </div>
+
+    </section>
+
+    <script>
+        // Slow, elegant, deliberate animations
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        tl.from(".gs-reveal", {
+            y: 40, opacity: 0, duration: 1.5, ease: "power2.out"
+        })
+        .from(".reservation-form", {
+            y: 30, opacity: 0, duration: 1.5, ease: "power2.out"
+        }, "-=1")
+        .from(".corner", {
+            scale: 0, opacity: 0, duration: 1, stagger: 0.2, ease: "power2.out"
+        }, "-=0.5")
+        .from(".input-group", {
+            y: 20, opacity: 0, duration: 1, stagger: 0.1, ease: "power2.out"
+        }, "-=1");
+    </script>
+</body>
+</html>

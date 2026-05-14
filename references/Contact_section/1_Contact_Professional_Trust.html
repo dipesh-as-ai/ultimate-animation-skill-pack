@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Contact Section</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border: #e2e8f0;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .contact-section {
+            width: 100%;
+            max-width: 1200px;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        /* Left Column: Info */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .heading {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            max-width: 450px;
+        }
+
+        .info-block {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .info-value:hover {
+            color: var(--primary);
+        }
+
+        /* Right Column: Form */
+        .form-wrapper {
+            background: var(--bg-card);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .input-control {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            color: var(--text-dark);
+            transition: border-color 0.3s;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-bottom-color: var(--primary);
+        }
+
+        .input-label {
+            position: absolute;
+            top: 0.8rem;
+            left: 0;
+            font-size: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Floating label logic */
+        .input-control:focus ~ .input-label,
+        .input-control:not(:placeholder-shown) ~ .input-label {
+            top: -12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        textarea.input-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-submit {
+            display: inline-block;
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .contact-section {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            .heading { font-size: 2.5rem; }
+            .form-wrapper { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="contact-section">
+        <div class="contact-info gs-reveal">
+            <span class="badge">Contact Us</span>
+            <h1 class="heading">Start a<br>Conversation.</h1>
+            <p class="description">Whether you have a specific project in mind or just want to explore possibilities, our team is ready to provide strategic insights and technical excellence.</p>
+            
+            <div class="info-block">
+                <span class="info-label">Direct Inquiry</span>
+                <a href="mailto:hello@professional.com" class="info-value">hello@professional.com</a>
+            </div>
+            
+            <div class="info-block">
+                <span class="info-label">Headquarters</span>
+                <span class="info-value">1200 Innovation Drive<br>Suite 400, San Francisco</span>
+            </div>
+        </div>
+
+        <div class="form-wrapper gs-reveal-up">
+            <form action="#" method="POST" onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <input type="text" id="name" class="input-control" placeholder=" " required>
+                    <label for="name" class="input-label">Full Name</label>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" id="email" class="input-control" placeholder=" " required>
+                    <label for="email" class="input-label">Corporate Email</label>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="company" class="input-control" placeholder=" ">
+                    <label for="company" class="input-label">Company / Organization</label>
+                </div>
+
+                <div class="input-group">
+                    <textarea id="message" class="input-control" placeholder=" " required></textarea>
+                    <label for="message" class="input-label">How can we help you?</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Entrance Animations
+        const tl = gsap.timeline();
+
+        tl.from(".gs-reveal", {
+            x: -50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+            stagger: 0.2
+        })
+        .from(".gs-reveal-up", {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        }, "-=0.6")
+        .from(".input-group", {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            stagger: 0.1
+        }, "-=0.5");
+    </script>
+</body>
+</html>

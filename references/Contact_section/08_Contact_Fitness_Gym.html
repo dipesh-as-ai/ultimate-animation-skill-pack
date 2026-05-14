@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Contact Section</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #121212;
+            --volt: #DFFF00; /* Neon Gym Yellow */
+            --text-light: #F0F0F0;
+            --text-muted: #555555;
+            --font-display: 'Teko', sans-serif;
+            --font-ui: 'Oswald', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-light);
+            font-family: var(--font-ui);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Concrete texture */
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.03"/%3E%3C/svg%3E');
+        }
+
+        .gym-container {
+            width: 100%; max-width: 1300px;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        /* Typography & Branding */
+        .brand-col {
+            position: relative;
+            z-index: 10;
+        }
+
+        .title-wrapper {
+            position: relative;
+        }
+
+        .huge-title {
+            font-family: var(--font-display);
+            font-size: clamp(6rem, 12vw, 12rem);
+            font-weight: 700;
+            line-height: 0.8;
+            text-transform: uppercase;
+            color: var(--text-light);
+            position: relative;
+            z-index: 2;
+        }
+
+        .huge-title.outline {
+            position: absolute;
+            top: 10px; left: 10px;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--volt);
+            z-index: 1;
+            opacity: 0.5;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .title-wrapper:hover .huge-title.outline {
+            transform: translate(15px, 15px);
+            opacity: 1;
+        }
+
+        .sub-title {
+            font-size: 2rem;
+            color: var(--volt);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 2rem;
+            display: block;
+            margin-top: 1rem;
+        }
+
+        /* The Aggressive Form */
+        .form-col {
+            position: relative;
+            padding: 3rem;
+            background: var(--surface);
+            border-left: 10px solid var(--volt);
+            /* Harsh directional lighting */
+            box-shadow: -20px 20px 60px rgba(0,0,0,0.8), 10px -10px 30px rgba(223, 255, 0, 0.05);
+            transform: skewX(-3deg);
+        }
+
+        .form-col > * {
+            transform: skewX(3deg); /* unskew content */
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            font-family: var(--font-display);
+            font-size: 3rem;
+            line-height: 1;
+            text-transform: uppercase;
+            border-bottom: 2px solid #222;
+            padding-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-control {
+            width: 100%;
+            background: #0A0A0A;
+            border: 2px solid #222;
+            padding: 1.2rem;
+            color: var(--text-light);
+            font-family: var(--font-ui);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-color: var(--volt);
+            background: #111;
+            /* Glowing inner shadow on focus */
+            box-shadow: inset 0 0 10px rgba(223, 255, 0, 0.1);
+        }
+
+        .input-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea.input-control {
+            min-height: 120px;
+            resize: none;
+        }
+
+        /* The Heavy Submit Button */
+        .btn-submit {
+            width: 100%;
+            background: var(--volt);
+            color: var(--bg);
+            border: none;
+            padding: 1.2rem;
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s, background 0.3s;
+            margin-top: 1rem;
+            line-height: 1;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            transition: left 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 1;
+        }
+
+        .btn-submit:hover::after {
+            left: 0;
+        }
+
+        .btn-submit span {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn-submit:hover span {
+            color: var(--volt);
+        }
+
+        /* Abstract Background Elements */
+        .diagonal-stripe {
+            position: absolute;
+            top: 0; right: 10%;
+            width: 200px; height: 150%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(223, 255, 0, 0.03) 10px,
+                rgba(223, 255, 0, 0.03) 20px
+            );
+            transform: rotate(15deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @media (max-width: 900px) {
+            .gym-container { grid-template-columns: 1fr; gap: 4rem; }
+            .form-col { transform: skewX(0); border-left: none; border-top: 10px solid var(--volt); }
+            .form-col > * { transform: skewX(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagonal-stripe"></div>
+
+    <section class="gym-container">
+        <div class="brand-col">
+            <span class="sub-title gs-slide-right">Start Your Journey</span>
+            <div class="title-wrapper gs-stomp">
+                <h1 class="huge-title">NO<br>EXCUSES</h1>
+                <h1 class="huge-title outline">NO<br>EXCUSES</h1>
+            </div>
+            <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 2rem; max-width: 400px;" class="gs-slide-right">
+                Drop your info below. Our elite trainers will contact you within 24 hours to build your custom regimen.
+            </p>
+        </div>
+
+        <div class="form-col gs-scale-up">
+            <h2 class="form-header">Commit Now</h2>
+            <form action="#" onsubmit="event.preventDefault();">
+                <div class="input-group gs-plate">
+                    <input type="text" class="input-control" placeholder="Full Name" required>
+                </div>
+                <div class="input-group gs-plate">
+                    <input type="email" class="input-control" placeholder="Email Address" required>
+                </div>
+                <div class="input-group gs-plate">
+                    <select class="input-control" required>
+                        <option value="" disabled selected>Select Primary Goal</option>
+                        <option value="hypertrophy">Hypertrophy / Muscle Gain</option>
+                        <option value="strength">Powerlifting / Strength</option>
+                        <option value="shred">Fat Loss / Shred</option>
+                    </select>
+                </div>
+                <div class="input-group gs-plate">
+                    <textarea class="input-control" placeholder="Tell us about your current fitness level..." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit gs-plate">
+                    <span>Send Request</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Intense, hard-hitting animations
+        const tl = gsap.timeline();
+
+        // Title stomps down heavy
+        tl.from(".gs-stomp", {
+            scale: 2,
+            opacity: 0,
+            duration: 0.6,
+            ease: "expo.inOut"
+        })
+        .from(".gs-slide-right", {
+            x: -50,
+            opacity: 0,
+            duration: 0.5,
+            stagger: 0.2,
+            ease: "power2.out"
+        }, "-=0.2")
+        // Form container scales up from bottom
+        .from(".gs-scale-up", {
+            y: 100,
+            opacity: 0,
+            duration: 0.7,
+            ease: "back.out(1.2)"
+        }, "-=0.3")
+        // Inputs slide in like weight plates hitting a bar
+        .from(".gs-plate", {
+            x: 100,
+            opacity: 0,
+            duration: 0.4,
+            stagger: 0.1,
+            ease: "power4.out"
+        }, "-=0.2");
+    </script>
+</body>
+</html>

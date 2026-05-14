@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNTITLED_AGENCY_01</title>
+    <!-- Raw system fonts. No Google Fonts. -->
+    <style>
+        /* --- Anti-Design Color Tokens --- */
+        :root {
+            --bg-raw: #F5F0E8; /* Newsprint off-white */
+            --text-raw: #000000; /* Pure black */
+            --accent-blue: #0000FF; /* Pure web-safe blue */
+            --highlight-yellow: #FFFF00; /* Actual highlighter yellow */
+            --border-thick: 3px solid #000000;
+        }
+
+        /* 
+           BRUTALIST RULE #1: 
+           Strip away all defaults. Force the box model. Use default cursor. 
+        */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: default; }
+        
+        /* 
+           BRUTALIST RULE #2: 
+           No transitions. Instant swaps only. 
+        */
+        *, *::before, *::after { transition: none !important; }
+
+        body { 
+            background: var(--bg-raw); 
+            color: var(--text-raw); 
+            /* Arial Black is the uncool default that becomes cool */
+            font-family: "Arial Black", "Helvetica Neue", Helvetica, sans-serif; 
+            overflow-x: hidden;
+            border: var(--border-thick);
+            min-height: 100vh;
+        }
+
+        /* Typewriter font for body copy to contrast massive headings */
+        .mono { font-family: "Courier New", Courier, monospace; font-weight: normal; }
+
+        /* --- Navigation: Vertical, rigid, bordered --- */
+        nav {
+            position: fixed; top: 0; left: 0; width: 250px; height: 100vh;
+            border-right: var(--border-thick); background: var(--bg-raw);
+            z-index: 100; display: flex; flex-direction: column;
+        }
+        .nav-logo {
+            font-size: 2rem; padding: 20px; border-bottom: var(--border-thick);
+            text-transform: uppercase; line-height: 1; word-break: break-all;
+        }
+        .nav-links { display: flex; flex-direction: column; flex: 1; }
+        .nav-link {
+            font-size: 3rem; padding: 15px 20px; border-bottom: var(--border-thick);
+            text-decoration: underline; text-decoration-thickness: 4px; color: var(--text-raw);
+            text-transform: uppercase; display: block;
+        }
+        
+        /* The signature Brutalist hover: Instant color inversion */
+        .nav-link:hover { background: var(--text-raw); color: var(--bg-raw); text-decoration-color: var(--bg-raw); }
+
+        /* --- Main Layout Grid --- */
+        main { margin-left: 250px; }
+
+        /* --- Hero: Massive overlapping typography --- */
+        .hero {
+            height: 80vh; border-bottom: var(--border-thick); position: relative;
+            padding: 20px; display: flex; flex-direction: column; justify-content: flex-end;
+            overflow: hidden;
+        }
+        
+        /* Violent mixing of sizes and weights */
+        .hero-small { font-size: 14px; font-family: "Courier New"; font-weight: bold; position: absolute; top: 20px; right: 20px; text-align: right; }
+        
+        .hero-massive {
+            font-size: clamp(100px, 15vw, 300px); 
+            line-height: 0.8; letter-spacing: -5px; /* No refined tracking */
+            text-transform: uppercase; white-space: nowrap;
+            /* Intentional clipping off screen */
+            margin-left: -10px; 
+        }
+        
+        /* Mixing weights in the same line */
+        .weight-thin { font-family: "Arial", sans-serif; font-weight: 100; letter-spacing: -2px; }
+        
+        /* Aggressive highlighter use */
+        .highlight { background-color: var(--highlight-yellow); padding: 0 10px; display: inline-block; }
+
+        /* --- Marquee: Raw energy, no easing --- */
+        .marquee-container {
+            border-bottom: var(--border-thick); background: var(--accent-blue); color: var(--bg-raw);
+            font-size: 4rem; padding: 10px 0; overflow: hidden; white-space: nowrap;
+            text-transform: uppercase;
+        }
+        .marquee-inner { display: inline-block; animation: rawMarquee 5s linear infinite; }
+        @keyframes rawMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- Content Grid: Visible 1px lines, asymmetry --- */
+        .content-grid {
+            display: grid; grid-template-columns: 1fr 2fr;
+            border-bottom: var(--border-thick); min-height: 60vh;
+        }
+        
+        .col { padding: 40px; }
+        .col-left { border-right: var(--border-thick); position: relative; }
+        
+        /* The "Too big" number next to "Too small" text */
+        .giant-number { font-size: 350px; line-height: 0.7; position: absolute; bottom: -40px; left: -20px; color: var(--accent-blue); z-index: -1; }
+        
+        .body-text {
+            font-size: 12px; font-family: "Courier New"; line-height: 1.2;
+            column-count: 2; column-gap: 40px; margin-top: 50px;
+        }
+
+        /* --- Advanced Brutalist Interaction: Image Flicker --- */
+        .flicker-container {
+            width: 100%; height: 500px; border: var(--border-thick);
+            position: relative; overflow: hidden; background: #000;
+        }
+        .flicker-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; filter: grayscale(1) contrast(1.5);
+            /* Step-end animation creates a hard strobe, not a smooth fade */
+            animation: flicker 0.3s step-end infinite;
+            animation-play-state: paused;
+            opacity: 0;
+        }
+        .flicker-container:hover .flicker-img { animation-play-state: running; opacity: 1; }
+        .flicker-container:hover::before { display: none; }
+        
+        .flicker-container::before {
+            content: 'HOVER TO STROBE'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: var(--highlight-yellow);
+            font-size: 3rem; text-align: center; width: 100%;
+        }
+
+        @keyframes flicker {
+            0% { background-image: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?auto=format&fit=crop&q=80'); }
+            33% { background-image: url('https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80'); }
+            66% { background-image: url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80'); }
+            100% { background-image: url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?auto=format&fit=crop&q=80'); }
+        }
+
+        /* --- Responsive / Breaking the Grid --- */
+        .breaker {
+            position: absolute; top: 50%; right: -50px;
+            transform: rotate(-90deg); transform-origin: right bottom;
+            font-size: 8rem; color: var(--text-raw); -webkit-text-stroke: 2px var(--text-raw);
+            color: transparent; white-space: nowrap; mix-blend-mode: multiply; z-index: 50;
+        }
+
+        @media(max-width: 1024px) {
+            nav { position: relative; width: 100%; height: auto; border-right: none; border-bottom: var(--border-thick); flex-direction: row; flex-wrap: wrap; }
+            .nav-logo { border-bottom: none; border-right: var(--border-thick); width: 100%; }
+            .nav-link { font-size: 1.5rem; border-bottom: none; border-right: var(--border-thick); flex: 1; text-align: center; }
+            main { margin-left: 0; }
+            .content-grid { grid-template-columns: 1fr; }
+            .col-left { border-right: none; border-bottom: var(--border-thick); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Strict vertical bordered nav -->
+    <nav>
+        <div class="nav-logo">SYSTEM<br>ERROR</div>
+        <div class="nav-links">
+            <a href="#" class="nav-link">INDEX</a>
+            <a href="#" class="nav-link">INFO</a>
+            <a href="#" class="nav-link">ARCHIVE</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero: Violent sizing and clipping -->
+        <section class="hero">
+            <div class="hero-small">
+                SYS.REQ: 2026<br>
+                STATUS: OFFLINE<br>
+                ERR_CODE: 0x000F
+            </div>
+            
+            <div class="hero-massive">
+                <span class="weight-thin">WE MAKE</span> <span class="highlight">UGLY</span>
+            </div>
+            <div class="hero-massive">
+                WEBSITES.
+            </div>
+            
+            <!-- Intentional broken grid element -->
+            <div class="breaker">DO NOT IGNORE</div>
+        </section>
+
+        <!-- Marquee: Raw Blue -->
+        <div class="marquee-container">
+            <div class="marquee-inner">
+                FUNCTION OVER FORM // FUNCTION OVER FORM // FUNCTION OVER FORM // FUNCTION OVER FORM // FUNCTION OVER FORM // FUNCTION OVER FORM // 
+            </div>
+        </div>
+
+        <!-- Content Grid: Asymmetry and Borders -->
+        <section class="content-grid">
+            <div class="col col-left">
+                <div class="giant-number">01</div>
+                <div class="mono" style="font-size: 2rem; font-weight: bold; margin-bottom: 20px;">THE MANIFESTO</div>
+                <div class="body-text">
+                    DESIGN IS A VIRUS. WE STRIP AWAY THE DECORATION. WE REMOVE THE SOFT GRADIENTS. WE BURN THE ROUNDED CORNERS. 
+                    <br><br>
+                    WHAT REMAINS IS THE RAW ARCHITECTURE OF THE INTERNET. IT IS UNCOMFORTABLE. IT IS HOSTILE. IT IS PERFECT.
+                    <br><br>
+                    DO NOT ASK US TO MAKE IT PRETTY. PRETTY IS FOR BILLBOARDS. WE BUILD STRUCTURES THAT SURVIVE THE COLLAPSE.
+                </div>
+            </div>
+            <div class="col col-right">
+                <!-- Advanced Hover Interaction: Image Strobe -->
+                <div class="flicker-container">
+                    <div class="flicker-img"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Raw Table Aesthetic -->
+        <div style="padding: 40px; border-bottom: var(--border-thick);">
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Courier New';">
+                <tr style="border-bottom: 2px solid #000;">
+                    <th style="text-align: left; padding: 10px;">ID</th>
+                    <th style="text-align: left; padding: 10px;">OPERATION</th>
+                    <th style="text-align: right; padding: 10px;">STATUS</th>
+                </tr>
+                <tr style="border-bottom: 1px solid #000; background: #000; color: var(--bg-raw);">
+                    <td style="padding: 10px;">001</td>
+                    <td style="padding: 10px;">SYSTEM PURGE</td>
+                    <td style="text-align: right; padding: 10px;">COMPLETE</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #000;">
+                    <td style="padding: 10px;">002</td>
+                    <td style="padding: 10px;">AESTHETIC DELETION</td>
+                    <td style="text-align: right; padding: 10px; color: var(--accent-blue);">IN PROGRESS</td>
+                </tr>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

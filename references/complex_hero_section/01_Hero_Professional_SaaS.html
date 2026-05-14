@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium SaaS Hero Section - Light</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #FFFFFF;
+            --bg-offwhite: #F8FAFC;
+            --surface-1: rgba(255, 255, 255, 0.7);
+            --surface-2: rgba(255, 255, 255, 0.9);
+            --border-light: rgba(15, 23, 42, 0.08);
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --brand-primary: #2563EB;
+            --brand-glow: rgba(37, 99, 235, 0.15);
+            --font-display: 'Manrope', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Ambient Light Glow Background */
+        .ambient-glow {
+            position: absolute;
+            top: -10%; left: 50%;
+            width: 70vw; height: 70vw;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.04) 40%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(60px);
+        }
+
+        /* Subtle Grid Overlay */
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--border-light) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: 0;
+            pointer-events: none;
+            mask-image: radial-gradient(ellipse at center top, black 30%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center top, black 30%, transparent 70%);
+        }
+
+        /* Hero Container */
+        .hero-section {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            padding: 8rem 2rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Light Glass Pill Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 16px 6px 6px;
+            background: var(--surface-1);
+            border: 1px solid var(--border-light);
+            border-radius: 100px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            background: var(--surface-2);
+            border-color: rgba(15, 23, 42, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .badge-tag {
+            background: var(--text-main);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Massive Typography */
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(3.5rem, 7vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 1.5rem;
+            max-width: 1000px;
+            color: var(--text-main);
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.25rem);
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 650px;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        /* Buttons */
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: #FFFFFF;
+            border: 1px solid var(--text-main);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #FFFFFF;
+            color: var(--text-main);
+            border: 1px solid rgba(15, 23, 42, 0.15);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-offwhite);
+            border-color: rgba(15, 23, 42, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 3D Dashboard Mockup (Light Mode) */
+        .dashboard-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            perspective: 2000px;
+        }
+
+        .dashboard-mockup {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 
+                0 40px 80px -20px rgba(15, 23, 42, 0.15),
+                0 0 0 1px rgba(15, 23, 42, 0.05) inset;
+            transform: rotateX(12deg) translateY(0);
+            transform-style: preserve-3d;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 1.5rem;
+            height: 600px;
+        }
+
+        /* Mockup Internals (Light Mode) */
+        .mockup-sidebar {
+            background: var(--bg-offwhite);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .mockup-main {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 1.5rem;
+        }
+
+        .mockup-header {
+            height: 60px;
+            background: var(--bg-offwhite);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .mockup-bento {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .bento-card {
+            background: var(--bg-offwhite);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .bento-card:hover {
+            background: #FFFFFF;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Skeleton UI Elements (Light Mode) */
+        .skeleton-line {
+            height: 10px; background: rgba(15, 23, 42, 0.06); border-radius: 5px;
+        }
+        .skeleton-circle {
+            width: 36px; height: 36px; background: rgba(15, 23, 42, 0.06); border-radius: 50%;
+        }
+        
+        .card-1 { grid-column: span 2; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;}
+        .card-2 { padding: 2rem; display: flex; align-items: center; justify-content: center;}
+        .card-3 { padding: 2rem; display: flex; flex-direction: column; gap: 1rem;}
+        .card-4 { grid-column: span 2; padding: 2rem; }
+
+        @media (max-width: 900px) {
+            .cta-group { flex-direction: column; width: 100%; max-width: 300px; }
+            .dashboard-mockup { grid-template-columns: 1fr; height: 400px; transform: rotateX(5deg); }
+            .mockup-sidebar { display: none; }
+            .mockup-bento { grid-template-columns: 1fr; }
+            .hero-title { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="bg-grid"></div>
+
+    <section class="hero-section">
+        
+        <div class="badge gs-up">
+            <span class="badge-tag">Update</span>
+            Antigravity Platform 2.0 is now live
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+
+        <h1 class="hero-title gs-up">
+            The infrastructure for <span>intelligent</span> applications.
+        </h1>
+
+        <p class="hero-subtitle gs-up">
+            A unified platform to build, scale, and secure your enterprise architecture. Deploy instantly with zero configuration and unmatched reliability.
+        </p>
+
+        <div class="cta-group gs-up">
+            <a href="#" class="btn btn-primary">Start Building Free</a>
+            <a href="#" class="btn btn-secondary">Explore Documentation</a>
+        </div>
+
+        <div class="dashboard-wrapper gs-dash">
+            <div class="dashboard-mockup">
+                
+                <div class="mockup-sidebar">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+                        <div class="skeleton-circle"></div>
+                        <div class="skeleton-line" style="width: 80px;"></div>
+                    </div>
+                    <div class="skeleton-line" style="width: 100%;"></div>
+                    <div class="skeleton-line" style="width: 80%;"></div>
+                    <div class="skeleton-line" style="width: 90%;"></div>
+                    <div class="skeleton-line" style="width: 75%;"></div>
+                    <div class="skeleton-line" style="width: 85%; margin-top: auto;"></div>
+                </div>
+
+                <div class="mockup-main">
+                    <div class="mockup-header" style="display: flex; align-items: center; padding: 0 1.5rem;">
+                        <div class="skeleton-line" style="width: 120px;"></div>
+                    </div>
+                    <div class="mockup-bento">
+                        <div class="bento-card card-1">
+                            <div class="skeleton-line" style="width: 40%; height: 20px;"></div>
+                            <div style="flex:1; background: linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent); border-radius: 8px; border-top: 2px solid var(--brand-primary); position: relative;">
+                                <!-- Simulated graph line -->
+                                <svg width="100%" height="100%" preserveAspectRatio="none" style="position: absolute; bottom: 0;">
+                                    <path d="M0,50 Q25,20 50,50 T100,30 T150,60 T200,20 T250,40 T300,10 L300,100 L0,100 Z" fill="rgba(37, 99, 235, 0.1)" />
+                                    <path d="M0,50 Q25,20 50,50 T100,30 T150,60 T200,20 T250,40 T300,10" fill="none" stroke="var(--brand-primary)" stroke-width="2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="bento-card card-2">
+                            <div class="skeleton-circle" style="width: 110px; height: 110px; border: 12px solid rgba(139, 92, 246, 0.2); border-top-color: #7C3AED; border-right-color: #7C3AED; background: transparent; transform: rotate(45deg);"></div>
+                        </div>
+                        <div class="bento-card card-3">
+                            <div class="skeleton-line" style="width: 60%; margin-bottom: 0.5rem;"></div>
+                            <div class="skeleton-line" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+                            <div class="skeleton-line" style="width: 100%; height: 40px; border-radius: 8px;"></div>
+                        </div>
+                        <div class="bento-card card-4">
+                            <div style="display: flex; gap: 1rem; height: 100%;">
+                                <div style="flex: 1; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 8px;"></div>
+                                <div style="flex: 1; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 8px;"></div>
+                                <div style="flex: 1; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <script>
+        // Clean, snappy entrance animations
+        const tl = gsap.timeline({ delay: 0.1 });
+
+        tl.from(".gs-up", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power2.out"
+        })
+        .from(".gs-dash", {
+            y: 100,
+            opacity: 0,
+            rotationX: 20, 
+            duration: 1.2,
+            ease: "power3.out"
+        }, "-=0.6");
+
+        // Continuous subtle floating animation for the dashboard
+        gsap.to(".dashboard-mockup", {
+            y: -12,
+            duration: 4,
+            yoyo: true,
+            repeat: -1,
+            ease: "sine.inOut"
+        });
+
+        // 3D Tilt on Mouse Move (Desktop Only)
+        const dashWrapper = document.querySelector('.dashboard-wrapper');
+        const dashMockup = document.querySelector('.dashboard-mockup');
+
+        dashWrapper.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 900) {
+                const rect = dashWrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left; 
+                const y = e.clientY - rect.top;  
+                
+                const xPercent = (x / rect.width - 0.5) * 2;
+                const yPercent = (y / rect.height - 0.5) * 2;
+
+                const maxRotateX = 4;
+                const maxRotateY = 4;
+
+                gsap.to(dashMockup, {
+                    rotationX: 12 - (yPercent * maxRotateX),
+                    rotationY: xPercent * maxRotateY,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            }
+        });
+
+        dashWrapper.addEventListener('mouseleave', () => {
+            gsap.to(dashMockup, {
+                rotationX: 12,
+                rotationY: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+    </script>
+</body>
+</html>

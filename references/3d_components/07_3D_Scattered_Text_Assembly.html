@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Scattered Text Assembly</title>
+    <!-- GSAP Core and ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0A0A0A;
+            --text-color: #E2E2E2;
+        }
+
+        body {
+            margin: 0; padding: 0; background: var(--bg);
+            font-family: 'Anton', sans-serif;
+            overflow-x: hidden; color: var(--text-color);
+        }
+
+        /* Spacers to allow scrolling */
+        .spacer {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            font-family: 'Helvetica Neue', sans-serif; font-weight: 300; letter-spacing: 5px;
+            color: #555; text-transform: uppercase;
+        }
+
+        /* --- The 3D Assembly Section --- */
+        .assembly-section {
+            height: 200vh; /* Extremely tall so we have a long scroll track for the animation */
+            position: relative;
+        }
+
+        /* The container that pins to the screen */
+        .pin-wrapper {
+            height: 100vh; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            position: sticky; top: 0;
+            overflow: hidden;
+            perspective: 2000px; /* Deep perspective for extreme scattering */
+            transform-style: preserve-3d;
+        }
+
+        /* The Text wrapper */
+        .text-3d {
+            font-size: clamp(5rem, 15vw, 15rem);
+            line-height: 1; letter-spacing: 5px;
+            text-transform: uppercase;
+            position: relative;
+            transform-style: preserve-3d;
+            display: flex; justify-content: center;
+        }
+
+        /* Individual character styling */
+        .char {
+            display: inline-block;
+            position: relative;
+            transform-style: preserve-3d;
+            /* 3D Extrusion effect via stacked text-shadows */
+            color: #FFF;
+            text-shadow: 
+                0px 1px 0 #999,
+                0px 2px 0 #888,
+                0px 3px 0 #777,
+                0px 4px 0 #666,
+                0px 5px 0 #555,
+                0px 6px 0 #444,
+                0px 7px 0 #333,
+                0px 8px 15px rgba(0,0,0,0.8),
+                0px 15px 30px rgba(0,0,0,0.9);
+        }
+
+        /* Ambient background lighting */
+        .ambient-light {
+            position: absolute; top: 50%; left: 50%; width: 50vw; height: 50vw;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            z-index: -1; pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="spacer">
+        ↓ Scroll Down to Assemble
+    </div>
+
+    <!-- Assembly Section -->
+    <div class="assembly-section" id="trigger-section">
+        <div class="pin-wrapper">
+            <div class="ambient-light" id="light"></div>
+            
+            <div class="text-3d" id="target-text">
+                ENGINEERING
+            </div>
+        </div>
+    </div>
+
+    <div class="spacer">
+        ↑ Scroll Up to Scatter
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const textContainer = document.getElementById('target-text');
+        const text = textContainer.innerText;
+        textContainer.innerHTML = ''; // Clear original text
+
+        // 1. Split text into individual <span> characters
+        const chars = [];
+        text.split('').forEach(char => {
+            const span = document.createElement('span');
+            // Handle spaces
+            if(char === ' ') {
+                span.innerHTML = '&nbsp;';
+            } else {
+                span.innerText = char;
+            }
+            span.className = 'char';
+            textContainer.appendChild(span);
+            chars.push(span);
+        });
+
+        // 2. Define the initial scattered state for each character
+        chars.forEach(char => {
+            // Random scatter values
+            const randX = (Math.random() - 0.5) * 3000; // Scatter widely horizontally
+            const randY = (Math.random() - 0.5) * 2000; // Scatter vertically
+            const randZ = Math.random() * 2000 + 500;   // Push deep into the screen (Z-axis)
+            
+            const rotX = Math.random() * 720 - 360; // Spin wildly on X
+            const rotY = Math.random() * 720 - 360; // Spin wildly on Y
+            const rotZ = Math.random() * 360 - 180; // Spin on Z
+            
+            const scale = Math.random() * 3 + 0.5; // Random sizes
+
+            // Set the initial scattered state (This is what you see before scrolling)
+            gsap.set(char, {
+                x: randX,
+                y: randY,
+                z: randZ,
+                rotationX: rotX,
+                rotationY: rotY,
+                rotationZ: rotZ,
+                scale: scale,
+                opacity: 0,
+                // Add a heavy blur when far away for depth of field effect
+                filter: "blur(20px)"
+            });
+        });
+
+        // 3. The Assembly Animation tied to Scroll
+        // As you scroll through the 200vh section, the letters snap to exactly 0,0,0
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#trigger-section",
+                start: "top top", // Start animation when section hits top of viewport
+                end: "bottom bottom", // End when section finishes
+                scrub: 1, // '1' gives a 1-second smoothing delay to the scroll connection (feels heavier)
+                pin: true, // Keep the view locked while animating
+            }
+        });
+
+        // Tween all characters from their random scattered state to their perfect alignment
+        tl.to(chars, {
+            x: 0,
+            y: 0,
+            z: 0,
+            rotationX: 0,
+            rotationY: 0,
+            rotationZ: 0,
+            scale: 1,
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 1,
+            stagger: {
+                amount: 0.5, // Letters assemble slightly one after another
+                from: "random" // Random order of assembly looks more organic
+            },
+            ease: "power3.inOut"
+        });
+
+        // Dynamic light that brightens as the word assembles
+        tl.fromTo("#light", { opacity: 0 }, { opacity: 1, duration: 1 }, "<");
+
+    </script>
+</body>
+</html>

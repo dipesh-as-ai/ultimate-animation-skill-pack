@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Fintech Hero</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070B14;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --accent-green: #10B981;
+            --accent-cyan: #06B6D4;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Abstract Network Background */
+        .network-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+            height: 1px;
+            width: 100%;
+        }
+
+        .grid-line.v {
+            background: linear-gradient(0deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+            width: 1px;
+            height: 100%;
+        }
+
+        .glow-orb {
+            position: absolute;
+            width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
+            top: -10%; right: -10%;
+            filter: blur(60px);
+            z-index: 0;
+            border-radius: 50%;
+        }
+
+        .glow-orb-2 {
+            position: absolute;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 60%);
+            bottom: -20%; left: -10%;
+            filter: blur(80px);
+            z-index: 0;
+            border-radius: 50%;
+        }
+
+        /* Hero Layout */
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 0 4rem;
+            align-items: center;
+        }
+
+        /* Left Typography */
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .dot { width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);}
+
+        .hero-title {
+            font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #FFFFFF 20%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+
+        /* Call to actions */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-green) 100%);
+            color: #000;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-main);
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--surface-border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* Right Side 3D Asset */
+        .hero-visual {
+            position: relative;
+            perspective: 2000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+        }
+
+        .card-group {
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg) rotateY(-15deg);
+        }
+
+        /* The Glass Card */
+        .glass-card {
+            width: 380px;
+            height: 240px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        /* Chip on Card */
+        .card-chip {
+            width: 45px; height: 35px;
+            background: linear-gradient(135deg, #E2E8F0, #94A3B8);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-chip::after {
+            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.2);
+        }
+        .card-chip::before {
+            content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(0,0,0,0.2);
+        }
+
+        .card-balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #FFF;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Floating Dashboard Elements */
+        .float-panel {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+        }
+
+        .panel-1 {
+            top: -40px; right: -80px;
+            width: 220px;
+            z-index: 1;
+            transform: translateZ(-50px);
+        }
+
+        .panel-2 {
+            bottom: -60px; left: -60px;
+            width: 260px;
+            z-index: 3;
+            transform: translateZ(50px);
+        }
+
+        .panel-title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .panel-val { font-size: 1.5rem; font-weight: 700; color: var(--accent-green); }
+        .panel-chart { height: 40px; margin-top: 1rem; position: relative; }
+        
+        .chart-bar {
+            position: absolute; bottom: 0; width: 8px; background: var(--accent-cyan); border-radius: 4px 4px 0 0;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-container { grid-template-columns: 1fr; gap: 2rem; padding: 0 2rem; text-align: center; }
+            .hero-content { align-items: center; }
+            .trust-badge { margin: 0 auto 2rem auto; }
+            .hero-desc { margin: 0 auto 2rem auto; }
+            .hero-visual { height: 400px; perspective: 1000px; transform: scale(0.8); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Background -->
+    <div class="glow-orb"></div>
+    <div class="glow-orb-2"></div>
+    <div class="network-bg" id="network">
+        <!-- Lines injected via JS -->
+    </div>
+
+    <main class="hero-container">
+        
+        <div class="hero-content">
+            <div class="trust-badge gs-up">
+                <div class="dot"></div>
+                Institutional Grade Security
+            </div>
+
+            <h1 class="hero-title">
+                <span style="display:block" class="gs-up">Global banking.</span>
+                <span style="display:block" class="gs-up">Engineered for <span class="gradient-text">Scale.</span></span>
+            </h1>
+
+            <p class="hero-desc gs-up">
+                Move capital across borders in milliseconds. Gain unified visibility over global treasury, automated reconciliation, and yield optimization—built on proprietary blockchain rails.
+            </p>
+
+            <div class="btn-group gs-up">
+                <button class="btn-primary">Open Enterprise Account</button>
+                <button class="btn-secondary">Talk to Sales</button>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="card-group gs-3d">
+                
+                <!-- Back Floating Panel -->
+                <div class="float-panel panel-1 gs-panel-1">
+                    <div class="panel-title">Yield Generated (30d)</div>
+                    <div class="panel-val">+$124,500.00</div>
+                    <div class="panel-chart">
+                        <div class="chart-bar" style="left: 0%; height: 40%;"></div>
+                        <div class="chart-bar" style="left: 20%; height: 60%;"></div>
+                        <div class="chart-bar" style="left: 40%; height: 30%;"></div>
+                        <div class="chart-bar" style="left: 60%; height: 80%;"></div>
+                        <div class="chart-bar" style="left: 80%; height: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Main Glass Card -->
+                <div class="glass-card gs-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div class="card-chip"></div>
+                        <svg width="40" height="25" viewBox="0 0 40 25" fill="none">
+                            <circle cx="12.5" cy="12.5" r="12.5" fill="rgba(255,255,255,0.5)"/>
+                            <circle cx="27.5" cy="12.5" r="12.5" fill="rgba(255,255,255,0.5)"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">Available Balance</div>
+                        <div class="card-balance" id="balance">$0.00</div>
+                    </div>
+                    <div class="card-details">
+                        <span>**** **** **** 8834</span>
+                        <span>12/28</span>
+                    </div>
+                </div>
+
+                <!-- Front Floating Panel -->
+                <div class="float-panel panel-2 gs-panel-2">
+                    <div class="panel-title">Real-time Transfer</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">EU</div>
+                            <div>
+                                <div style="font-size: 0.8rem; color: #FFF;">Acme Corp Ltd</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">Processing...</div>
+                            </div>
+                        </div>
+                        <div style="color: #FFF; font-weight: 600;">-€45,000</div>
+                    </div>
+                    <!-- Loading bar -->
+                    <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 15px; overflow: hidden;">
+                        <div style="width: 60%; height: 100%; background: var(--accent-cyan); border-radius: 2px;" class="gs-loading"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Generate Background Grid Lines
+        const network = document.getElementById('network');
+        for(let i=0; i<10; i++) {
+            let line = document.createElement('div');
+            line.className = 'grid-line';
+            line.style.top = `${i * 10}%`;
+            network.appendChild(line);
+            
+            let vline = document.createElement('div');
+            vline.className = 'grid-line v';
+            vline.style.left = `${i * 10}%`;
+            network.appendChild(vline);
+        }
+
+        // Entrance Animations
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        // Left Side Content
+        tl.from(".gs-up", {
+            y: 40,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out"
+        })
+        // 3D Card Group Flip Entrance
+        .from(".gs-3d", {
+            rotationY: 90,
+            rotationX: 0,
+            z: -500,
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.out"
+        }, "-=0.8")
+        // Panels pop out
+        .from(".gs-panel-1", {
+            x: -50, y: 50, z: 0, opacity: 0, duration: 1, ease: "back.out(1.5)"
+        }, "-=1")
+        .from(".gs-panel-2", {
+            x: 50, y: -50, z: 0, opacity: 0, duration: 1, ease: "back.out(1.5)"
+        }, "-=0.8");
+
+        // Number Counter Animation for the Balance
+        const balanceObj = { val: 0 };
+        tl.to(balanceObj, {
+            val: 8450250.75,
+            duration: 2,
+            ease: "power2.out",
+            onUpdate: function() {
+                // Format as currency
+                const formatted = balanceObj.val.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD'
+                });
+                document.getElementById('balance').innerText = formatted;
+            }
+        }, "-=1");
+
+        // Continuous subtle float for the 3D group
+        gsap.to(".card-group", {
+            y: -15,
+            rotationX: 18,
+            duration: 4,
+            yoyo: true,
+            repeat: -1,
+            ease: "sine.inOut"
+        });
+
+        // Loading bar loop
+        gsap.to(".gs-loading", {
+            width: "100%",
+            duration: 2,
+            repeat: -1,
+            ease: "power1.inOut"
+        });
+
+        // Mouse Tracking 3D Tilt (Desktop)
+        const visualArea = document.querySelector('.hero-visual');
+        const cardGroup = document.querySelector('.card-group');
+
+        visualArea.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 1024) {
+                const rect = visualArea.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+                gsap.to(cardGroup, {
+                    rotationY: -15 + (x * 20),
+                    rotationX: 15 - (y * 20),
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            }
+        });
+
+        visualArea.addEventListener('mouseleave', () => {
+            gsap.to(cardGroup, {
+                rotationY: -15,
+                rotationX: 15,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Music Festival Contact</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --acid: #CCFF00;
+            --hot-pink: #FF0055;
+            --text-light: #FFFFFF;
+            --font-display: 'Anton', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: var(--font-mono);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            transition: filter 0.1s;
+        }
+
+        body.glitch-mode {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        /* Custom Rave Cursor */
+        .cursor-cross {
+            position: fixed; top: 0; left: 0;
+            width: 40px; height: 40px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+        .cursor-cross::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: var(--acid); transform: translateY(-50%); }
+        .cursor-cross::after { content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 100%; background: var(--acid); transform: translateX(-50%); }
+
+        /* Background Marquee */
+        .marquee-bg {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 200vw;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            z-index: 0;
+            opacity: 0.05;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .marquee-track {
+            display: flex;
+            white-space: nowrap;
+            animation: scrollText 20s linear infinite;
+        }
+        
+        .marquee-track:nth-child(even) {
+            animation-direction: reverse;
+            animation-duration: 25s;
+        }
+
+        .marquee-track span {
+            font-family: var(--font-display);
+            font-size: 8rem;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--text-light);
+            padding: 0 2rem;
+            text-transform: uppercase;
+        }
+
+        @keyframes scrollText {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Main Content */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: end;
+            min-height: 100vh;
+        }
+
+        .header-col h1 {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 10vw, 9rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            color: var(--acid);
+        }
+
+        .header-col h1 span {
+            display: block;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--text-light);
+        }
+
+        .header-col p {
+            font-size: 1.1rem;
+            max-width: 400px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+        }
+
+        /* Brutalist Form */
+        .form-col {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            padding-bottom: 2rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-number {
+            position: absolute;
+            left: 0; top: -20px;
+            font-size: 0.8rem;
+            color: var(--hot-pink);
+            font-weight: 700;
+        }
+
+        .rave-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 4px solid #333;
+            padding: 1rem 0;
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .rave-input::placeholder {
+            color: #444;
+        }
+
+        .rave-input:focus {
+            border-bottom-color: var(--acid);
+            color: var(--acid);
+            transform: translateX(10px);
+        }
+
+        /* Hover interaction button */
+        .btn-rave {
+            background: transparent;
+            border: 4px solid var(--text-light);
+            color: var(--text-light);
+            font-family: var(--font-display);
+            font-size: 4rem;
+            text-transform: uppercase;
+            padding: 1rem 2rem;
+            cursor: none;
+            margin-top: 2rem;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-rave::before {
+            content: 'HIT IT';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--hot-pink);
+            color: var(--bg-color);
+            display: flex; align-items: center; justify-content: center;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .btn-rave:hover {
+            border-color: var(--hot-pink);
+        }
+
+        .btn-rave:hover::before {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; align-items: flex-start; gap: 2rem; }
+            .header-col h1 { font-size: 4rem; }
+            .rave-input { font-size: 1.8rem; }
+            .btn-rave { font-size: 2.5rem; }
+            body { cursor: auto; }
+            .cursor-cross { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-cross"></div>
+
+    <div class="marquee-bg">
+        <div class="marquee-track">
+            <span>SOUNDSYSTEM</span><span>SOUNDSYSTEM</span><span>SOUNDSYSTEM</span><span>SOUNDSYSTEM</span>
+        </div>
+        <div class="marquee-track">
+            <span>TRANSMISSION</span><span>TRANSMISSION</span><span>TRANSMISSION</span><span>TRANSMISSION</span>
+        </div>
+        <div class="marquee-track">
+            <span>BASSLINE</span><span>BASSLINE</span><span>BASSLINE</span><span>BASSLINE</span>
+        </div>
+    </div>
+
+    <main class="container">
+        
+        <div class="header-col gs-slide">
+            <h1>NOISE<br><span>CONTROL</span></h1>
+            <p>For press passes, artist booking, or lost & found inquiries. We read everything. Eventually.</p>
+        </div>
+
+        <div class="form-col">
+            <form action="#" onsubmit="event.preventDefault();">
+                
+                <div class="input-wrapper gs-up">
+                    <span class="input-number">01</span>
+                    <input type="text" class="rave-input" placeholder="Who Are You?" required>
+                </div>
+
+                <div class="input-wrapper gs-up">
+                    <span class="input-number">02</span>
+                    <input type="email" class="rave-input" placeholder="Commlink (Email)" required>
+                </div>
+
+                <div class="input-wrapper gs-up">
+                    <span class="input-number">03</span>
+                    <input type="text" class="rave-input" placeholder="The Frequency (Subject)">
+                </div>
+
+                <div class="input-wrapper gs-up">
+                    <button type="submit" class="btn-rave hover-trigger">Send It</button>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+    <script>
+        // Custom Crosshair Cursor
+        const cursor = document.querySelector('.cursor-cross');
+        
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1,
+                ease: "power2.out"
+            });
+        });
+
+        // Glitch Mode on Button Hover
+        const btn = document.querySelector('.hover-trigger');
+        btn.addEventListener('mouseenter', () => {
+            document.body.classList.add('glitch-mode');
+            gsap.to(cursor, { scale: 2, rotation: 45, duration: 0.2 });
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            document.body.classList.remove('glitch-mode');
+            gsap.to(cursor, { scale: 1, rotation: 0, duration: 0.2 });
+        });
+
+        // Heavy Entrance Animations
+        const tl = gsap.timeline({ delay: 0.3 });
+
+        tl.from(".gs-slide h1", {
+            x: -100, opacity: 0, duration: 1, ease: "power4.out"
+        })
+        .from(".gs-slide p", {
+            x: -50, opacity: 0, duration: 0.8, ease: "power2.out"
+        }, "-=0.6")
+        .from(".gs-up", {
+            y: 50, opacity: 0, duration: 0.6, stagger: 0.15, ease: "back.out(1.5)"
+        }, "-=0.4");
+    </script>
+</body>
+</html>

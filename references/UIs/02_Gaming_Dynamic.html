@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Gaming UI</title>
+    
+    <!-- Aggressive Tech/Gaming Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for Dynamic Entrances -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-yellow: #fcee0a;
+            --ui-border: rgba(0, 243, 255, 0.3);
+            --text-main: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            /* Tech Grid Background */
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* --- HUD Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(5,5,8,0.9) 0%, rgba(5,5,8,0) 100%);
+        }
+
+        .hud-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-pink);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background-color: var(--neon-pink);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Cyberpunk Glitch Button --- */
+        .cy-btn {
+            background: var(--neon-yellow);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            text-transform: uppercase;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            /* Angled corners */
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: all 0.2s;
+        }
+
+        .cy-btn:hover {
+            background: var(--neon-pink);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 234, 0.6);
+        }
+
+        /* The Glitch decoration on the button */
+        .cy-btn::before {
+            content: 'sys.init()';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-cyan);
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            transition: clip-path 0.2s ease-in-out;
+        }
+
+        .cy-btn:hover::before {
+            clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%);
+            animation: btnGlitch 0.4s infinite;
+        }
+
+        @keyframes btnGlitch {
+            0% { clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%); }
+            50% { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+            100% { clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%); }
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            width: 50%;
+            z-index: 10;
+        }
+
+        /* Glitch Title Animation */
+        .glitch-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6rem;
+            font-weight: 900;
+            line-height: 1;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-title::before, .glitch-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+        }
+
+        .glitch-title::before {
+            left: 3px;
+            text-shadow: -2px 0 var(--neon-pink);
+            clip-path: inset(10% 0 60% 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-title::after {
+            left: -3px;
+            text-shadow: -2px 0 var(--neon-cyan);
+            clip-path: inset(80% 0 5% 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); }
+            20% { clip-path: inset(60% 0 10% 0); }
+            40% { clip-path: inset(40% 0 50% 0); }
+            60% { clip-path: inset(80% 0 5% 0); }
+            80% { clip-path: inset(10% 0 70% 0); }
+            100% { clip-path: inset(30% 0 20% 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 60% 0); }
+            20% { clip-path: inset(30% 0 20% 0); }
+            40% { clip-path: inset(70% 0 10% 0); }
+            60% { clip-path: inset(20% 0 50% 0); }
+            80% { clip-path: inset(90% 0 5% 0); }
+            100% { clip-path: inset(50% 0 30% 0); }
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 40px;
+            max-width: 500px;
+            border-left: 2px solid var(--neon-cyan);
+            padding-left: 15px;
+        }
+
+        /* --- Hero Image Placeholder (Skewed) --- */
+        .hero-image-wrapper {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 55%;
+            height: 100vh;
+            /* Angled cut on the left side */
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-left: 4px solid var(--neon-cyan);
+        }
+
+        /* Add a scanner line to the image placeholder */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 243, 255, 0.8);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            animation: scan 3s infinite linear;
+            z-index: 5;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        .img-placeholder-text {
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 4px;
+            z-index: 2;
+        }
+
+        /* --- Infinite Marquee Tape --- */
+        .marquee-container {
+            width: 100%;
+            background: var(--neon-yellow);
+            color: #000;
+            padding: 10px 0;
+            overflow: hidden;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            transform: rotate(-2deg) scale(1.05);
+            margin: 40px 0;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 15s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- Roster / Loadout Section --- */
+        .roster {
+            padding: 100px 5%;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+        }
+        .section-title span { color: var(--neon-pink); }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        /* Dynamic Gaming Card */
+        .game-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--ui-border);
+            height: 400px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Tech corners */
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 0, 234, 0.1) 100%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--neon-pink);
+            box-shadow: 0 10px 30px rgba(255, 0, 234, 0.2);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-hud {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+        }
+
+        .card-hud h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .game-card:hover .card-hud h3 {
+            color: var(--neon-cyan);
+        }
+
+        .card-hud p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Dynamic progress bar inside card */
+        .stat-bar {
+            width: 100px;
+            height: 4px;
+            background: #222;
+            margin-top: 10px;
+            position: relative;
+        }
+        .stat-fill {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: var(--neon-cyan);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .game-card:hover .stat-fill {
+            width: 80%; /* Fills up on hover */
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="hud-logo">SYS.CORE</div>
+        <div class="nav-links">
+            <a href="#">Factions</a>
+            <a href="#">Armory</a>
+            <a href="#">Leaderboard</a>
+        </div>
+        <button class="cy-btn">PLAY FREE</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="glitch-title" data-text="CYBER SURGE">CYBER SURGE</div>
+            <p class="hero-desc">
+                Engage in hyper-kinetic warfare in a dystopian metropolis. The grid is waiting. Are you ready to synchronize?
+            </p>
+            <button class="cy-btn" style="font-size: 1.2rem;">ENTER THE GRID</button>
+        </div>
+
+        <div class="hero-image-wrapper">
+            <div class="scanner-line"></div>
+            <span class="img-placeholder-text">CINEMATIC HERO ART (1200x1080)</span>
+            
+            <!-- Crosshair decoration -->
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:50px; height:50px; border: 1px solid var(--neon-cyan); border-radius: 50%; display: flex; justify-content:center; align-items:center;">
+                <div style="width:4px; height:4px; background:var(--neon-pink);"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Infinite Marquee -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            /// WARNING: UNAUTHORIZED ACCESS DETECTED /// INITIATING OVERRIDE PROTOCOL /// SERVERS ONLINE /// MATCHMAKING ACTIVE /// WARNING: UNAUTHORIZED ACCESS DETECTED /// INITIATING OVERRIDE PROTOCOL /// SERVERS ONLINE /// MATCHMAKING ACTIVE ///
+        </div>
+    </div>
+
+    <!-- Roster Grid -->
+    <section class="roster">
+        <h2 class="section-title">SELECT <span>OPERATIVE</span></h2>
+        
+        <div class="card-grid">
+            <!-- Card 1 -->
+            <div class="game-card">
+                <span style="color:#444; font-weight: 700;">CHARACTER RENDER</span>
+                <div class="card-hud">
+                    <h3>GHOST</h3>
+                    <p>STEALTH / INFILTRATION</p>
+                    <div class="stat-bar"><div class="stat-fill" style="--target: 95%;"></div></div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="game-card">
+                <span style="color:#444; font-weight: 700;">CHARACTER RENDER</span>
+                <div class="card-hud">
+                    <h3>TANK</h3>
+                    <p>HEAVY ARMOR / ASSAULT</p>
+                    <div class="stat-bar"><div class="stat-fill"></div></div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="game-card">
+                <span style="color:#444; font-weight: 700;">CHARACTER RENDER</span>
+                <div class="card-hud">
+                    <h3>HACKER</h3>
+                    <p>TECH / SABOTAGE</p>
+                    <div class="stat-bar"><div class="stat-fill"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // GSAP Initial Entrance Animations
+        gsap.from(".hero-content > *", {
+            x: -100,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "expo.out",
+            delay: 0.2
+        });
+
+        gsap.from(".hero-image-wrapper", {
+            x: 200,
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.out"
+        });
+
+        // Specific hover logic for the dynamic stat bars
+        const cards = document.querySelectorAll('.game-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Randomize the fill percentage on hover to simulate dynamic data
+                const fill = card.querySelector('.stat-fill');
+                const randomFill = Math.floor(Math.random() * 40) + 60; // 60% to 100%
+                fill.style.width = randomFill + '%';
+            });
+            card.addEventListener('mouseleave', () => {
+                const fill = card.querySelector('.stat-fill');
+                fill.style.width = '0%';
+            });
+        });
+    </script>
+</body>
+</html>

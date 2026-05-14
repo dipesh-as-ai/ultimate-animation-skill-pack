@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holographic Foil Text</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d0d0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Syncopate', sans-serif; /* Wide, premium aesthetic font */
+            overflow: hidden;
+        }
+
+        .text-container {
+            position: relative;
+            font-size: 8vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            cursor: pointer;
+        }
+
+        /* 
+           The Holographic Text Effect 
+           We use a custom CSS variable (--mouse-x, --mouse-y) updated via JS
+           to drive a complex multi-color gradient that looks like iridescent foil.
+        */
+        .holo-text {
+            background-image: 
+                linear-gradient(
+                    calc(var(--angle, 0) * 1deg), 
+                    #ff0000 0%, 
+                    #ff7300 10%, 
+                    #fffb00 20%, 
+                    #48ff00 30%, 
+                    #00ffd5 40%, 
+                    #002bff 50%, 
+                    #7a00ff 60%, 
+                    #ff00c8 70%, 
+                    #ff0000 80%
+                ),
+                radial-gradient(
+                    circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                    rgba(255, 255, 255, 1) 0%, 
+                    rgba(0, 0, 0, 0) 40%
+                );
+            background-blend-mode: color-dodge;
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            
+            /* Add an inner shadow and 3D bevel to make it look like a physical piece of glass/foil */
+            filter: drop-shadow(0px 10px 20px rgba(0, 255, 213, 0.2));
+            transition: filter 0.3s ease;
+        }
+
+        .text-container:hover .holo-text {
+            filter: drop-shadow(0px 0px 40px rgba(0, 255, 213, 0.5)) brightness(1.2);
+        }
+
+        /* Ambient glow behind the text */
+        .ambient-glow {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 50%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(122, 0, 255, 0.4) 0%,
+                rgba(0, 0, 0, 0) 70%
+            );
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 0.5s ease;
+        }
+
+        .text-container:hover .ambient-glow {
+            opacity: 1;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="text-container" id="container">
+        <div class="holo-text" id="text">IRIDESCENT</div>
+    </div>
+    <div class="hint">Shine the light with your mouse</div>
+
+    <script>
+        const textElement = document.getElementById('text');
+        const container = document.getElementById('container');
+
+        // Update CSS variables for the holographic foil reflection based on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // Calculate mouse position as a percentage of the window
+            const xPercent = (x / window.innerWidth) * 100;
+            const yPercent = (y / window.innerHeight) * 100;
+            
+            // Calculate an angle based on mouse position to rotate the rainbow gradient
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+
+            // Apply the variables directly to the text element's inline styles
+            textElement.style.setProperty('--mouse-x', `${xPercent}%`);
+            textElement.style.setProperty('--mouse-y', `${yPercent}%`);
+            textElement.style.setProperty('--angle', `${angle}`);
+        });
+
+        // Add a gyro sensor fallback for mobile devices to make the foil shine when tilting the phone
+        window.addEventListener('deviceorientation', (e) => {
+            const beta = e.beta;  // x-axis rotation (-180 to 180)
+            const gamma = e.gamma; // y-axis rotation (-90 to 90)
+            
+            const xPercent = Math.min(Math.max((gamma + 90) / 180 * 100, 0), 100);
+            const yPercent = Math.min(Math.max((beta + 90) / 180 * 100, 0), 100);
+            
+            textElement.style.setProperty('--mouse-x', `${xPercent}%`);
+            textElement.style.setProperty('--mouse-y', `${yPercent}%`);
+        });
+    </script>
+</body>
+</html>

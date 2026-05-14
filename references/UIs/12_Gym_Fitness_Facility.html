@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Gym & Facility UI</title>
+    
+    <!-- Athletic, Heavy Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-black: #050505;
+            --bg-iron: #141414;
+            --accent-volt: #DFFF00; /* High-energy athletic neon chartreuse/yellow */
+            --text-light: #ffffff;
+            --text-grey: #888888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .impact-text {
+            font-family: 'Bebas Neue', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 25px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.9) 0%, transparent 100%);
+            transition: background 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(5,5,5,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent-volt);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-volt);
+        }
+
+        .btn-volt {
+            background: var(--accent-volt);
+            color: var(--bg-black);
+            padding: 15px 35px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: inline-block;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-volt:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(223, 255, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+            padding: 13px 33px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-outline:hover {
+            background: var(--text-light);
+            color: var(--bg-black);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 120%; /* Extra height for parallax */
+            background: #111;
+            z-index: -2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            font-family: 'Bebas Neue';
+            font-size: 3rem;
+        }
+
+        /* Diagonal overlay to make text pop */
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(105deg, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.7) 40%, transparent 100%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 10;
+        }
+
+        .hero-title {
+            font-size: 9rem;
+            line-height: 0.85;
+            margin-bottom: 20px;
+        }
+
+        .hero-title .stroke {
+            -webkit-text-stroke: 2px var(--text-light);
+            color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-grey);
+            max-width: 500px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* --- THE FACILITY ACCORDION (Main Focus) --- */
+        /* This is the advanced UI pattern for showing off the physical gym */
+        .facility-section {
+            padding: 100px 0;
+            background: var(--bg-iron);
+        }
+
+        .section-header {
+            padding: 0 5%;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .section-header h2 {
+            font-size: 5rem;
+            color: var(--text-light);
+            line-height: 1;
+        }
+
+        .section-header p {
+            color: var(--text-grey);
+            max-width: 400px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .facility-accordion {
+            display: flex;
+            height: 70vh; /* Massive screen-filling gallery */
+            width: 100%;
+        }
+
+        .facility-panel {
+            flex: 1; /* All panels start equal width */
+            position: relative;
+            background-color: #222;
+            border-right: 2px solid var(--bg-black);
+            transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Buttery smooth expansion */
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        /* The Expansion Magic */
+        .facility-panel:hover {
+            flex: 5; /* Expands to take up 5x more space than the others */
+        }
+
+        .panel-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #444;
+            font-family: 'Bebas Neue';
+            font-size: 2rem;
+            transition: transform 0.6s ease;
+        }
+
+        /* Subtle zoom on the image inside when hovered */
+        .facility-panel:hover .panel-img {
+            transform: scale(1.05);
+        }
+
+        /* Dark overlay at bottom for text readability */
+        .panel-overlay {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+        }
+
+        .panel-content {
+            position: relative;
+            z-index: 10;
+            padding: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .panel-content h3 {
+            font-size: 3rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            /* Rotating text when compressed */
+            transform: rotate(-90deg) translateX(50px);
+            transform-origin: left bottom;
+            transition: transform 0.6s ease, color 0.3s;
+        }
+
+        .facility-panel:hover .panel-content h3 {
+            transform: rotate(0deg) translateX(0);
+            color: var(--accent-volt);
+        }
+
+        .panel-details {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            max-width: 300px;
+        }
+
+        .facility-panel:hover .panel-details {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.2s; /* Wait for expansion to start before showing text */
+        }
+
+        /* --- Statistics/Equipment Ticker --- */
+        .ticker-wrap {
+            width: 100%;
+            background: var(--accent-volt);
+            color: var(--bg-black);
+            padding: 20px 0;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .ticker-text {
+            font-family: 'Bebas Neue';
+            font-size: 2.5rem;
+            white-space: nowrap;
+            animation: ticker 20s linear infinite;
+            padding-right: 50px;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- Classes / Schedule --- */
+        .classes-section {
+            padding: 100px 5%;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .class-card {
+            background: var(--bg-iron);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border-top: 3px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .class-card:hover {
+            border-top: 3px solid var(--accent-volt);
+        }
+
+        .class-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .class-card p {
+            color: var(--text-grey);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="logo">IRON<span>FORGE</span></div>
+        <div class="nav-links">
+            <a href="#">The Facility</a>
+            <a href="#">Classes</a>
+            <a href="#">Personal Training</a>
+            <a href="#">Membership</a>
+        </div>
+        <div>
+            <a href="#" class="btn-volt" style="padding: 10px 25px; font-size: 1.2rem;">JOIN NOW</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Background Video/Image Placeholder -->
+        <div class="hero-bg parallax-bg">
+            CINEMATIC GYM VIDEO PLACEHOLDER (1920x1080)
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <h1 class="hero-title gs-reveal">
+                BUILD YOUR <br>
+                <span class="stroke">LEGACY.</span>
+            </h1>
+            <p class="hero-desc gs-reveal">
+                Over 25,000 sq ft of premium equipment, elite personal trainers, and high-octane group classes designed to push you past your limits.
+            </p>
+            <div class="gs-reveal" style="display: flex; gap: 20px;">
+                <a href="#" class="btn-volt">VIEW MEMBERSHIPS</a>
+                <a href="#" class="btn-outline">TAKE THE TOUR</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scrolling Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker-text">
+            ✦ 25,000 SQ FT FACILITY ✦ 10+ OLYMPIC LIFTING PLATFORMS ✦ RECOVERY SAUNA & ICE BATHS ✦ ELITE PERSONAL TRAINERS ✦ 24/7 ACCESS FOR MEMBERS ✦
+        </div>
+        <div class="ticker-text">
+            ✦ 25,000 SQ FT FACILITY ✦ 10+ OLYMPIC LIFTING PLATFORMS ✦ RECOVERY SAUNA & ICE BATHS ✦ ELITE PERSONAL TRAINERS ✦ 24/7 ACCESS FOR MEMBERS ✦
+        </div>
+    </div>
+
+    <!-- THE FACILITY ACCORDION -->
+    <!-- This is the core requirement: Showing off the physical gym -->
+    <section class="facility-section">
+        <div class="section-header">
+            <h2>THE FACILITY</h2>
+            <p>Hover over a zone to explore our state-of-the-art layout. We spared no expense in building the ultimate training environment.</p>
+        </div>
+
+        <div class="facility-accordion">
+            
+            <!-- Zone 1: Free Weights -->
+            <div class="facility-panel">
+                <div class="panel-img" style="background-color: #1a1a1a;">WEIGHTS IMG</div>
+                <div class="panel-overlay"></div>
+                <div class="panel-content">
+                    <h3>FREE WEIGHTS</h3>
+                    <div class="panel-details">
+                        <p style="color: #ccc; font-family: sans-serif; font-size: 0.85rem; line-height: 1.5;">
+                            Featuring 12 Eleiko competition platforms, calibrated plates, and dumbbells up to 150lbs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 2: Strength Machines -->
+            <div class="facility-panel">
+                <div class="panel-img" style="background-color: #222222;">MACHINES IMG</div>
+                <div class="panel-overlay"></div>
+                <div class="panel-content">
+                    <h3>STRENGTH LAB</h3>
+                    <div class="panel-details">
+                        <p style="color: #ccc; font-family: sans-serif; font-size: 0.85rem; line-height: 1.5;">
+                            Full circuit of Arsenal Strength and Prime Fitness selectorized and plate-loaded machines.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 3: Cardio -->
+            <div class="facility-panel">
+                <div class="panel-img" style="background-color: #1a1a1a;">CARDIO IMG</div>
+                <div class="panel-overlay"></div>
+                <div class="panel-content">
+                    <h3>CARDIO DECK</h3>
+                    <div class="panel-details">
+                        <p style="color: #ccc; font-family: sans-serif; font-size: 0.85rem; line-height: 1.5;">
+                            Over 50 pieces of cardio equipment including Woodway treadmills and Concept2 rowers.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 4: Turf/Functional -->
+            <div class="facility-panel">
+                <div class="panel-img" style="background-color: #222222;">TURF IMG</div>
+                <div class="panel-overlay"></div>
+                <div class="panel-content">
+                    <h3>FUNCTIONAL TURF</h3>
+                    <div class="panel-details">
+                        <p style="color: #ccc; font-family: sans-serif; font-size: 0.85rem; line-height: 1.5;">
+                            40-yard indoor turf strip equipped with push sleds, battle ropes, and plyo boxes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone 5: Recovery -->
+            <div class="facility-panel">
+                <div class="panel-img" style="background-color: #1a1a1a;">RECOVERY IMG</div>
+                <div class="panel-overlay"></div>
+                <div class="panel-content">
+                    <h3>RECOVERY WING</h3>
+                    <div class="panel-details">
+                        <p style="color: #ccc; font-family: sans-serif; font-size: 0.85rem; line-height: 1.5;">
+                            Accelerate your gains with our infrared saunas, cold plunge tubs, and compression therapy.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Classes Preview -->
+    <section class="classes-section">
+        <h2 style="font-size: 4rem; margin-bottom: 50px; text-align: center;">SIGNATURE <span style="color: var(--accent-volt);">PROGRAMS</span></h2>
+        
+        <div class="class-grid">
+            <div class="class-card">
+                <h3>HYPERTROPHY</h3>
+                <p>A science-based bodybuilding program focused on maximizing muscle growth through progressive overload and precise form.</p>
+                <a href="#" style="color: var(--text-light); font-weight: bold; text-decoration: none;">VIEW SCHEDULE →</a>
+            </div>
+            <div class="class-card">
+                <h3>ENGINE ROOM</h3>
+                <p>High-intensity metabolic conditioning combining concept rowers, ski ergs, and light kettlebells to build an unstoppable engine.</p>
+                <a href="#" style="color: var(--text-light); font-weight: bold; text-decoration: none;">VIEW SCHEDULE →</a>
+            </div>
+            <div class="class-card">
+                <h3>STRENGTH CLINIC</h3>
+                <p>Small group training focused purely on mastering the big three: Squat, Bench Press, and Deadlift.</p>
+                <a href="#" style="color: var(--text-light); font-weight: bold; text-decoration: none;">VIEW SCHEDULE →</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Hero Entrance Animations ---
+        gsap.from(".gs-reveal", {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 0.2
+        });
+
+        // --- 2. Parallax Background ---
+        // As you scroll down, the gym background image pushes up, creating massive depth
+        gsap.to(".parallax-bg", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: 150,
+            ease: "none"
+        });
+
+        // --- 3. Navbar Background Toggle ---
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Note: The main showcase (The Facility Accordion) is driven entirely by pure CSS 
+        // flex-grow transitions! This ensures it runs at a flawless 60fps on all devices 
+        // without requiring heavy JS event listeners.
+    </script>
+</body>
+</html>

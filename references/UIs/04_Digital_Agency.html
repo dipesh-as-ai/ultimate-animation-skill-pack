@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Digital Agency UI</title>
+    
+    <!-- Bold, Modern Agency Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-light: #ffffff;
+            --accent: #ccff00; /* Neon Lime Green - Classic modern agency accent */
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Manrope', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .marquee-text {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- Global Image Placeholder --- */
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 30px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            mix-blend-mode: difference; /* Ensures text is visible on any background */
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 30px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-btn {
+            background: var(--accent);
+            color: black;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Full Screen Hero --- */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 5% 5% 8%;
+            overflow: hidden;
+        }
+
+        /* Hero Video/Image Background */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%; /* Extra height for parallax */
+            z-index: -2;
+        }
+
+        /* Dark overlay to make text readable */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.6);
+            z-index: -1;
+        }
+
+        .hero-content {
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: 8vw;
+            line-height: 0.9;
+            letter-spacing: -3px;
+            margin-bottom: 20px;
+            /* GSAP mask setup */
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .hero-title .line {
+            overflow: hidden;
+            display: block;
+        }
+        
+        .hero-title .line span {
+            display: block;
+            transform: translateY(110%);
+        }
+
+        /* --- Infinite Marquee Banner --- */
+        .marquee {
+            background-color: var(--accent);
+            color: black;
+            padding: 20px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .marquee-text {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            display: inline-block;
+            animation: scrollText 15s linear infinite;
+        }
+
+        @keyframes scrollText {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- Statement / About Section --- */
+        .statement {
+            padding: 150px 5%;
+            font-size: 4rem;
+            line-height: 1.2;
+            font-weight: 500;
+            max-width: 1400px;
+            letter-spacing: -1.5px;
+        }
+
+        .statement span {
+            color: rgba(255, 255, 255, 0.15); /* Starts dim */
+            transition: color 0.4s ease;
+        }
+
+        .statement span.active {
+            color: var(--text-light); /* Illuminates on scroll */
+        }
+        
+        .statement span.highlight {
+            color: var(--accent);
+        }
+
+        /* --- Interactive Services Accordion --- */
+        .services {
+            padding: 0 5% 150px;
+        }
+
+        .services-header {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            overflow: hidden; /* Crucial for the height expansion */
+        }
+
+        .accordion-title {
+            padding: 50px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .accordion-title h2 {
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .accordion-title span {
+            font-size: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent);
+        }
+
+        /* The hidden content inside the accordion */
+        .accordion-content {
+            height: 0;
+            opacity: 0;
+            display: flex;
+            gap: 50px;
+            transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        }
+
+        .accordion-desc {
+            flex: 1;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #aaa;
+            padding-bottom: 50px;
+        }
+
+        .accordion-img-wrapper {
+            flex: 1;
+            height: 300px;
+            margin-bottom: 50px;
+        }
+
+        /* Hover Interactions */
+        .accordion-item:hover .accordion-title h2 {
+            transform: translateX(30px);
+            color: var(--accent);
+        }
+
+        .accordion-item:hover .accordion-content {
+            height: 350px; /* Expands to show image and text */
+            opacity: 1;
+        }
+
+        /* --- Massive Footer --- */
+        footer {
+            height: 80vh;
+            background: var(--accent);
+            color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5%;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .footer-bottom h1 {
+            font-size: 12vw; /* Massive screen-filling text */
+            line-height: 0.8;
+            letter-spacing: -5px;
+            margin-left: -5px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">OBLIVION.</div>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="#">Work</a>
+                <a href="#">Agency</a>
+                <a href="#">Expertise</a>
+            </div>
+            <a href="#" class="nav-btn">Start a Project</a>
+        </div>
+    </nav>
+
+    <!-- Full Screen Hero -->
+    <section class="hero">
+        <div class="hero-bg img-placeholder parallax-bg">
+            CINEMATIC SHOWREEL VIDEO BACKGROUND (1920x1080)
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="line"><span class="reveal-text">WE ENGINEER</span></span>
+                <span class="line"><span class="reveal-text">DIGITAL</span></span>
+                <span class="line"><span class="reveal-text">FUTURES.</span></span>
+            </h1>
+        </div>
+    </section>
+
+    <!-- Infinite Marquee -->
+    <div class="marquee">
+        <div class="marquee-text">
+            DIGITAL PRODUCT AGENCY — BRAND STRATEGY — UX/UI DESIGN — FULL STACK DEVELOPMENT — DIGITAL PRODUCT AGENCY — BRAND STRATEGY — UX/UI DESIGN — FULL STACK DEVELOPMENT — 
+        </div>
+    </div>
+
+    <!-- Scroll Text Highlight Section -->
+    <section class="statement" id="statement">
+        <!-- JS will wrap these words in span tags -->
+        We partner with visionary brands to build digital products that drive growth, disrupt industries, and redefine what is possible on the web.
+    </section>
+
+    <!-- Interactive Services Accordion -->
+    <section class="services">
+        <div class="services-header">Our Capabilities</div>
+
+        <div class="accordion-item">
+            <div class="accordion-title">
+                <h2>Digital Strategy</h2>
+                <span>01</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-desc">
+                    We dive deep into your business logic, mapping out user journeys and technical architectures that align perfectly with your long-term goals.
+                </div>
+                <div class="accordion-img-wrapper">
+                    <div class="img-placeholder">Strategy Dashboard Image (600x300)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-title">
+                <h2>UX/UI Design</h2>
+                <span>02</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-desc">
+                    Creating award-winning interfaces that are as beautiful as they are functional. We focus on conversion, accessibility, and high-end aesthetics.
+                </div>
+                <div class="accordion-img-wrapper">
+                    <div class="img-placeholder">Interface Mockup Image (600x300)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-title">
+                <h2>Web Engineering</h2>
+                <span>03</span>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-desc">
+                    Performant, scalable, and secure. We build robust frontends and backends using the latest enterprise-grade technologies like React, Next.js, and Node.
+                </div>
+                <div class="accordion-img-wrapper">
+                    <div class="img-placeholder">Code/Architecture Image (600x300)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Massive Footer -->
+    <footer>
+        <div class="footer-top">
+            <div>New York — London</div>
+            <div><a href="#" style="color: black;">hello@oblivion.agency</a></div>
+        </div>
+        <div class="footer-bottom">
+            <h1>LET'S TALK.</h1>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 1. Hero Text Reveal Animation
+        gsap.to(".reveal-text", {
+            y: "0%",
+            duration: 1.2,
+            stagger: 0.1,
+            ease: "power4.out",
+            delay: 0.2
+        });
+
+        // 2. Parallax Hero Background
+        // As you scroll down, the background image moves up slowly
+        gsap.to(".parallax-bg", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: 150,
+            ease: "none"
+        });
+
+        // 3. Scroll Text Illumination (The Statement Section)
+        const statementEl = document.getElementById('statement');
+        const words = statementEl.innerText.split(' ');
+        statementEl.innerHTML = ''; // Clear the text
+
+        // Wrap every word in a span so we can target it
+        words.forEach(word => {
+            let span = document.createElement('span');
+            span.innerText = word + ' ';
+            
+            // Highlight specific powerful words
+            if(['visionary', 'disrupt', 'redefine'].includes(word.toLowerCase().replace(',',''))) {
+                span.classList.add('highlight');
+            }
+            
+            statementEl.appendChild(span);
+        });
+
+        // Use GSAP to add the 'active' class to words as you scroll past them
+        const spans = document.querySelectorAll('.statement span');
+        
+        gsap.to(spans, {
+            scrollTrigger: {
+                trigger: ".statement",
+                start: "top 70%", // Triggers when the top of the statement hits 70% of the screen height
+                end: "bottom 60%", // Finishes animating when the bottom hits 60%
+                scrub: 1 // Links animation progress directly to the scrollbar
+            },
+            color: "#ffffff", // Changes from dim to bright white
+            stagger: 0.1
+        });
+
+        // Note: The Accordion functionality is purely handled by the CSS :hover pseudo-class 
+        // using the height expansion trick, keeping the JS incredibly lightweight!
+    </script>
+</body>
+</html>

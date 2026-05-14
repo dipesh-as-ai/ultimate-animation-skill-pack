@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avant-Garde Artist Hero - Lens Reveal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #EAEAE4;
+            --text-dark: #111111;
+            --text-light: #F4F4F4;
+            --font-display: 'Syne', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        /* 4-Corner Minimalist UI */
+        .corner-ui {
+            position: absolute;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 50;
+            color: var(--text-dark);
+            mix-blend-mode: difference; /* Ensures visibility over both layers */
+            color: #fff; /* When mixed, it will show up against dark and light */
+        }
+
+        .top-left { top: 2.5rem; left: 3rem; font-weight: 700; font-family: var(--font-display); font-size: 1.2rem;}
+        .top-right { top: 2.5rem; right: 3rem; }
+        .bottom-left { bottom: 2.5rem; left: 3rem; }
+        .bottom-right { bottom: 2.5rem; right: 3rem; }
+
+        /* The Hero Layers */
+        .hero-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* Base Layer (Light) */
+        .layer-base {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            z-index: 10;
+        }
+
+        /* Mask Layer (Image + Light Text) */
+        .layer-mask {
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            z-index: 20;
+            /* The magic clip-path that creates the "lens" */
+            clip-path: circle(0px at 50% 50%); 
+        }
+
+        /* Dark overlay to make white text pop on the image */
+        .layer-mask::before {
+            content: ''; position: absolute; inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+
+        /* Massive Typography Structure */
+        .title-wrapper {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .title-line {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 15vw, 14rem);
+            font-weight: 800;
+            line-height: 0.8;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden; /* For entrance animation */
+        }
+
+        .title-line span {
+            display: inline-block;
+        }
+
+        .title-line.italic {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: 0;
+        }
+
+        /* Custom Cursor Dot (Always visible) */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--text-dark);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            background-color: #fff;
+        }
+
+        /* Drag Instructions */
+        .drag-text {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            z-index: 25;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        @media (max-width: 900px) {
+            .layer-mask { clip-path: circle(150px at 50% 50%) !important; } /* Static circle on mobile */
+            body { cursor: auto; }
+            .cursor-dot { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="drag-text gs-drag">EXPLORE</div>
+
+    <!-- UI Corners -->
+    <div class="corner-ui top-left gs-corner">Maison</div>
+    <div class="corner-ui top-right gs-corner">Menu [=]</div>
+    <div class="corner-ui bottom-left gs-corner">Available '26</div>
+    <div class="corner-ui bottom-right gs-corner">Scroll ↓</div>
+
+    <!-- Base Layer -->
+    <div class="hero-layer layer-base">
+        <div class="title-wrapper">
+            <div class="title-line"><span class="gs-text">CREATIVE</span></div>
+            <div class="title-line italic"><span class="gs-text">Direction</span></div>
+            <div class="title-line"><span class="gs-text">& DESIGN</span></div>
+        </div>
+    </div>
+
+    <!-- Mask Layer (The Lens) -->
+    <div class="hero-layer layer-mask">
+        <div class="title-wrapper">
+            <div class="title-line"><span class="gs-text-mask">CREATIVE</span></div>
+            <div class="title-line italic"><span class="gs-text-mask">Direction</span></div>
+            <div class="title-line"><span class="gs-text-mask">& DESIGN</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Lens Reveal Interaction
+        const maskLayer = document.querySelector('.layer-mask');
+        const cursorDot = document.querySelector('.cursor-dot');
+        const dragText = document.querySelector('.drag-text');
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        
+        // Target size for the lens
+        let currentSize = 0; 
+        let targetSize = 250; 
+
+        // Smoothly track mouse with GSAP quickSetter for performance
+        const setMask = gsap.quickSetter(maskLayer, "clipPath");
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Move cursor dot
+            gsap.to(cursorDot, { x: mouseX, y: mouseY, duration: 0 });
+            gsap.to(dragText, { x: mouseX - window.innerWidth/2, y: mouseY - window.innerHeight/2, duration: 0.1 });
+        });
+
+        // Expand lens on mouse down to show "click to drag/explore" feeling
+        window.addEventListener('mousedown', () => { targetSize = 400; });
+        window.addEventListener('mouseup', () => { targetSize = 250; });
+
+        // Animation loop for smooth lens tracking
+        gsap.ticker.add(() => {
+            // Smoothly interpolate size
+            currentSize += (targetSize - currentSize) * 0.1;
+            // Update clip path
+            maskLayer.style.clipPath = `circle(${currentSize}px at ${mouseX}px ${mouseY}px)`;
+        });
+
+        // Entrance Animations
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        // Text rolls up
+        tl.from(".gs-text, .gs-text-mask", {
+            y: "120%",
+            duration: 1.2,
+            stagger: 0.15,
+            ease: "power4.out"
+        })
+        // Corners fade in
+        .from(".gs-corner", {
+            opacity: 0,
+            y: 20,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power2.out"
+        }, "-=0.8")
+        // Start the lens from 0 to 250
+        .fromTo(maskLayer, 
+            { clipPath: "circle(0px at 50% 50%)" }, 
+            { 
+                clipPath: `circle(250px at ${window.innerWidth/2}px ${window.innerHeight/2}px)`, 
+                duration: 1.5, 
+                ease: "expo.inOut",
+                onComplete: () => {
+                    // Show "EXPLORE" text inside lens after intro
+                    gsap.to(dragText, { opacity: 1, duration: 0.5 });
+                }
+            }, 
+        "-=1");
+    </script>
+</body>
+</html>

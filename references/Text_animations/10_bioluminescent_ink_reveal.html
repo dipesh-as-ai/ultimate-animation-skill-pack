@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioluminescent Ink Reveal Text</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020205; /* Deep ocean black */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Adds a glowing blur to the ink */
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+        }
+
+        .hint {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hint">Paint with your mouse to discover</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        let width, height;
+        let textMaskData;
+        let particles = [];
+        
+        const TEXT = "VISIONARY";
+        const FONT_SIZE = 180;
+        
+        // Setup offscreen canvas to hold the hidden text mask
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+
+        function init() {
+            width = canvas.width = offscreenCanvas.width = window.innerWidth;
+            height = canvas.height = offscreenCanvas.height = window.innerHeight;
+            
+            // 1. Draw the hidden text onto the offscreen canvas
+            offCtx.clearRect(0, 0, width, height);
+            offCtx.fillStyle = '#FFFFFF'; // Color doesn't matter, we just need alpha
+            offCtx.font = `900 ${FONT_SIZE}px "Helvetica Neue", sans-serif`;
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(TEXT, width / 2, height / 2);
+            
+            // 2. Extract the pixel map
+            textMaskData = offCtx.getImageData(0, 0, width, height).data;
+            
+            particles = [];
+        }
+
+        // Helper function to check if a pixel (x,y) is inside the hidden text
+        function isInsideText(x, y) {
+            x = Math.floor(x);
+            y = Math.floor(y);
+            if (x < 0 || x >= width || y < 0 || y >= height) return false;
+            
+            const index = (y * width + x) * 4;
+            // Check the alpha channel of the offscreen canvas
+            return textMaskData[index + 3] > 128;
+        }
+
+        class InkParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                // Give it a random spread velocity
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                this.size = Math.random() * 3 + 1;
+                this.life = 1.0; // Life goes from 1.0 to 0.0
+                this.isCaught = false; // Whether it hit the text
+            }
+
+            update() {
+                // If it hasn't hit the text yet, check if it's currently over the text
+                if (!this.isCaught && isInsideText(this.x, this.y)) {
+                    this.isCaught = true;
+                    // When caught, the particle sticks to the text and lives much longer
+                    this.vx *= 0.05; 
+                    this.vy *= 0.05;
+                    this.life = Math.min(this.life + 0.5, 1.0); // Boost life when it hits text
+                }
+
+                // Move particle
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Physics logic
+                if (this.isCaught) {
+                    // Stuck to text: Very slow fade, glowing Cyan color
+                    this.life -= 0.003; 
+                } else {
+                    // Floating in empty space: Falls down slightly, fades fast, deep blue color
+                    this.vy += 0.05; // Gravity
+                    this.life -= 0.015;
+                }
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+
+                let r, g, b;
+                if (this.isCaught) {
+                    // Glowing Neon Cyan/White when stuck to text
+                    r = 0;
+                    g = Math.floor(255 * this.life);
+                    b = 255;
+                } else {
+                    // Deep ocean blue when floating in the void
+                    r = 10;
+                    g = 20;
+                    b = Math.floor(150 * this.life);
+                }
+
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.life})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            // Darken the canvas slightly every frame to create a trailing effect
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.15)';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Use reverse loop so we can safely remove dead particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Spawn ink when dragging or moving the mouse fast
+        function spawnInk(x, y) {
+            // Spawn multiple particles per mouse event for a thick brush effect
+            for (let i = 0; i < 15; i++) {
+                particles.push(new InkParticle(
+                    x + (Math.random() - 0.5) * 20, 
+                    y + (Math.random() - 0.5) * 20
+                ));
+            }
+        }
+
+        let isDrawing = false;
+
+        window.addEventListener('mousedown', () => isDrawing = true);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        
+        window.addEventListener('mousemove', (e) => {
+            // We spawn ink constantly, but more if mouse is down
+            spawnInk(e.clientX, e.clientY);
+            if (isDrawing) {
+                spawnInk(e.clientX, e.clientY); // Double ink
+            }
+        });
+        
+        window.addEventListener('touchmove', (e) => {
+            spawnInk(e.touches[0].clientX, e.touches[0].clientY);
+            spawnInk(e.touches[0].clientX, e.touches[0].clientY);
+        });
+
+        window.addEventListener('resize', init);
+
+        init();
+        animate();
+    </script>
+</body>
+</html>

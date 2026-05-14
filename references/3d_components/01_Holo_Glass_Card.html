@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Holographic Glass Card</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+        }
+
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg); font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            /* Background grid for depth */
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* 3D Scene setup */
+        .scene {
+            width: 350px; height: 500px;
+            perspective: 1500px; /* Crucial for 3D depth */
+        }
+
+        .card {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d; /* Allows children to pop out */
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.05);
+            /* Smooth reset when mouse leaves */
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        /* The Holographic Shimmer / Glare */
+        .glare {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 20px; z-index: 5; pointer-events: none;
+            /* Rainbow holographic gradient */
+            background: radial-gradient(
+                circle at 50% 50%, 
+                rgba(255, 255, 255, 0.4) 0%, 
+                rgba(255, 100, 255, 0.2) 20%, 
+                rgba(100, 200, 255, 0.2) 40%, 
+                transparent 60%
+            );
+            background-size: 200% 200%;
+            background-position: 50% 50%;
+            opacity: 0; transition: opacity 0.3s;
+            mix-blend-mode: color-dodge;
+        }
+        .card:hover .glare { opacity: 1; }
+
+        /* The 3D Content Wrapper */
+        .content {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px; display: flex; flex-direction: column; justify-content: space-between;
+            pointer-events: none;
+            /* Pops the entire content off the glass */
+            transform: translateZ(60px); 
+        }
+
+        .chip {
+            width: 50px; height: 35px;
+            background: linear-gradient(135deg, #FFD700, #DAA520);
+            border-radius: 5px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            /* Extra pop for the chip */
+            transform: translateZ(20px);
+        }
+
+        .number {
+            font-size: 1.5rem; letter-spacing: 4px; color: #FFF; font-weight: 700;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .name {
+            font-size: 1rem; color: #AAA; text-transform: uppercase; letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        /* 3D Floating Orb behind the card */
+        .orb {
+            position: absolute; top: 50%; left: 50%; width: 250px; height: 250px;
+            background: radial-gradient(circle, #4F46E5, #9333EA);
+            border-radius: 50%; filter: blur(50px);
+            transform: translate(-50%, -50%) translateZ(-100px); /* Pushed deep into background */
+            z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="card" id="card">
+            <div class="orb"></div>
+            <div class="glare" id="glare"></div>
+            
+            <div class="content">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="chip"></div>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                
+                <div>
+                    <div class="number">4111 2345 8901 2345</div>
+                    <div class="name">Awwwards Engineer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const card = document.getElementById('card');
+        const glare = document.getElementById('glare');
+        const scene = document.querySelector('.scene');
+
+        // GSAP QuickSetters for extreme 60fps performance
+        const setRotX = gsap.quickSetter(card, "rotateX", "deg");
+        const setRotY = gsap.quickSetter(card, "rotateY", "deg");
+        
+        // Let's also move the background position of the glare
+        const setGlarePos = gsap.quickSetter(glare, "backgroundPosition");
+
+        scene.addEventListener('mousemove', (e) => {
+            const rect = scene.getBoundingClientRect();
+            
+            // Calculate mouse position relative to center of card (-1 to 1)
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            
+            // Tilt card (Multiplier determines aggressiveness of the tilt)
+            // Negative Y so it tilts *towards* the mouse vertically
+            setRotX(-y * 35); 
+            setRotY(x * 35);
+
+            // Move the glare background opposite to the mouse
+            const glareX = (x + 0.5) * 100; // 0 to 100%
+            const glareY = (y + 0.5) * 100;
+            setGlarePos(`${glareX}% ${glareY}%`);
+        });
+
+        scene.addEventListener('mouseleave', () => {
+            // Smoothly snap back to center when mouse leaves
+            gsap.to(card, {
+                rotateX: 0,
+                rotateY: 0,
+                duration: 0.8,
+                ease: "elastic.out(1, 0.4)" // Satisfying wobble
+            });
+            // Reset glare
+            gsap.to(glare, {
+                backgroundPosition: "50% 50%",
+                duration: 0.8
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTI-DESIGN // CHAOS UI</title>
+    
+    <style>
+        /* 
+         WARNING: This CSS violates every rule of good design intentionally. 
+         Welcome to the Void.
+        */
+        
+        :root {
+            --p-red: #ff0000;
+            --p-blue: #0000ff;
+            --p-yellow: #ffff00;
+            --p-lime: #00ff00;
+            --p-magenta: #ff00ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair; /* Aggressive cursor */
+        }
+
+        body {
+            background-color: var(--p-blue);
+            color: var(--p-yellow);
+            font-family: "Comic Sans MS", "Impact", sans-serif; /* The forbidden fonts */
+            overflow-x: hidden;
+            /* Seizure-inducing background pattern */
+            background-image: repeating-linear-gradient(
+                45deg,
+                var(--p-blue),
+                var(--p-blue) 10px,
+                #0000aa 10px,
+                #0000aa 20px
+            );
+        }
+
+        /* --- Persistent Shake Animation --- */
+        @keyframes constant-shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake-element {
+            display: inline-block;
+            animation: constant-shake 0.5s infinite;
+        }
+
+        /* --- Navigation that takes up too much space --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--p-red);
+            border-bottom: 10px dashed var(--p-yellow);
+            padding: 20px;
+            z-index: 10000;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        nav a {
+            color: var(--p-lime);
+            font-size: 2rem;
+            font-family: "Impact";
+            text-transform: uppercase;
+            text-decoration: overline underline;
+            transition: all 0.1s;
+        }
+
+        nav a:hover {
+            color: var(--p-magenta);
+            background: var(--p-yellow);
+            padding: 10px;
+            font-size: 3rem; /* Layout shift nightmare */
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding-top: 150px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* The Intense Glitch Text */
+        .mega-glitch {
+            font-size: 10vw;
+            font-family: 'Impact', sans-serif;
+            color: var(--p-yellow);
+            text-transform: uppercase;
+            position: relative;
+            animation: text-glitch 2s infinite linear alternate-reverse;
+        }
+
+        .mega-glitch::before, .mega-glitch::after {
+            content: "SYSTEM FAILURE";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--p-blue);
+        }
+
+        .mega-glitch::before {
+            left: 10px;
+            text-shadow: -10px 0 var(--p-red);
+            clip-path: inset(10% 0 60% 0);
+            animation: glitch-slice-1 0.2s infinite linear alternate-reverse;
+        }
+
+        .mega-glitch::after {
+            left: -10px;
+            text-shadow: 10px 0 var(--p-lime);
+            clip-path: inset(80% 0 5% 0);
+            animation: glitch-slice-2 0.3s infinite linear alternate-reverse;
+            z-index: -1;
+        }
+
+        @keyframes glitch-slice-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translate(-5px, 5px); }
+            50% { clip-path: inset(60% 0 10% 0); transform: translate(5px, -5px); }
+            100% { clip-path: inset(40% 0 50% 0); transform: translate(-5px, -5px); }
+        }
+        @keyframes glitch-slice-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translate(5px, 5px); }
+            50% { clip-path: inset(80% 0 5% 0); transform: translate(-5px, -5px); }
+            100% { clip-path: inset(30% 0 20% 0); transform: translate(5px, -5px); }
+        }
+
+        @keyframes text-glitch {
+            0% { transform: skewX(0deg); text-shadow: 5px 5px 0px var(--p-red), -5px -5px 0px var(--p-lime); }
+            5% { transform: skewX(20deg); text-shadow: -15px 5px 0px var(--p-magenta), 15px -5px 0px var(--p-yellow); }
+            10% { transform: skewX(-20deg); }
+            15% { transform: skewX(0deg); }
+            100% { transform: skewX(0deg); text-shadow: 5px 5px 0px var(--p-red), -5px -5px 0px var(--p-lime); }
+        }
+
+        /* --- Obnoxious Marquees --- */
+        .marquee-wrapper {
+            position: absolute;
+            width: 150vw;
+            left: -25vw;
+            background: var(--p-magenta);
+            color: var(--p-yellow);
+            font-size: 3rem;
+            font-family: "Impact";
+            padding: 10px;
+            border: 5px solid var(--p-lime);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .mq-1 {
+            top: 20%;
+            transform: rotate(15deg);
+        }
+
+        .mq-2 {
+            bottom: 20%;
+            transform: rotate(-10deg);
+            background: var(--p-lime);
+            color: var(--p-red);
+        }
+
+        .marquee-inner {
+            display: inline-block;
+            animation: super-fast-scroll 2s linear infinite;
+        }
+
+        .marquee-inner.reverse {
+            animation: super-fast-scroll 1.5s linear infinite reverse;
+        }
+
+        @keyframes super-fast-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- The Teleporting Button --- */
+        .teleport-btn {
+            background: var(--p-yellow);
+            color: var(--p-blue);
+            font-family: "Comic Sans MS";
+            font-weight: bold;
+            font-size: 2rem;
+            padding: 20px 40px;
+            border: 10px double var(--p-red);
+            border-radius: 50%;
+            cursor: wait; /* Annoying cursor */
+            z-index: 500;
+        }
+
+        /* --- Chaotic Image Section --- */
+        .image-gallery {
+            padding: 100px 5%;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .chaotic-img {
+            width: 300px;
+            height: 300px;
+            background: url('https://picsum.photos/400/400?random=1') center/cover;
+            border: 15px solid var(--p-magenta);
+            border-radius: 50%; /* Make them circles */
+            animation: spin-fast 1s linear infinite;
+            transition: all 0.1s;
+        }
+
+        .chaotic-img:hover {
+            border-radius: 0; /* Snap to square */
+            transform: scale(2) rotate(45deg);
+            filter: invert(1) hue-rotate(180deg) saturate(500%); /* Deep fry it */
+            z-index: 100;
+        }
+
+        @keyframes spin-fast {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Chaotic Typo Paragraph --- */
+        .chaotic-text-container {
+            padding: 100px 5%;
+            background: var(--p-lime);
+            border-top: 20px dotted var(--p-red);
+            text-align: center;
+        }
+
+        /* Spans injected by JS will be wild */
+        .wild-char {
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+        .wild-char:hover {
+            transform: scale(5) translateY(-20px);
+            z-index: 999;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="shake-element">
+        <a href="#">HOME</a>
+        <a href="#">ABOUT</a>
+        <a href="#">DON'T CLICK</a>
+    </nav>
+
+    <section class="hero">
+        <div class="marquee-wrapper mq-1">
+            <div class="marquee-inner">
+                WELCOME TO THE VOID !!! WELCOME TO THE VOID !!! WELCOME TO THE VOID !!! WELCOME TO THE VOID !!! WELCOME TO THE VOID !!! WELCOME TO THE VOID !!! 
+            </div>
+        </div>
+
+        <h1 class="mega-glitch shake-element">SYSTEM FAILURE</h1>
+
+        <button class="teleport-btn" id="badBtn">CLICK ME FOR FREE PRIZE!</button>
+
+        <div class="marquee-wrapper mq-2">
+            <div class="marquee-inner reverse">
+                ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 ERROR 404 
+            </div>
+        </div>
+    </section>
+
+    <!-- The Cursed Image Gallery -->
+    <section class="image-gallery">
+        <div class="chaotic-img"></div>
+        <div class="chaotic-img" style="animation-duration: 0.5s; animation-direction: reverse; background-image: url('https://picsum.photos/400/400?random=2');"></div>
+        <div class="chaotic-img" style="animation-duration: 2s; background-image: url('https://picsum.photos/400/400?random=3'); border-color: var(--p-lime);"></div>
+    </section>
+
+    <!-- The Broken Typo Section -->
+    <section class="chaotic-text-container" id="chaoticText">
+        This is a highly professional paragraph describing our corporate synergy and dynamic paradigm shifts in the B2B space. Please take us very seriously.
+    </section>
+
+    <script>
+        // 1. The Teleporting Button Troll
+        const badBtn = document.getElementById('badBtn');
+        badBtn.addEventListener('mouseover', () => {
+            // Instantly move the button to a random position on the screen
+            badBtn.style.position = 'fixed';
+            badBtn.style.top = (Math.random() * 80 + 10) + 'vh';
+            badBtn.style.left = (Math.random() * 80 + 10) + 'vw';
+            
+            // Randomly change its colors just to be annoying
+            const colors = ['red', 'blue', 'yellow', 'lime', 'magenta'];
+            badBtn.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            badBtn.style.color = colors[Math.floor(Math.random() * colors.length)];
+        });
+
+        // 2. The Chaotic Typo Generator
+        const p = document.getElementById('chaoticText');
+        const text = p.innerText;
+        p.innerHTML = ''; // Clear it
+
+        const fonts = ['Comic Sans MS', 'Impact', 'Times New Roman', 'Arial', 'Courier New'];
+        const colors = ['#ff0000', '#0000ff', '#ffff00', '#000000', '#ff00ff'];
+
+        text.split('').forEach(char => {
+            if (char === ' ') {
+                p.appendChild(document.createTextNode(' '));
+                return;
+            }
+            
+            let span = document.createElement('span');
+            span.innerText = char;
+            span.className = 'wild-char shake-element';
+            
+            // Apply completely random styling to EVERY SINGLE LETTER
+            span.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+            span.style.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random font size between 1rem and 5rem
+            span.style.fontSize = (Math.random() * 4 + 1) + 'rem';
+            
+            // Random baseline shift
+            span.style.verticalAlign = (Math.random() * 40 - 20) + 'px';
+
+            p.appendChild(span);
+        });
+
+        // 3. Custom Trail Cursor (Spawning emojis everywhere you move)
+        const emojis = ['💥', '💀', '🔥', '⚠️', '🤡'];
+        window.addEventListener('mousemove', (e) => {
+            if(Math.random() > 0.8) { // Don't spawn on every single pixel to save browser from crashing immediately
+                const trail = document.createElement('div');
+                trail.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                trail.style.position = 'fixed';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + 'px';
+                trail.style.fontSize = '30px';
+                trail.style.pointerEvents = 'none';
+                trail.style.zIndex = '99999';
+                trail.style.transition = 'all 1s ease-out';
+                
+                document.body.appendChild(trail);
+
+                // Make the emoji float up and fade away
+                setTimeout(() => {
+                    trail.style.transform = `translate(${(Math.random() - 0.5) * 100}px, -100px) rotate(${Math.random() * 360}deg)`;
+                    trail.style.opacity = '0';
+                }, 10);
+
+                // Clean up DOM
+                setTimeout(() => {
+                    trail.remove();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

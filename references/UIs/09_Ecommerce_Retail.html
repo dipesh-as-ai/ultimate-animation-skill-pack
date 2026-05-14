@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailHub | Athletic Sneaker Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- E-Commerce Conversion Color Tokens --- */
+        :root {
+            --cta-orange: #F97316; /* Amazon-style conversion orange */
+            --cta-hover: #EA580C;
+            --discount-red: #EF4444; /* Psychological urgency */
+            --trust-blue: #3B82F6; /* Calms purchase anxiety */
+            --success-green: #16A34A; /* Success / Free Shipping */
+            --bg-white: #FFFFFF;
+            --bg-gray: #F9FAFB;
+            --text-dark: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-white); color: var(--text-dark); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5vw; }
+
+        /* --- Promo Banner (The Yellow Strip) --- */
+        .promo-banner {
+            background: #FEF08A; color: #854D0E; font-weight: 600; font-size: 0.85rem;
+            text-align: center; padding: 8px 0; position: relative;
+        }
+        .promo-banner span { text-decoration: underline; cursor: pointer; }
+
+        /* --- Navigation --- */
+        header { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #FFF; z-index: 50; }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--cta-orange); }
+        
+        .search-bar { display: flex; flex: 1; max-width: 400px; margin: 0 20px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+        .search-bar input { flex: 1; padding: 10px 15px; border: none; outline: none; }
+        .search-bar button { background: var(--bg-gray); border: none; padding: 0 15px; border-left: 1px solid var(--border); cursor: pointer; }
+
+        .cart-icon { position: relative; cursor: pointer; width: 24px; height: 24px; }
+        .cart-badge {
+            position: absolute; top: -8px; right: -8px; background: var(--discount-red);
+            color: #FFF; font-size: 0.7rem; font-weight: 700; width: 18px; height: 18px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- Product Layout (Above the Fold) --- */
+        .product-section { padding: 40px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        
+        /* Left: Image Gallery & Zoom */
+        .gallery-container { display: flex; flex-direction: column; gap: 15px; }
+        .main-image-wrap {
+            width: 100%; aspect-ratio: 1; background: var(--bg-gray);
+            border-radius: 12px; overflow: hidden; position: relative; cursor: zoom-in;
+        }
+        .main-image {
+            width: 100%; height: 100%; 
+            background: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80') center/cover;
+            transition: transform 0.2s ease-out; /* Smooth reset, fast follow */
+        }
+        
+        .thumbnail-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .thumb { aspect-ratio: 1; background: var(--bg-gray); border-radius: 8px; cursor: pointer; border: 2px solid transparent; background-size: cover; background-position: center;}
+        .thumb.active { border-color: var(--cta-orange); }
+
+        /* Right: Product Details & Conversion Triggers */
+        .product-info { display: flex; flex-direction: column; gap: 20px; }
+        .brand { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .title { font-size: 2.2rem; line-height: 1.2; font-weight: 800; }
+        
+        /* Reviews / Trust Badge */
+        .reviews { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--trust-blue); font-weight: 500; }
+        .stars { color: #FBBF24; }
+        
+        /* Price Block with Sale Red */
+        .price-block { display: flex; align-items: baseline; gap: 15px; }
+        .price-current { font-size: 2rem; font-weight: 800; color: var(--discount-red); }
+        .price-original { font-size: 1.2rem; color: var(--text-muted); text-decoration: line-through; }
+        .discount-badge { background: #FEE2E2; color: var(--discount-red); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
+
+        /* Scarcity Trigger */
+        .scarcity { display: flex; align-items: center; gap: 8px; color: var(--discount-red); font-size: 0.9rem; font-weight: 600; }
+        .pulse-dot { width: 8px; height: 8px; background: var(--discount-red); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* Selectors */
+        .selector-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; display: block; }
+        .size-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .size-btn { border: 1px solid var(--border); background: #FFF; padding: 12px 0; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .size-btn:hover { border-color: var(--text-dark); }
+        .size-btn.selected { border-color: var(--cta-orange); background: #FFF7ED; color: var(--cta-orange); }
+
+        /* Main CTA */
+        .add-to-cart-btn {
+            background: var(--cta-orange); color: #FFF; border: none; width: 100%;
+            padding: 18px; font-size: 1.1rem; font-weight: 700; border-radius: 8px;
+            cursor: pointer; transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+        }
+        .add-to-cart-btn:hover { background: var(--cta-hover); }
+        .add-to-cart-btn:active { transform: scale(0.98); }
+
+        /* Trust guarantees */
+        .trust-guarantees { display: flex; gap: 20px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text-muted); }
+        .trust-item svg { width: 20px; height: 20px; color: var(--trust-blue); }
+
+        /* --- Related Products --- */
+        .related { padding: 60px 0; border-top: 1px solid var(--border); margin-top: 40px; }
+        .related h3 { font-size: 1.5rem; margin-bottom: 30px; }
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .product-card { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; position: relative; padding-bottom: 20px; }
+        .card-img { width: 100%; aspect-ratio: 1; background: var(--bg-gray); background-size: cover; background-position: center; transition: opacity 0.3s; }
+        .card-info { padding: 15px; }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 5px; }
+        .card-price { font-weight: 700; }
+        
+        /* Quick Add Button */
+        .quick-add {
+            position: absolute; bottom: -50px; left: 10px; right: 10px;
+            background: var(--text-dark); color: #FFF; border: none; padding: 10px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: bottom 0.2s;
+        }
+        .product-card:hover .quick-add { bottom: 10px; }
+
+        /* --- Fast Cart Flyout --- */
+        .cart-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .cart-drawer {
+            position: fixed; top: 0; right: -400px; width: 400px; height: 100%;
+            background: #FFF; z-index: 101; box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column;
+        }
+        .cart-drawer.open { right: 0; }
+        .cart-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .cart-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.2rem; }
+        .close-cart { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
+        
+        /* The Dark Pattern Progress Bar */
+        .cart-progress { padding: 20px; background: var(--bg-gray); border-bottom: 1px solid var(--border); }
+        .progress-text { font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; color: var(--text-dark); }
+        .progress-bar-bg { width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { width: 60%; height: 100%; background: var(--success-green); transition: width 0.5s; }
+
+        .cart-items { flex: 1; padding: 20px; overflow-y: auto; }
+        .cart-footer { padding: 20px; border-top: 1px solid var(--border); }
+        .checkout-btn {
+            width: 100%; background: var(--success-green); color: #FFF; border: none;
+            padding: 18px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+        }
+
+        /* --- Sticky Add to Cart (Mobile/Scroll) --- */
+        .sticky-atc {
+            position: fixed; bottom: -100px; left: 0; width: 100%; background: #FFF;
+            border-top: 1px solid var(--border); padding: 15px 5vw; display: flex;
+            justify-content: space-between; align-items: center; z-index: 90;
+            transition: bottom 0.3s; box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+        .sticky-atc.visible { bottom: 0; }
+        .sticky-info { display: flex; align-items: center; gap: 15px; }
+
+        @media(max-width: 1024px) {
+            .product-section { grid-template-columns: 1fr; }
+            .product-grid { grid-template-columns: 1fr 1fr; }
+            .cart-drawer { width: 100%; right: -100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Promo Banner -->
+    <div class="promo-banner">
+        🔥 FLASH SALE: Use code <strong>SPRINT20</strong> for 20% off all athletic gear. <span>Shop Now</span>
+    </div>
+
+    <!-- Nav -->
+    <header>
+        <div class="container nav-inner">
+            <div class="logo">RetailHub.</div>
+            <div class="search-bar" style="display: none;"> <!-- Hidden on small screens normally, omitted for brevity --> </div>
+            <div class="cart-icon" id="cartTrigger">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <div class="cart-badge">2</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Layout -->
+    <div class="container product-section" id="productTop">
+        
+        <!-- Left: Image Gallery -->
+        <div class="gallery-container">
+            <div class="main-image-wrap" id="imageZoomWrapper">
+                <div class="main-image" id="mainImg"></div>
+            </div>
+            <div class="thumbnail-row">
+                <div class="thumb active" style="background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80');"></div>
+                <div class="thumb" style="background-image: url('https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&q=80');"></div>
+                <div class="thumb" style="background-image: url('https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&q=80');"></div>
+            </div>
+        </div>
+
+        <!-- Right: Details & Conversion -->
+        <div class="product-info">
+            <div>
+                <div class="brand">Nike PRO</div>
+                <h1 class="title">Air Zoom Alphafly Next% 2</h1>
+            </div>
+            
+            <div class="reviews">
+                <div class="stars">★★★★★</div>
+                <span style="text-decoration: underline; cursor: pointer;">1,284 Reviews</span>
+            </div>
+
+            <div class="price-block">
+                <div class="price-current">$220.00</div>
+                <div class="price-original">$275.00</div>
+                <div class="discount-badge">Save 20%</div>
+            </div>
+
+            <div class="scarcity">
+                <div class="pulse-dot"></div>
+                High demand: Only 3 pairs left in your size!
+            </div>
+
+            <div>
+                <span class="selector-label">Select Size (US Men's)</span>
+                <div class="size-grid">
+                    <button class="size-btn">8</button>
+                    <button class="size-btn">8.5</button>
+                    <button class="size-btn selected">9</button>
+                    <button class="size-btn">9.5</button>
+                    <button class="size-btn">10</button>
+                </div>
+            </div>
+
+            <!-- The most important button on the site -->
+            <button class="add-to-cart-btn" id="addToCartBtn">Add to Cart — $220.00</button>
+
+            <!-- Trust signals -->
+            <div class="trust-guarantees">
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    Secure Checkout
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    Free Shipping & Returns
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products (Increase AOV) -->
+    <div class="container related">
+        <h3>You might also like</h3>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80');"></div>
+                <div class="card-info">
+                    <div class="card-title">Pro Performance Socks (3-Pack)</div>
+                    <div class="card-price">$24.00</div>
+                </div>
+                <button class="quick-add">+ Quick Add</button>
+            </div>
+            <div class="product-card">
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&q=80');"></div>
+                <div class="card-info">
+                    <div class="card-title">Elite Running Shorts</div>
+                    <div class="card-price">$45.00</div>
+                </div>
+                <button class="quick-add">+ Quick Add</button>
+            </div>
+            <div class="product-card">
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&q=80');"></div>
+                <div class="card-info">
+                    <div class="card-title">VaporMax Flyknit</div>
+                    <div class="card-price">$190.00</div>
+                </div>
+                <button class="quick-add">+ Quick Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Bottom Bar -->
+    <div class="sticky-atc" id="stickyATC">
+        <div class="sticky-info">
+            <div style="width: 40px; height: 40px; background: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80') center/cover; border-radius: 4px;"></div>
+            <div style="font-weight: 700;">Air Zoom Alphafly Next% 2</div>
+        </div>
+        <button class="add-to-cart-btn" style="width: auto; padding: 12px 30px;">Add to Cart</button>
+    </div>
+
+    <!-- Cart Flyout -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            Your Cart (2)
+            <button class="close-cart" id="closeCart">×</button>
+        </div>
+        
+        <!-- The Progress Bar (Upsell mechanic) -->
+        <div class="cart-progress">
+            <div class="progress-text" id="progressText">You're <strong>$30.00</strong> away from FREE shipping!</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="cart-items">
+            <!-- Simulated cart item -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #EEE; padding-bottom: 20px;">
+                <div style="width: 80px; height: 80px; background: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80') center/cover; border-radius: 6px;"></div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600;">Air Zoom Alphafly Next% 2</div>
+                    <div style="color: #666; font-size: 0.85rem; margin-top: 4px;">Size: 9 | Color: Crimson</div>
+                    <div style="font-weight: 700; margin-top: 10px;">$220.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem; font-weight: 800;">
+                <span>Subtotal</span>
+                <span>$220.00</span>
+            </div>
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Image Zoom on Hover ---
+        const wrap = document.getElementById('imageZoomWrapper');
+        const img = document.getElementById('mainImg');
+
+        wrap.addEventListener('mousemove', (e) => {
+            const rect = wrap.getBoundingClientRect();
+            // Calculate mouse position relative to image (0 to 1)
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            
+            // Transform origin moves based on mouse position
+            img.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+            img.style.transform = 'scale(2)'; // 2x zoom
+        });
+
+        wrap.addEventListener('mouseleave', () => {
+            img.style.transformOrigin = `center center`;
+            img.style.transform = 'scale(1)'; // Reset
+        });
+
+        // --- Cart Flyout Logic ---
+        const cartTrigger = document.getElementById('cartTrigger');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const cartDrawer = document.getElementById('cartDrawer');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const closeCart = document.getElementById('closeCart');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        function openCart(isAddingItem = false) {
+            cartDrawer.classList.add('open');
+            cartOverlay.classList.add('open');
+            
+            // Fast purposeful animation
+            if (isAddingItem) {
+                // Simulate unlocking free shipping
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                    progressText.innerHTML = '🎉 You unlocked <strong>FREE Shipping!</strong>';
+                }, 500);
+            }
+        }
+
+        function closeCartDrawer() {
+            cartDrawer.classList.remove('open');
+            cartOverlay.classList.remove('open');
+        }
+
+        cartTrigger.addEventListener('click', () => openCart(false));
+        addToCartBtn.addEventListener('click', () => {
+            const btn = addToCartBtn;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Adding...';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                openCart(true); // Open drawer and show progress bar update
+            }, 400);
+        });
+
+        closeCart.addEventListener('click', closeCartDrawer);
+        cartOverlay.addEventListener('click', closeCartDrawer);
+
+        // --- Sticky Bottom Bar visibility ---
+        const stickyATC = document.getElementById('stickyATC');
+        
+        window.addEventListener('scroll', () => {
+            // Show sticky bar when user scrolls past the main Add To Cart button
+            if (window.scrollY > addToCartBtn.offsetTop + 100) {
+                stickyATC.classList.add('visible');
+            } else {
+                stickyATC.classList.remove('visible');
+            }
+        });
+
+    </script>
+</body>
+</html>

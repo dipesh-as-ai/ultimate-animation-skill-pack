@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT: ZERO | Action FPS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Aggressive Gaming Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- Gaming Color & Effect Tokens --- */
+        :root {
+            --bg-dark: #06060A;
+            --bg-darker: #020204;
+            --accent-red: #FF0022;
+            --accent-glow: rgba(255, 0, 34, 0.6);
+            --ticker-yellow: #FFE000;
+            --text-white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-white); 
+            font-family: 'Barlow Condensed', sans-serif; 
+            overflow-x: hidden; 
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3, .display-font { font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+
+        /* --- Global Visual Effects (Scanlines & Noise) --- */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 9999; pointer-events: none; opacity: 0.3;
+        }
+        
+        /* --- Urgency Ticker Tape --- */
+        .ticker {
+            background: var(--ticker-yellow);
+            color: #000; font-weight: 800; font-size: 1.2rem;
+            letter-spacing: 0.05em; overflow: hidden; white-space: nowrap;
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 8px 0; border-bottom: 2px solid #000;
+            box-shadow: 0 0 15px rgba(255, 224, 0, 0.5);
+        }
+        .ticker-inner { display: inline-flex; animation: tickerAnim 15s linear infinite; }
+        .ticker-item { padding: 0 2vw; }
+        @keyframes tickerAnim {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed; top: 40px; left: 0; width: 100%; padding: 20px 4vw;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 90; background: linear-gradient(to bottom, rgba(6,6,10,0.9), transparent);
+        }
+        .logo { font-size: 2.5rem; color: #FFF; text-shadow: 0 0 10px var(--accent-glow); }
+        .logo span { color: var(--accent-red); }
+        .nav-links { display: flex; gap: 30px; font-size: 1.2rem; font-weight: 700; }
+        .nav-links a { color: #FFF; text-decoration: none; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--accent-red); }
+        
+        .btn {
+            background: var(--accent-red); color: #FFF; border: none;
+            padding: 12px 30px; font-size: 1.2rem; font-weight: 800;
+            font-family: 'Barlow Condensed'; cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.2s; position: relative;
+        }
+        .btn::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.5); opacity: 0; transition: opacity 0.2s;
+        }
+        .btn:hover { background: #FFF; color: var(--accent-red); transform: scale(1.05); }
+        .btn:hover::after { opacity: 1; }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh; position: relative; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; margin-top: 40px;
+        }
+        
+        /* Background Layer */
+        .hero-bg {
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            background: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80') center/cover;
+            opacity: 0.4; filter: contrast(1.2) grayscale(0.5); z-index: 1;
+        }
+        
+        /* Ember Particles Canvas */
+        #embers { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 2; pointer-events: none; }
+        
+        /* Hero Content */
+        .hero-content { position: relative; z-index: 4; text-align: center; }
+        .hero-title {
+            font-size: clamp(6rem, 15vw, 15rem); line-height: 0.8;
+            color: transparent; -webkit-text-stroke: 2px #FFF;
+            position: relative; margin-bottom: 20px;
+        }
+        .hero-title.solid {
+            position: absolute; top: 0; left: 0; width: 100%; color: var(--text-white); -webkit-text-stroke: 0;
+            clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+        }
+        .hero-subtitle { font-size: 2rem; color: var(--accent-red); letter-spacing: 5px; font-weight: 800; text-shadow: 0 0 20px var(--accent-red); }
+
+        /* --- Stats Section (Diagonal Cuts) --- */
+        .stats {
+            background: var(--accent-red); color: #FFF; padding: 100px 5vw;
+            display: flex; justify-content: space-around; position: relative; z-index: 10;
+            clip-path: polygon(0 10%, 100% 0, 100% 90%, 0 100%);
+            margin-top: -5vh; /* Overlap the hero */
+        }
+        .stat-block { text-align: center; }
+        .stat-num { font-size: 6rem; font-family: 'Bebas Neue'; line-height: 1; text-shadow: 4px 4px 0 #000; }
+        .stat-label { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #000; }
+
+        /* --- Game Modes Section --- */
+        .modes { padding: 15vh 5vw; background: var(--bg-darker); position: relative; }
+        .section-header { text-align: center; margin-bottom: 10vh; }
+        .section-header h2 { font-size: 5rem; color: #FFF; }
+        .section-header span { color: var(--accent-red); }
+
+        .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .mode-card {
+            background: #111; border: 1px solid #333; height: 500px;
+            position: relative; overflow: hidden; cursor: crosshair;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .mode-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; opacity: 0.5;
+            transition: transform 0.5s, opacity 0.5s; filter: grayscale(1);
+        }
+        .mode-card:hover { border-color: var(--accent-red); box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-10px); }
+        .mode-card:hover .mode-img { transform: scale(1.1); opacity: 0.8; filter: grayscale(0); }
+        
+        .mode-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(transparent, #000); }
+        .mode-title { font-size: 3rem; font-family: 'Bebas Neue'; margin-bottom: 10px; transition: color 0.2s; }
+        
+        /* The Glitch Hover Effect */
+        .mode-card:hover .mode-title {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: var(--accent-red);
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); text-shadow: none; }
+            20% { transform: translate(-2px, 2px); text-shadow: 2px 2px 0px #00FFFF, -2px -2px 0px #FF0022; }
+            40% { transform: translate(-2px, -2px); text-shadow: 2px 2px 0px #00FFFF, -2px -2px 0px #FF0022; }
+            60% { transform: translate(2px, 2px); text-shadow: -2px 2px 0px #00FFFF, 2px -2px 0px #FF0022; }
+            80% { transform: translate(2px, -2px); text-shadow: 2px -2px 0px #00FFFF, -2px 2px 0px #FF0022; }
+            100% { transform: translate(0); text-shadow: none; }
+        }
+
+        .m1 { background-image: url('https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&q=80'); }
+        .m2 { background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80'); }
+        .m3 { background-image: url('https://images.unsplash.com/photo-1605901309584-818e25960b8f?auto=format&fit=crop&q=80'); }
+
+        @media(max-width: 1024px) {
+            .mode-grid { grid-template-columns: 1fr; }
+            .stats { flex-direction: column; gap: 40px; clip-path: none; padding: 60px 5vw; margin-top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Global Screen FX -->
+    <div class="scanlines"></div>
+
+    <!-- Urgency Ticker -->
+    <div class="ticker">
+        <div class="ticker-inner">
+            <div class="ticker-item">SEASON 4 LIVE // NEW WEAPONS // BATTLE PASS OUT NOW // RANKED REWARDS UPDATED //</div>
+            <div class="ticker-item">SEASON 4 LIVE // NEW WEAPONS // BATTLE PASS OUT NOW // RANKED REWARDS UPDATED //</div>
+            <div class="ticker-item">SEASON 4 LIVE // NEW WEAPONS // BATTLE PASS OUT NOW // RANKED REWARDS UPDATED //</div>
+        </div>
+    </div>
+
+    <!-- Nav -->
+    <nav>
+        <div class="logo">PROJECT<span>:</span>ZERO</div>
+        <div class="nav-links">
+            <a href="#">Intel</a>
+            <a href="#">Arsenal</a>
+            <a href="#">Leaderboards</a>
+        </div>
+        <button class="btn">PLAY FREE</button>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="heroArea">
+        <div class="hero-bg" id="heroBg"></div>
+        <canvas id="embers"></canvas>
+        
+        <div class="hero-content gs-hero">
+            <div class="hero-title">SURVIVE
+                <div class="hero-title solid">SURVIVE</div>
+            </div>
+            <div class="hero-subtitle">The Final Extraction</div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stat-block gs-stat">
+            <div class="stat-num">15M+</div>
+            <div class="stat-label">Active Operators</div>
+        </div>
+        <div class="stat-block gs-stat">
+            <div class="stat-num">120</div>
+            <div class="stat-label">Weapons Added</div>
+        </div>
+        <div class="stat-block gs-stat">
+            <div class="stat-label" style="font-size: 2.5rem; margin-top: 20px;">DOMINATE<br>THE WARZONE</div>
+        </div>
+    </section>
+
+    <!-- Game Modes -->
+    <section class="modes">
+        <div class="section-header gs-up">
+            <h2>CHOOSE YOUR <span>BATTLEFIELD</span></h2>
+        </div>
+        
+        <div class="mode-grid">
+            <div class="mode-card gs-up">
+                <div class="mode-img m1"></div>
+                <div class="mode-info">
+                    <div class="mode-title">DEATHMATCH</div>
+                    <p>6v6 pure chaos. No respawn delays. Maximum adrenaline.</p>
+                </div>
+            </div>
+            <div class="mode-card gs-up" style="transition-delay: 0.1s;">
+                <div class="mode-img m2"></div>
+                <div class="mode-info">
+                    <div class="mode-title">EXTRACTION</div>
+                    <p>Loot, survive, and extract before the radiation zone closes.</p>
+                </div>
+            </div>
+            <div class="mode-card gs-up" style="transition-delay: 0.2s;">
+                <div class="mode-img m3"></div>
+                <div class="mode-info">
+                    <div class="mode-title">RANKED</div>
+                    <p>Compete against the best. Climb the global leaderboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Aggressive Hero Entrance ---
+        gsap.from(".gs-hero", {
+            scale: 0.5,
+            opacity: 0,
+            duration: 1.5,
+            ease: "elastic.out(1, 0.5)",
+            delay: 0.5
+        });
+
+        // Mouse Parallax on Hero Background
+        const heroArea = document.getElementById('heroArea');
+        const heroBg = document.getElementById('heroBg');
+        
+        heroArea.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+            gsap.to(heroBg, { x: x, y: y, duration: 1, ease: "power2.out" });
+        });
+
+        // --- Scroll Animations ---
+        // Stats punch in
+        gsap.from(".gs-stat", {
+            y: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+                trigger: ".stats",
+                start: "top 80%"
+            }
+        });
+
+        // Modes slide up aggressively
+        gsap.utils.toArray('.gs-up').forEach(elem => {
+            gsap.from(elem, {
+                y: 100,
+                opacity: 0,
+                duration: 1,
+                ease: "power4.out",
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%"
+                }
+            });
+        });
+
+        // --- Ember Particles Script ---
+        const canvas = document.getElementById('embers');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let w, h;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * w;
+                this.y = h + Math.random() * 100;
+                this.vx = (Math.random() - 0.5) * 2; // drift sideways
+                this.vy = -Math.random() * 3 - 1; // float up
+                this.size = Math.random() * 3 + 1;
+                this.life = Math.random();
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.01;
+                
+                // Wiggle effect
+                this.vx += (Math.random() - 0.5) * 0.5;
+                
+                if (this.y < 0 || this.life <= 0) {
+                    this.y = h + 10;
+                    this.x = Math.random() * w;
+                    this.life = 1;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 60, 0, ${this.life})`;
+                ctx.fill();
+                
+                // Glow
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#FF0022';
+            }
+        }
+
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, w, h);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+    </script>
+</body>
+</html>

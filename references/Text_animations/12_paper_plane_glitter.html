@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Plane Glitter Morph</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0c10;
+            height: 400vh; /* Long scrollable area */
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .fixed-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #66fcf1;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+        
+        .scroll-indicator span {
+            display: block;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+            40% { transform: translate(-50%, -10px); }
+            60% { transform: translate(-50%, -5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+        Scroll to Fly
+        <span>↓</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        let width, height;
+        let particles = [];
+        let smokeParticles = [];
+        
+        const TEXT = "JOURNEY";
+        const FONT_SIZE = 160;
+        
+        function getPixelCoords(tempCtx, density) {
+            const coords = [];
+            const data = tempCtx.getImageData(0, 0, width, height).data;
+            for(let y = 0; y < height; y += density) {
+                for(let x = 0; x < width; x += density) {
+                    if(data[(y * width + x) * 4 + 3] > 128) { // If pixel is not transparent
+                        coords.push({x, y});
+                    }
+                }
+            }
+            return coords;
+        }
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            
+            // 1. Draw Text on offscreen canvas
+            const textCanvas = document.createElement('canvas');
+            textCanvas.width = width; textCanvas.height = height;
+            const textCtx = textCanvas.getContext('2d');
+            
+            textCtx.fillStyle = '#ffffff';
+            textCtx.font = `900 ${FONT_SIZE}px "Poppins", sans-serif`;
+            textCtx.textAlign = 'center';
+            textCtx.textBaseline = 'middle';
+            textCtx.fillText(TEXT, width / 2, height / 2);
+            
+            // 2. Draw Paper Plane on another offscreen canvas
+            const planeCanvas = document.createElement('canvas');
+            planeCanvas.width = width; planeCanvas.height = height;
+            const planeCtx = planeCanvas.getContext('2d');
+            
+            planeCtx.fillStyle = '#ffffff';
+            planeCtx.translate(width/2, height/2);
+            planeCtx.beginPath();
+            let L = 120; // Plane size
+            planeCtx.moveTo(0, -L); // Nose pointing UP
+            planeCtx.lineTo(L, L); // Right wing tip
+            planeCtx.lineTo(0, L*0.4); // Inner tail center
+            planeCtx.lineTo(-L, L); // Left wing tip
+            planeCtx.closePath();
+            planeCtx.fill();
+            
+            // 3. Extract pixel coordinates
+            const density = 6; // Space between particles. Lower = more particles.
+            const textCoords = getPixelCoords(textCtx, density);
+            const planeCoords = getPixelCoords(planeCtx, density);
+            
+            particles = [];
+            smokeParticles = [];
+            
+            // Create particles mapping text pixels to plane pixels
+            const numParticles = Math.max(textCoords.length, planeCoords.length);
+            
+            for(let i = 0; i < numParticles; i++) {
+                const tCoord = textCoords[i % textCoords.length];
+                // Shuffle the plane coords slightly so the morph feels chaotic/magical
+                const pCoord = planeCoords[Math.floor(Math.random() * planeCoords.length)];
+                
+                particles.push({
+                    tx: tCoord.x, 
+                    ty: tCoord.y,
+                    px: pCoord.x, 
+                    py: pCoord.y,
+                    x: tCoord.x, 
+                    y: tCoord.y,
+                    noiseOffset: Math.random() // Used to stagger the animation
+                });
+            }
+        }
+
+        class Smoke {
+            constructor(x, y) {
+                // Add some initial random scatter
+                this.x = x + (Math.random() - 0.5) * 50;
+                this.y = y + (Math.random() - 0.5) * 50;
+                // Smoke drifts left and down
+                this.vx = (Math.random() - 0.5) * 3 - 2; 
+                this.vy = Math.random() * 2 + 1;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.01 + 0.005;
+                this.size = Math.random() * 4 + 1;
+                
+                // Glitter colors: Gold, Cyan, White
+                const colors = ['#FFD700', '#66fcf1', '#ffffff', '#FF00EA'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+            }
+            
+            draw(ctx) {
+                if (this.life <= 0) return;
+                ctx.fillStyle = this.color;
+                
+                // Twinkle effect: random opacity multiplied by life
+                let opacity = this.life * (Math.random() * 0.5 + 0.5);
+                ctx.globalAlpha = opacity;
+                
+                // Draw a glowing circle
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0; // Reset
+            }
+        }
+
+        // Custom easing function for smooth acceleration
+        function easeInOutCubic(x) {
+            return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+        }
+
+        let targetScroll = 0;
+        let currentScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            targetScroll = window.scrollY / maxScroll;
+            
+            if (targetScroll > 0.05) {
+                document.getElementById('scrollIndicator').style.opacity = '0';
+            } else {
+                document.getElementById('scrollIndicator').style.opacity = '1';
+            }
+        });
+
+        function render() {
+            // Smooth scroll scrubbing
+            currentScroll += (targetScroll - currentScroll) * 0.1;
+            
+            // Clear canvas with a slight trail effect
+            ctx.fillStyle = '#0b0c10';
+            ctx.fillRect(0, 0, width, height);
+
+            // Phase 1: Morph Text into Plane (0.1 to 0.4)
+            let morphProgress = Math.min(Math.max((currentScroll - 0.1) / 0.3, 0), 1);
+            
+            // Phase 2: Plane Flies Away (0.4 to 1.0)
+            let flyProgress = Math.min(Math.max((currentScroll - 0.4) / 0.6, 0), 1);
+            let easeFly = Math.pow(flyProgress, 2); // Exponential flight curve
+            
+            // Calculate flight path (flies up and right)
+            let pathX = easeFly * width * 1.5;
+            let pathY = -easeFly * height * 1.5;
+            let rotation = easeFly * Math.PI / 2; // Tilts to the right as it flies
+
+            // Render morphing particles
+            ctx.fillStyle = '#66fcf1'; // Neon cyan base
+            ctx.globalAlpha = 1.0;
+            
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                
+                // Stagger the morphing using the particle's random noiseOffset
+                // This makes it look like sand/particles blowing in the wind rather than a rigid block
+                let localMorph = Math.max(0, Math.min(1, morphProgress * 1.5 - p.noiseOffset * 0.5));
+                let ease = easeInOutCubic(localMorph);
+                
+                // Calculate position relative to center
+                let cx = width / 2;
+                let cy = height / 2;
+                
+                // Base morphing position
+                let currentLocalX = p.tx + (p.px - p.tx) * ease;
+                let currentLocalY = p.ty + (p.py - p.ty) * ease;
+                
+                // If it's flying, apply rotation and translation to the WHOLE shape
+                let dx = currentLocalX - cx;
+                let dy = currentLocalY - cy;
+                
+                let rotatedX = dx * Math.cos(rotation) - dy * Math.sin(rotation);
+                let rotatedY = dx * Math.sin(rotation) + dy * Math.cos(rotation);
+                
+                p.x = cx + rotatedX + pathX;
+                p.y = cy + rotatedY + pathY;
+                
+                // Draw particle
+                ctx.fillRect(p.x, p.y, 2, 2);
+            }
+            
+            // Spawn Glitter Smoke if plane is flying
+            if (flyProgress > 0 && flyProgress < 1) {
+                // The tail of the plane is at center + L in the local space
+                let L = 120 * 0.4; // Approximating the tail position
+                let tailDx = 0;
+                let tailDy = L;
+                
+                // Rotate the tail offset to match the plane's current flight rotation
+                let tailRotX = tailDx * Math.cos(rotation) - tailDy * Math.sin(rotation);
+                let tailRotY = tailDx * Math.sin(rotation) + tailDy * Math.cos(rotation);
+                
+                // Add the flight translation to get global tail position
+                let tailGlobalX = width / 2 + tailRotX + pathX;
+                let tailGlobalY = height / 2 + tailRotY + pathY;
+                
+                // Spawn 5 smoke particles per frame
+                for (let i = 0; i < 5; i++) {
+                    smokeParticles.push(new Smoke(tailGlobalX, tailGlobalY));
+                }
+            }
+            
+            // Render and update smoke particles
+            for (let i = smokeParticles.length - 1; i >= 0; i--) {
+                let s = smokeParticles[i];
+                s.update();
+                s.draw(ctx);
+                
+                if (s.life <= 0) {
+                    smokeParticles.splice(i, 1);
+                }
+            }
+            
+            ctx.globalAlpha = 1.0;
+            requestAnimationFrame(render);
+        }
+
+        window.addEventListener('resize', init);
+
+        // Wait for font to load
+        document.fonts.ready.then(() => {
+            init();
+            render();
+        });
+    </script>
+</body>
+</html>

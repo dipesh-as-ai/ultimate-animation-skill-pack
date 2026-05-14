@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium UI Text Intros</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #080808;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .text-container {
+            position: relative;
+            height: 200px; /* Fixed height so things don't jump around */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* 
+         =========================================
+         ANIMATION 1: THE ELASTIC SQUEEZE 
+         =========================================
+        */
+        .anim-squeeze {
+            font-size: 8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #00f3ff;
+            /* Starts completely crushed horizontally and stretched vertically */
+            transform: scaleX(0.01) scaleY(2);
+            letter-spacing: -50px;
+            opacity: 0;
+        }
+
+        .play-squeeze {
+            animation: squeezeEntrance 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes squeezeEntrance {
+            0% { transform: scaleX(0.01) scaleY(2.5); letter-spacing: -50px; opacity: 0; }
+            40% { transform: scaleX(1.2) scaleY(0.8); letter-spacing: 20px; opacity: 1; }
+            70% { transform: scaleX(0.95) scaleY(1.05); letter-spacing: -2px; }
+            100% { transform: scaleX(1) scaleY(1); letter-spacing: 5px; opacity: 1; }
+        }
+
+        /* 
+         =========================================
+         ANIMATION 2: CINEMATIC BLUR FADE
+         =========================================
+        */
+        .anim-blur {
+            font-size: 8rem;
+            font-weight: 300; /* Elegant thin font for cinematic feel */
+            text-transform: uppercase;
+            letter-spacing: 15px;
+            color: #ffffff;
+            filter: blur(20px);
+            opacity: 0;
+            transform: scale(1.1); /* Starts slightly larger */
+        }
+
+        .play-blur {
+            animation: blurEntrance 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes blurEntrance {
+            0% { filter: blur(30px); opacity: 0; transform: scale(1.1); }
+            100% { filter: blur(0px); opacity: 1; transform: scale(1); }
+        }
+
+        /* 
+         =========================================
+         ANIMATION 3: THE AGENCY MASK REVEAL
+         =========================================
+        */
+        .anim-mask {
+            display: flex;
+            font-size: 8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #ff00ea;
+        }
+
+        .mask-wrapper {
+            /* The crucial part: hides the letter until it slides up */
+            overflow: hidden; 
+            display: inline-block;
+            line-height: 1.1; /* Prevents clipping the top of the text */
+        }
+
+        .mask-letter {
+            display: inline-block;
+            transform: translateY(110%); /* Hidden below the mask */
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 
+         =========================================
+         ANIMATION 4: THE 3D FLIP STAGGER
+         =========================================
+        */
+        .anim-flip {
+            display: flex;
+            font-size: 8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            perspective: 600px;
+            color: #ffd700;
+        }
+
+        .flip-letter {
+            display: inline-block;
+            transform-origin: bottom center;
+            transform: rotateX(-90deg); /* Folded flat away from camera */
+            opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+        }
+
+        /* --- UI Controls --- */
+        .controls {
+            position: absolute;
+            bottom: 50px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            background-color: white;
+            color: black;
+        }
+
+        /* Utility classes for toggling visibility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="text-container">
+        <!-- 1. Squeeze -->
+        <div id="elSqueeze" class="anim-squeeze hidden">SQUEEZE</div>
+        
+        <!-- 2. Blur -->
+        <div id="elBlur" class="anim-blur hidden">CINEMATIC</div>
+        
+        <!-- 3. Mask Reveal -->
+        <div id="elMask" class="anim-mask hidden">
+            <!-- Letters wrapped in masks -->
+            <div class="mask-wrapper"><div class="mask-letter">A</div></div>
+            <div class="mask-wrapper"><div class="mask-letter">G</div></div>
+            <div class="mask-wrapper"><div class="mask-letter">E</div></div>
+            <div class="mask-wrapper"><div class="mask-letter">N</div></div>
+            <div class="mask-wrapper"><div class="mask-letter">C</div></div>
+            <div class="mask-wrapper"><div class="mask-letter">Y</div></div>
+        </div>
+
+        <!-- 4. 3D Flip -->
+        <div id="elFlip" class="anim-flip hidden">
+            <div class="flip-letter">F</div>
+            <div class="flip-letter">L</div>
+            <div class="flip-letter">I</div>
+            <div class="flip-letter">P</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="playSqueeze()">Squeeze Elastic</button>
+        <button onclick="playBlur()">Cinematic Fade</button>
+        <button onclick="playMask()">Mask Reveal</button>
+        <button onclick="playFlip()">3D Flip Stagger</button>
+    </div>
+
+    <script>
+        // Helper to reset and hide all text elements
+        function resetAll() {
+            document.getElementById('elSqueeze').classList.add('hidden');
+            document.getElementById('elSqueeze').classList.remove('play-squeeze');
+
+            document.getElementById('elBlur').classList.add('hidden');
+            document.getElementById('elBlur').classList.remove('play-blur');
+
+            document.getElementById('elMask').classList.add('hidden');
+            const maskLetters = document.querySelectorAll('.mask-letter');
+            maskLetters.forEach(l => {
+                l.style.transition = 'none'; // Remove transition instantly
+                l.style.transform = 'translateY(110%)'; // Reset position
+            });
+
+            document.getElementById('elFlip').classList.add('hidden');
+            const flipLetters = document.querySelectorAll('.flip-letter');
+            flipLetters.forEach(l => {
+                l.style.transition = 'none';
+                l.style.transform = 'rotateX(-90deg)';
+                l.style.opacity = '0';
+            });
+        }
+
+        function playSqueeze() {
+            resetAll();
+            const el = document.getElementById('elSqueeze');
+            el.classList.remove('hidden');
+            // Force a reflow so the animation restarts
+            void el.offsetWidth;
+            el.classList.add('play-squeeze');
+        }
+
+        function playBlur() {
+            resetAll();
+            const el = document.getElementById('elBlur');
+            el.classList.remove('hidden');
+            void el.offsetWidth;
+            el.classList.add('play-blur');
+        }
+
+        function playMask() {
+            resetAll();
+            const el = document.getElementById('elMask');
+            el.classList.remove('hidden');
+            
+            const letters = document.querySelectorAll('.mask-letter');
+            
+            // Wait a tiny bit for the display:flex to apply, then animate
+            setTimeout(() => {
+                letters.forEach((letter, index) => {
+                    // Re-apply the transition property
+                    letter.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+                    // Stagger the animation delay by 50ms per letter
+                    letter.style.transitionDelay = `${index * 0.05}s`;
+                    // Trigger the animation
+                    letter.style.transform = 'translateY(0%)';
+                });
+            }, 50);
+        }
+
+        function playFlip() {
+            resetAll();
+            const el = document.getElementById('elFlip');
+            el.classList.remove('hidden');
+            
+            const letters = document.querySelectorAll('.flip-letter');
+            
+            setTimeout(() => {
+                letters.forEach((letter, index) => {
+                    letter.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease';
+                    // Stagger by 100ms
+                    letter.style.transitionDelay = `${index * 0.1}s`;
+                    letter.style.transform = 'rotateX(0deg)';
+                    letter.style.opacity = '1';
+                });
+            }, 50);
+        }
+
+        // Play the first one on load
+        window.onload = playSqueeze;
+    </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAISON | Luxury Retail</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Cormorant Garamond is the absolute king of luxury web typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* --- Luxury Color Tokens --- */
+        :root {
+            --bg-warm: #FAF8F5; /* Fine paper/linen feel */
+            --text-charcoal: #2C2A28; /* Softer than pure black */
+            --accent-champagne: #B8965A; /* Restrained, elegant gold */
+        }
+
+        /* Hide native cursor for the entire site to use custom circle */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
+        body { 
+            background: var(--bg-warm); 
+            color: var(--text-charcoal); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .serif { font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+        
+        /* The signature luxury label styling */
+        .label { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.3em; 
+            color: var(--accent-champagne); 
+            display: block;
+            margin-bottom: 2vh;
+        }
+
+        /* --- Custom Circular Cursor --- */
+        .cursor {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px; 
+            border: 1px solid rgba(44, 42, 40, 0.5); border-radius: 50%; 
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); 
+            transition: width 0.3s, height 0.3s, background 0.3s;
+            mix-blend-mode: difference; /* Makes it visible on light and dark backgrounds */
+        }
+        /* Hover state for links */
+        .cursor.active { width: 80px; height: 80px; background: rgba(255,255,255,1); mix-blend-mode: difference; border: none; }
+
+        /* --- Navigation (Disappearing on scroll) --- */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 40px 5vw; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            color: #FFF; mix-blend-mode: difference;
+        }
+        nav.hidden { transform: translateY(-100%); }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-link { 
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; 
+            text-decoration: none; color: inherit; position: relative;
+        }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0%; height: 1px;
+            background: currentColor; transition: width 0.4s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+        
+        .logo { font-size: 2.5rem; letter-spacing: 0.1em; line-height: 1; }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh; position: relative; display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .hero-img-wrap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .hero-img {
+            width: 100%; height: 130%; /* Taller for parallax room */
+            background: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80') center 20%/cover;
+            /* Parallax will move this image vertically */
+        }
+        /* Gradient overlay to ensure text legibility without making it completely dark */
+        .hero-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%);
+        }
+        .hero-content {
+            position: relative; z-index: 2; text-align: center; color: #FFF; margin-top: 10vh;
+        }
+        .hero-title {
+            font-size: clamp(4rem, 10vw, 9rem);
+            letter-spacing: -0.02em; line-height: 1;
+            /* Clip-path reveal setup */
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+        }
+
+        /* --- Editorial Lookbook Section --- */
+        /* Extreme whitespace, asymmetric alignment */
+        .editorial { padding: 25vh 5vw; display: flex; flex-direction: column; gap: 30vh; }
+        
+        .look-row { display: flex; align-items: center; justify-content: space-between; gap: 10vw; }
+        .look-row.reverse { flex-direction: row-reverse; }
+        
+        .look-img-wrap { flex: 1.2; height: 80vh; overflow: hidden; position: relative; }
+        .look-img { 
+            width: 100%; height: 130%; 
+            background-size: cover; background-position: center; 
+        }
+        /* The Clip-path wipe overlay for the image */
+        .img-reveal-mask {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-warm); z-index: 2; transform-origin: top;
+        }
+
+        .look-text { flex: 1; max-width: 400px; }
+        .look-text h2 { font-size: 4rem; margin-bottom: 4vh; line-height: 1; }
+        .look-text p { font-size: 1rem; line-height: 1.8; color: #555; font-weight: 300; }
+
+        /* --- Horizontal Scroll Collection --- */
+        .collection { height: 100vh; overflow: hidden; position: relative; background: #111; color: #FFF; display: flex; align-items: center; }
+        .collection-track { display: flex; gap: 5vw; padding: 0 20vw; width: fit-content; }
+        
+        .col-item { width: 35vw; height: 60vh; position: relative; overflow: hidden; }
+        .col-img { width: 120%; height: 100%; background-size: cover; background-position: center; margin-left: -10%; }
+        
+        /* Titles overlaying the images */
+        .col-title {
+            position: absolute; bottom: -20px; left: -20px;
+            font-size: 6rem; font-family: 'Cormorant Garamond', serif; font-weight: 300;
+            color: rgba(255,255,255,0.8); pointer-events: none; mix-blend-mode: overlay;
+        }
+
+        /* --- Footer --- */
+        footer { padding: 15vh 5vw 5vh; text-align: center; border-top: 1px solid rgba(44, 42, 40, 0.1); }
+        .footer-logo { font-size: 3rem; margin-bottom: 5vh; }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 10vh; }
+        .footer-links a { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; text-decoration: none; color: var(--text-charcoal); }
+        .copyright { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        @media(max-width: 1024px) {
+            .nav-links { display: none; }
+            .look-row, .look-row.reverse { flex-direction: column; gap: 10vh; }
+            .look-img-wrap { width: 100%; height: 60vh; }
+            .look-text { max-width: 100%; text-align: center; }
+            .col-item { width: 70vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <nav id="navbar">
+        <div class="nav-links">
+            <a href="#" class="nav-link hover-target">Collection</a>
+            <a href="#" class="nav-link hover-target">Heritage</a>
+        </div>
+        <div class="logo serif hover-target">MAISON</div>
+        <div class="nav-links">
+            <a href="#" class="nav-link hover-target">Boutiques</a>
+            <a href="#" class="nav-link hover-target">Contact</a>
+        </div>
+    </nav>
+
+    <!-- 1. Full-viewport minimal hero -->
+    <section class="hero">
+        <div class="hero-img-wrap">
+            <div class="hero-img" id="heroBg"></div>
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">Elegance in silence.</h1>
+            <span class="label" style="color:#FFF; margin-top:4vh; opacity:0;" id="heroSubtitle">The Fall Campaign</span>
+        </div>
+    </section>
+
+    <!-- 2. Editorial Lookbook -->
+    <section class="editorial">
+        <!-- Look 1 -->
+        <div class="look-row">
+            <div class="look-img-wrap">
+                <div class="img-reveal-mask"></div>
+                <div class="look-img para-img" style="background-image: url('https://images.unsplash.com/photo-1599643478514-4a884f631165?auto=format&fit=crop&q=80');"></div>
+            </div>
+            <div class="look-text gs-fade">
+                <span class="label">Chapter I</span>
+                <h2>A diamond that remembers where it came from.</h2>
+                <p>Mined with profound respect for the earth. Crafted by hands that have mastered the subtle tension between raw nature and human precision.</p>
+            </div>
+        </div>
+
+        <!-- Look 2 (Reverse) -->
+        <div class="look-row reverse">
+            <div class="look-img-wrap">
+                <div class="img-reveal-mask"></div>
+                <div class="look-img para-img" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80');"></div>
+            </div>
+            <div class="look-text gs-fade">
+                <span class="label">Chapter II</span>
+                <h2>Restraint is the ultimate sophistication.</h2>
+                <p>We do not seek to dominate the room. We seek to elevate the one who wears our creations. True luxury does not shout; it merely exists.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Horizontal Scroll Collection -->
+    <section class="collection" id="colWrapper">
+        <div class="collection-track" id="colTrack">
+            <!-- Item 1 -->
+            <div class="col-item">
+                <div class="col-img col-para" style="background-image: url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80');"></div>
+                <div class="col-title">LUMIÈRE</div>
+            </div>
+            <!-- Item 2 -->
+            <div class="col-item">
+                <div class="col-img col-para" style="background-image: url('https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&q=80');"></div>
+                <div class="col-title">OBSIDIAN</div>
+            </div>
+            <!-- Item 3 -->
+            <div class="col-item">
+                <div class="col-img col-para" style="background-image: url('https://images.unsplash.com/photo-1573408301145-b98c4af0608f?auto=format&fit=crop&q=80');"></div>
+                <div class="col-title">AURA</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Minimal Footer -->
+    <footer>
+        <div class="footer-logo serif">MAISON</div>
+        <div class="footer-links">
+            <a href="#" class="hover-target">Press</a>
+            <a href="#" class="hover-target">Legal</a>
+            <a href="#" class="hover-target">Instagram</a>
+        </div>
+        <div class="copyright">© 2026 MAISON PARIS. ALL RIGHTS RESERVED.</div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Custom Cursor Logic ---
+        const cursor = document.getElementById('cursor');
+        const hoverTargets = document.querySelectorAll('.hover-target, .col-item');
+
+        // Fast GSAP setters
+        const setCursorX = gsap.quickSetter(cursor, "x", "px");
+        const setCursorY = gsap.quickSetter(cursor, "y", "px");
+
+        window.addEventListener('mousemove', (e) => {
+            setCursorX(e.clientX);
+            setCursorY(e.clientY);
+        });
+
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => cursor.classList.add('active'));
+            target.addEventListener('mouseleave', () => cursor.classList.remove('active'));
+        });
+
+        // --- Navbar Scroll Hide/Show ---
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > lastScrollY && window.scrollY > 100) {
+                navbar.classList.add('hidden'); // Scrolling down
+            } else {
+                navbar.classList.remove('hidden'); // Scrolling up
+            }
+            lastScrollY = window.scrollY;
+        });
+
+        // --- Hero Entrance Animation ---
+        const heroTl = gsap.timeline();
+        // Clip-path wipe up for the title
+        heroTl.to("#heroTitle", { 
+            clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)", 
+            duration: 1.5, ease: "power4.inOut", delay: 0.5 
+        })
+        .to("#heroSubtitle", { opacity: 1, duration: 1, ease: "none" }, "-=0.5");
+
+        // --- Slow Parallax on Hero Image ---
+        gsap.to("#heroBg", {
+            yPercent: 30, // Moves the background down at 0.7x speed
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // --- Editorial Lookbook Animations ---
+        // 1. Image Wipe Reveals
+        const masks = gsap.utils.toArray('.img-reveal-mask');
+        masks.forEach(mask => {
+            gsap.to(mask, {
+                scaleY: 0,
+                duration: 1.2,
+                ease: "power3.inOut",
+                scrollTrigger: {
+                    trigger: mask.parentElement,
+                    start: "top 70%",
+                }
+            });
+        });
+
+        // 2. Inner Image Parallax (Standard Luxury Effect)
+        const paraImgs = gsap.utils.toArray('.para-img');
+        paraImgs.forEach(img => {
+            gsap.to(img, {
+                yPercent: -15, // Move image up slightly while scrolling down
+                ease: "none",
+                scrollTrigger: {
+                    trigger: img.parentElement,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        });
+
+        // 3. Graceful Text Fades
+        const texts = gsap.utils.toArray('.gs-fade');
+        texts.forEach(text => {
+            gsap.from(text, {
+                y: 40,
+                opacity: 0,
+                duration: 1.5,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: text,
+                    start: "top 85%",
+                }
+            });
+        });
+
+        // --- Horizontal Collection Scroll ---
+        const track = document.getElementById('colTrack');
+        
+        function getScrollAmount() {
+            return -(track.scrollWidth - window.innerWidth);
+        }
+
+        const hScrollTween = gsap.to(track, {
+            x: getScrollAmount,
+            ease: "none"
+        });
+
+        ScrollTrigger.create({
+            trigger: "#colWrapper",
+            start: "top top",
+            end: () => `+=${getScrollAmount() * -1}`,
+            pin: true,
+            animation: hScrollTween,
+            scrub: 1, // Momentum inertia
+            invalidateOnRefresh: true
+        });
+
+        // Inner image parallax during horizontal scroll
+        const colImgs = gsap.utils.toArray('.col-para');
+        colImgs.forEach(img => {
+            gsap.to(img, {
+                xPercent: 10,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#colWrapper",
+                    start: "top top",
+                    end: () => `+=${getScrollAmount() * -1}`,
+                    scrub: 1,
+                    invalidateOnRefresh: true
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>

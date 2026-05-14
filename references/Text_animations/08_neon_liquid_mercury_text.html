@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Neon Liquid Mercury</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030303; /* Deep dark background to make neon pop */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* The container where the magic happens */
+        .gooey-container {
+            width: 100vw;
+            height: 100vh;
+            /* This is the secret sauce: it forces individual particles to melt into each other like liquid metal */
+            filter: url('#gooey');
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SVG filter that creates the liquid surface tension effect -->
+    <svg style="display: none;">
+        <defs>
+            <filter id="gooey">
+                <!-- 1. Blur the particles heavily so their edges overlap -->
+                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+                <!-- 2. Sharpen the alpha channel to create a hard edge where the blurs intersect -->
+                <feColorMatrix in="blur" mode="matrix" values="
+                    1 0 0 0 0  
+                    0 1 0 0 0  
+                    0 0 1 0 0  
+                    0 0 0 35 -15" result="gooey" />
+                <!-- 3. Blend it back to retain the original bright neon colors -->
+                <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="gooey-container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="hint">Slash through the liquid</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        let width, height;
+        let particles = [];
+        let mouse = { x: -1000, y: -1000, radius: 150 }; // Large mouse radius for a massive splash
+        
+        const TEXT = "CREATIVITY";
+        const FONT_SIZE = 160;
+        
+        // Aggressive, beautiful neon color palette
+        const colors = ['#FF003C', '#00F3FF', '#FFE600', '#FF00EA'];
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            
+            // Draw text onto an invisible layer to extract pixel data
+            ctx.fillStyle = 'white';
+            ctx.font = `900 ${FONT_SIZE}px "Helvetica Neue", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(TEXT, width / 2, height / 2);
+            
+            const textCoordinates = ctx.getImageData(0, 0, width, height);
+            ctx.clearRect(0, 0, width, height);
+            
+            particles = [];
+            
+            // Grid step size. Lower = more particles (thicker liquid, but heavier on CPU). 
+            // 8 is the sweet spot for the gooey filter.
+            const step = 8; 
+            
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    const index = (y * width + x) * 4;
+                    // Check if the pixel has alpha (meaning it's part of the text)
+                    if (textCoordinates.data[index + 3] > 128) {
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        particles.push(new LiquidParticle(x, y, color));
+                    }
+                }
+            }
+        }
+
+        class LiquidParticle {
+            constructor(x, y, color) {
+                this.x = Math.random() * width; // Spawn randomly for a cool intro effect
+                this.y = Math.random() * height;
+                this.baseX = x;
+                this.baseY = y;
+                // Large particles so the gooey filter can fuse them together
+                this.size = Math.random() * 8 + 8; 
+                this.color = color;
+                
+                // Physics properties
+                this.density = (Math.random() * 40) + 10;
+                this.friction = 0.88; // How fast they slow down
+                this.ease = 0.04;     // How fast they snap back to the text shape
+                this.vx = 0;
+                this.vy = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            update() {
+                // Distance from mouse
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // If mouse is near, calculate repulsion force
+                if (distance < mouse.radius) {
+                    let forceDirectionX = dx / distance;
+                    let forceDirectionY = dy / distance;
+                    let force = (mouse.radius - distance) / mouse.radius;
+                    
+                    // The "Splash" effect
+                    let directionX = forceDirectionX * force * this.density;
+                    let directionY = forceDirectionY * force * this.density;
+                    
+                    this.vx -= directionX;
+                    this.vy -= directionY;
+                } else {
+                    // If mouse is far, slowly spring back to original text shape
+                    this.vx += (this.baseX - this.x) * this.ease;
+                    this.vy += (this.baseY - this.y) * this.ease;
+                }
+                
+                // Apply friction
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                
+                // Update position
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+        }
+
+        function animate() {
+            // Clear canvas every frame
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners for interaction
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        // Touch support for mobile
+        window.addEventListener('touchmove', (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        });
+
+        // Hide mouse offscreen when not interacting
+        window.addEventListener('mouseout', () => {
+            mouse.x = -1000;
+            mouse.y = -1000;
+        });
+
+        window.addEventListener('resize', () => {
+            init();
+        });
+
+        // Start the engine
+        init();
+        animate();
+    </script>
+</body>
+</html>

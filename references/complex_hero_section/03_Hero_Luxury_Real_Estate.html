@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Luxury Real Estate</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070707;
+            --text-light: #F5F5F0;
+            --gold: #C0A062;
+            --font-display: 'Cinzel', serif;
+            --font-sans: 'Jost', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        /* Sleek Custom Cursor */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: var(--gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor-ring {
+            position: fixed; top: 0; left: 0;
+            width: 40px; height: 40px;
+            border: 1px solid rgba(192, 160, 98, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Full Screen Background Image */
+        .hero-bg {
+            position: absolute;
+            inset: -5%; /* Slightly larger for parallax */
+            width: 110%;
+            height: 110%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.4) contrast(1.1);
+            transform: scale(1.1); /* Starting scale for animation */
+        }
+
+        /* Overlay to darken edges */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 20%, #000 120%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Top Navigation */
+        header {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 3rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .nav-links span {
+            cursor: pointer;
+            position: relative;
+        }
+        .nav-links span::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0%; height: 1px; background: var(--gold); transition: width 0.3s;
+        }
+        .nav-links span:hover::after { width: 100%; }
+
+        /* Center Content */
+        .hero-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+            padding: 0 2rem;
+        }
+
+        .sub-heading {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .main-title {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 10vw, 8rem);
+            font-weight: 400;
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            white-space: nowrap;
+        }
+
+        /* Text reveal masks */
+        .line-mask {
+            display: block;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        /* Bottom Details */
+        .hero-bottom {
+            position: absolute;
+            bottom: 3rem; left: 4rem; right: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .property-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .property-info .id { font-size: 0.8rem; color: var(--gold); letter-spacing: 2px;}
+        .property-info .loc { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 4px;}
+
+        /* Scroll Down Indicator */
+        .scroll-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            position: absolute;
+            left: 50%; bottom: 3rem;
+            transform: translateX(-50%);
+        }
+
+        .scroll-text {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #888;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: 0; width: 100%; height: 100%;
+            background: var(--gold);
+            animation: scrollDrop 2s infinite;
+        }
+
+        @keyframes scrollDrop {
+            0% { top: -100%; }
+            50% { top: 100%; }
+            100% { top: 100%; }
+        }
+
+        @media (max-width: 900px) {
+            header { padding: 2rem; flex-direction: column; gap: 1rem; }
+            .hero-bottom { flex-direction: column; left: 2rem; right: 2rem; align-items: flex-start; gap: 2rem; bottom: 2rem;}
+            .scroll-indicator { display: none; }
+            body { cursor: auto; }
+            .cursor-dot, .cursor-ring { display: none; }
+            .main-title { white-space: normal; font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <div class="hero-bg">
+        <img class="gs-bg-img" src="https://images.unsplash.com/photo-1613490900233-a417551ab66e?auto=format&fit=crop&q=80" alt="Luxury Villa">
+        <div class="vignette"></div>
+    </div>
+
+    <header class="gs-fade">
+        <div class="logo">Valerius</div>
+        <div class="nav-links">
+            <span class="hover-target">Estates</span>
+            <span class="hover-target">Philosophy</span>
+            <span class="hover-target">Contact</span>
+        </div>
+    </header>
+
+    <main class="hero-content">
+        <span class="sub-heading gs-fade">The Pinnacle of Living</span>
+        <h1 class="main-title">
+            <span class="line-mask"><span class="gs-title" style="display: block;">Curated</span></span>
+            <span class="line-mask"><span class="gs-title" style="display: block; color: var(--gold); font-style: italic;">Residences</span></span>
+        </h1>
+    </main>
+
+    <div class="hero-bottom gs-fade">
+        <div class="property-info">
+            <span class="id">Featured Property 01</span>
+            <span class="loc">Lake Como, Italy</span>
+        </div>
+        
+        <div class="property-info" style="text-align: right;">
+            <span class="id">Starting Value</span>
+            <span class="loc">€ 24.5M</span>
+        </div>
+    </div>
+
+    <div class="scroll-indicator gs-fade">
+        <span class="scroll-text">Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+
+    <script>
+        // Custom Cursor Logic
+        const dot = document.querySelector('.cursor-dot');
+        const ring = document.querySelector('.cursor-ring');
+        const hoverTargets = document.querySelectorAll('.hover-target');
+
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
+            gsap.to(ring, { x: e.clientX, y: e.clientY, duration: 0.15, ease: "power2.out" });
+        });
+
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => {
+                gsap.to(dot, { scale: 0, duration: 0.2 });
+                gsap.to(ring, { width: 60, height: 60, backgroundColor: 'rgba(192, 160, 98, 0.2)', duration: 0.3 });
+            });
+            target.addEventListener('mouseleave', () => {
+                gsap.to(dot, { scale: 1, duration: 0.2 });
+                gsap.to(ring, { width: 40, height: 40, backgroundColor: 'transparent', duration: 0.3 });
+            });
+        });
+
+        // Cinematic Entrance Animations
+        const tl = gsap.timeline({ delay: 0.3 });
+
+        // Background image slow zoom out and unblur
+        tl.fromTo(".gs-bg-img", 
+            { scale: 1.2, filter: "brightness(0) blur(10px)" },
+            { scale: 1, filter: "brightness(0.4) blur(0px)", duration: 2.5, ease: "power3.out" }
+        )
+        // Main title slides up gracefully from its mask
+        .from(".gs-title", {
+            y: "110%",
+            duration: 1.5,
+            stagger: 0.2,
+            ease: "power3.out"
+        }, "-=1.5")
+        // Everything else fades in slowly
+        .from(".gs-fade", {
+            y: 20,
+            opacity: 0,
+            duration: 1.5,
+            stagger: 0.1,
+            ease: "power2.out"
+        }, "-=1");
+
+        // Subtle mouse parallax for the background image
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            gsap.to(".gs-bg-img", {
+                x: -x,
+                y: -y,
+                duration: 1.5,
+                ease: "power2.out"
+            });
+        });
+    </script>
+</body>
+</html>

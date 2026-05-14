@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALEX.DEV | Kinetic Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Syne for brutalist display, Inter for tiny utility text -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* --- Brutalist / Kinetic Color Tokens --- */
+        :root {
+            --bg-dark: #0A0A0A;
+            --text-light: #F4F4F4;
+            --accent-acid: #CCFF00; /* Signature wild accent color */
+            --border-dim: rgba(244, 244, 244, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        
+        body { 
+            background: var(--bg-dark); 
+            color: var(--text-light); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .display { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 0.9; text-transform: uppercase; }
+
+        /* --- Page Arrival Loader --- */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--text-light); color: var(--bg-dark);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+        }
+        .loader-text { font-family: 'Syne'; font-size: 4rem; font-weight: 800; overflow: hidden; }
+        .loader-text span { display: inline-block; transform: translateY(100%); }
+
+        /* --- Custom Kinetic Cursor --- */
+        .cursor-dot, .cursor-ring {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; pointer-events: none; z-index: 9999;
+        }
+        .cursor-dot { width: 8px; height: 8px; background: var(--accent-acid); transition: width 0.2s, height 0.2s; mix-blend-mode: difference; }
+        .cursor-ring { 
+            width: 40px; height: 40px; border: 1px solid var(--accent-acid); 
+            transition: width 0.3s, height 0.3s, background 0.3s, border 0.3s; 
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Syne'; font-weight: 800; font-size: 14px; color: #000;
+        }
+        
+        /* Cursor View State for Projects */
+        .cursor-ring.view { 
+            width: 100px; height: 100px; background: var(--accent-acid); 
+            border: none; mix-blend-mode: normal;
+        }
+        .cursor-ring.view::after { content: 'VIEW'; }
+        .cursor-ring.view ~ .cursor-dot { opacity: 0; }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 30px 4vw;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            z-index: 100; mix-blend-mode: difference;
+        }
+        .nav-logo { font-family: 'Syne'; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
+        .nav-meta { text-align: right; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; color: #999; }
+        .nav-meta p { margin-bottom: 5px; }
+        .nav-meta .highlight { color: var(--accent-acid); }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh; padding: 0 4vw; display: flex; flex-direction: column; justify-content: center;
+            position: relative; border-bottom: 1px solid var(--border-dim);
+        }
+        .hero-title-container { position: relative; z-index: 10; margin-top: 10vh; }
+        .hero h1 { 
+            font-size: clamp(4rem, 12vw, 14rem); letter-spacing: -0.04em; 
+            white-space: nowrap; overflow: hidden;
+        }
+        .hero h1 span { display: inline-block; transform: translateY(110%); }
+        
+        .hero-sub {
+            position: absolute; bottom: 5vh; left: 4vw; font-size: 1rem; max-width: 300px;
+            color: #888; line-height: 1.5; font-weight: 400;
+        }
+
+        /* --- Selected Works (Full Scale) --- */
+        .work-section { padding: 15vh 0; }
+        .section-label { 
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+            padding: 0 4vw; margin-bottom: 10vh; color: #666;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border-dim); }
+
+        .project {
+            position: relative; padding: 5vh 4vw; border-bottom: 1px solid var(--border-dim);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        /* Broken grid / Brutalist layout for project titles */
+        .project-title { font-size: clamp(3rem, 8vw, 8rem); z-index: 2; position: relative; mix-blend-mode: difference; transition: color 0.3s;}
+        .project-meta { font-size: 1rem; text-align: right; text-transform: uppercase; z-index: 2; mix-blend-mode: difference; }
+        
+        /* The massive image reveal on hover */
+        .project-img-wrapper {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 60vw; height: 70vh; z-index: 1; overflow: hidden; pointer-events: none;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s;
+            opacity: 0; filter: grayscale(1);
+        }
+        .project-img {
+            width: 100%; height: 100%; background-size: cover; background-position: center;
+            transform: scale(1.2); transition: transform 0.6s;
+        }
+        
+        .project:hover .project-img-wrapper { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .project:hover .project-img { transform: scale(1); filter: grayscale(0); }
+        .project:hover .project-title { color: var(--accent-acid); font-style: italic; }
+
+        /* --- Case Study Process (Minimal Text, Brutal Layout) --- */
+        .process { padding: 15vh 4vw; display: grid; grid-template-columns: 1fr 2fr; gap: 10vw; border-bottom: 1px solid var(--border-dim); }
+        .process h2 { font-size: 4rem; position: sticky; top: 15vh; }
+        .process-blocks { display: flex; flex-direction: column; gap: 10vh; }
+        .block p { font-size: 1.5rem; line-height: 1.6; color: #AAA; }
+        .block p strong { color: #FFF; font-weight: 500; }
+
+        /* --- Huge Footer --- */
+        footer { padding: 10vh 4vw 5vh; text-align: center; }
+        .footer-cta { font-size: clamp(5rem, 15vw, 18rem); color: var(--bg-dark); -webkit-text-stroke: 2px var(--text-light); transition: all 0.3s; cursor: none; }
+        .footer-cta:hover { color: var(--accent-acid); -webkit-text-stroke: 0; }
+        .footer-bottom { display: flex; justify-content: space-between; margin-top: 10vh; font-size: 0.8rem; color: #666; text-transform: uppercase; }
+
+        @media(max-width: 1024px) {
+            .nav-meta { display: none; }
+            .hero-sub { position: relative; bottom: 0; left: 0; margin-top: 5vh; }
+            .project { flex-direction: column; align-items: flex-start; gap: 20px; }
+            .project-img-wrapper { width: 90vw; }
+            .process { grid-template-columns: 1fr; }
+            .process h2 { position: relative; top: 0; margin-bottom: 5vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Kinetic Cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Page Arrival Transition -->
+    <div class="loader" id="loader">
+        <div class="loader-text"><span id="loaderWord">INITIALIZING...</span></div>
+    </div>
+
+    <!-- Nav -->
+    <nav>
+        <div class="nav-logo">ALEX.DEV</div>
+        <div class="nav-meta">
+            <p>Available for freelance</p>
+            <p>Based in <span class="highlight">Tokyo, JP</span></p>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-title-container">
+            <h1 class="display"><span class="hero-word">CREATIVE</span></h1>
+            <h1 class="display"><span class="hero-word" style="margin-left: 10vw;">DEVELOPER.</span></h1>
+            <h1 class="display" style="color: transparent; -webkit-text-stroke: 2px #F4F4F4;"><span class="hero-word">DESIGNER.</span></h1>
+        </div>
+        <div class="hero-sub">I build digital experiences that live at the intersection of raw engineering and bold aesthetics.</div>
+    </section>
+
+    <!-- Selected Works -->
+    <section class="work-section">
+        <div class="section-label">Selected Works — 24/25</div>
+        
+        <div class="project work-hover">
+            <div class="project-title">AETHER</div>
+            <div class="project-img-wrapper">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80');"></div>
+            </div>
+            <div class="project-meta">
+                <div>WebGL / Three.js</div>
+                <div style="color: #666;">2024</div>
+            </div>
+        </div>
+
+        <div class="project work-hover">
+            <div class="project-title">NEXUS</div>
+            <div class="project-img-wrapper">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80');"></div>
+            </div>
+            <div class="project-meta">
+                <div>E-Commerce / Next.js</div>
+                <div style="color: #666;">2024</div>
+            </div>
+        </div>
+
+        <div class="project work-hover">
+            <div class="project-title">VOID</div>
+            <div class="project-img-wrapper">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&q=80');"></div>
+            </div>
+            <div class="project-meta">
+                <div>Brand Identity</div>
+                <div style="color: #666;">2023</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process -->
+    <section class="process">
+        <h2 class="display">THE<br>METHOD.</h2>
+        <div class="process-blocks">
+            <div class="block gs-fade">
+                <p><strong>01. Strategy over aesthetics.</strong> A beautiful website that doesn't solve a problem is just digital art. I start by dismantling the brand's core architecture.</p>
+            </div>
+            <div class="block gs-fade">
+                <p><strong>02. Motion as meaning.</strong> Animation should never be decorative. Every micro-interaction is engineered to guide the user's eye and reinforce the brand's narrative.</p>
+            </div>
+            <div class="block gs-fade">
+                <p><strong>03. Execution.</strong> WebGL, GSAP, and native performance. The code must be as pristine as the visual design.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="section-label" style="justify-content: center; margin-bottom: 5vh;">Have a project?</div>
+        <div class="footer-cta display">LET'S TALK</div>
+        <div class="footer-bottom">
+            <div>© 2026 ALEX.DEV</div>
+            <div>SCROLL TO TOP</div>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Custom Kinetic Cursor ---
+        const dot = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Dot follows instantly
+            gsap.set(dot, { x: mouseX, y: mouseY });
+        });
+
+        // Ring follows with slight lag (lerp)
+        gsap.ticker.add(() => {
+            ringX += (mouseX - ringX) * 0.15;
+            ringY += (mouseY - ringY) * 0.15;
+            gsap.set(ring, { x: ringX, y: ringY });
+        });
+
+        // Hover states for projects
+        const works = document.querySelectorAll('.work-hover');
+        works.forEach(work => {
+            work.addEventListener('mouseenter', () => ring.classList.add('view'));
+            work.addEventListener('mouseleave', () => ring.classList.remove('view'));
+        });
+
+        // Hover state for footer CTA
+        const cta = document.querySelector('.footer-cta');
+        cta.addEventListener('mouseenter', () => {
+            gsap.to(dot, { scale: 5, backgroundColor: '#0A0A0A' });
+            ring.style.display = 'none';
+        });
+        cta.addEventListener('mouseleave', () => {
+            gsap.to(dot, { scale: 1, backgroundColor: '#CCFF00' });
+            ring.style.display = 'flex';
+        });
+
+        // --- 2. Page Arrival Loader Transition ---
+        const tlLoader = gsap.timeline();
+        
+        // Word pops up
+        tlLoader.to("#loaderWord", { y: 0, duration: 1, ease: "power4.out", delay: 0.2 })
+        // Wait a beat, slide word up and out
+        .to("#loaderWord", { y: "-100%", duration: 0.8, ease: "power4.in", delay: 0.5 })
+        // Loader curtain slides UP to reveal site
+        .to("#loader", { y: "-100%", duration: 1.2, ease: "power4.inOut" }, "-=0.3")
+        // Trigger Hero text reveal
+        .from(".hero-word", { 
+            y: "110%", 
+            duration: 1.2, 
+            stagger: 0.15, 
+            ease: "power4.out" 
+        }, "-=0.6");
+
+        // --- 3. Scroll Animations ---
+        // Fade up process blocks
+        const blocks = gsap.utils.toArray('.gs-fade');
+        blocks.forEach(block => {
+            gsap.from(block, {
+                y: 50, opacity: 0, duration: 1, ease: "power3.out",
+                scrollTrigger: { trigger: block, start: "top 85%" }
+            });
+        });
+
+        // Parallax effect on Hero text when scrolling down
+        gsap.to(".hero-title-container", {
+            y: 150,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero", start: "top top", end: "bottom top", scrub: true
+            }
+        });
+
+    </script>
+</body>
+</html>

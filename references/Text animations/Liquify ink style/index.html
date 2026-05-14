@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liquid Mercury Morph — Text Effect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Montserrat:wght@200;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SVG Goo Filter — the secret sauce -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <defs>
+      <filter id="goo-strong" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur" />
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  0 0 0 38 -14"
+          result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+      <filter id="goo-soft" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  0 0 0 26 -10"
+          result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+      <!-- Metallic displacement for shimmer -->
+      <filter id="metal-shimmer">
+        <feTurbulence type="fractalNoise" baseFrequency="0.015 0.7"
+          numOctaves="2" seed="2" result="noise" />
+        <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+        <feBlend in="SourceGraphic" in2="grayNoise" mode="overlay" result="blend"/>
+        <feComposite in="blend" in2="SourceGraphic" operator="in" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="bg-grid"></div>
+
+  <main class="scene">
+
+    <span class="label-top">— 02 —</span>
+
+    <!-- Goo container: filter applied here -->
+    <div class="goo-stage" id="goo-stage">
+      <!-- Chars injected by JS -->
+    </div>
+
+    <!-- Clean text layer shown after morph (layered on top) -->
+    <div class="final-layer" id="final-layer" aria-hidden="true"></div>
+
+    <div class="tagline" id="tagline">
+      <span>liquid</span>
+      <span class="sep">·</span>
+      <span>mercury</span>
+      <span class="sep">·</span>
+      <span>morph</span>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

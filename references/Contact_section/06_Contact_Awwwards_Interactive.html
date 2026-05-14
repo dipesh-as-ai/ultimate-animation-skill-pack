@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awwwards Contact Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --text: #f0f0f0;
+            --accent: #ff4500;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Custom Dot Cursor */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 10px; height: 10px;
+            background: var(--text);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+
+        /* Hover Image attached to cursor */
+        .cursor-image {
+            position: fixed; top: 0; left: 0;
+            width: 300px; height: 400px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.4s;
+        }
+        .cursor-image img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .contact-wrapper {
+            padding: 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Massive Typography */
+        .huge-text-container {
+            position: relative;
+            z-index: 1;
+            transition: filter 0.5s ease, opacity 0.5s ease;
+        }
+        
+        .huge-text {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(6rem, 15vw, 15rem);
+            line-height: 0.85;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin: 0;
+            white-space: nowrap;
+        }
+        .huge-text.outline {
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255,255,255,0.2);
+            transition: -webkit-text-stroke 0.3s;
+        }
+        .huge-text.outline:hover {
+            -webkit-text-stroke: 2px var(--text);
+        }
+
+        /* The Minimalist Form */
+        .form-container {
+            margin-top: 6rem;
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .minimal-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding: 1.5rem 0;
+            font-size: 2rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.4s;
+        }
+
+        .minimal-input::placeholder {
+            color: rgba(255,255,255,0.15);
+        }
+
+        .minimal-input:focus {
+            border-bottom-color: var(--text);
+        }
+
+        .btn-submit {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 2rem;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            padding: 1rem;
+            transition: transform 0.3s;
+        }
+        
+        .btn-submit:hover {
+            transform: translateX(10px);
+            color: var(--accent);
+        }
+
+        /* Bottom Footer info */
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .footer-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+        }
+        .footer-link {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.2rem;
+            position: relative;
+            display: inline-block;
+        }
+        .footer-link::after {
+            content: ''; position: absolute;
+            bottom: -2px; left: 0; width: 100%; height: 1px;
+            background: var(--text);
+            transform: scaleX(0); transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+        .footer-link:hover::after {
+            transform: scaleX(1); transform-origin: left;
+        }
+
+        /* Form Active State Classes */
+        body.form-active .huge-text-container {
+            filter: blur(10px);
+            opacity: 0.2;
+        }
+
+        @media (max-width: 768px) {
+            .contact-wrapper { padding: 2rem; }
+            .minimal-input { font-size: 1.5rem; }
+            .footer-info { flex-direction: column; gap: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-image" id="cursorImg">
+        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop" alt="Abstract">
+    </div>
+
+    <section class="contact-wrapper">
+        <div class="huge-text-container" id="textWrap">
+            <h1 class="huge-text hover-trigger">HAVE AN</h1>
+            <h1 class="huge-text outline hover-trigger">IDEA?</h1>
+        </div>
+
+        <div class="form-container">
+            <form onsubmit="event.preventDefault();">
+                <div class="input-wrapper gs-up">
+                    <input type="email" class="minimal-input" id="emailInput" placeholder="Enter your email to begin..." required>
+                    <button type="submit" class="btn-submit magnetic-btn">→</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="footer-info gs-up">
+            <div class="footer-col">
+                <span class="footer-label">Location</span>
+                <span>Los Angeles, CA</span>
+                <span>11:24 PM PST</span>
+            </div>
+            <div class="footer-col">
+                <span class="footer-label">Socials</span>
+                <a href="#" class="footer-link magnetic-btn">Instagram</a>
+                <a href="#" class="footer-link magnetic-btn">Twitter / X</a>
+                <a href="#" class="footer-link magnetic-btn">LinkedIn</a>
+            </div>
+            <div class="footer-col">
+                <span class="footer-label">Direct</span>
+                <a href="#" class="footer-link">hello@agency.com</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Custom Cursor & Floating Image Logic
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorImg = document.getElementById('cursorImg');
+        const triggers = document.querySelectorAll('.hover-trigger');
+        const magnetics = document.querySelectorAll('.magnetic-btn');
+
+        let mouseX = 0, mouseY = 0;
+        let imgX = 0, imgY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Move dot immediately
+            gsap.to(cursorDot, { x: mouseX, y: mouseY, duration: 0.1 });
+        });
+
+        // Smooth follow for the image
+        gsap.ticker.add(() => {
+            imgX += (mouseX - imgX) * 0.1;
+            imgY += (mouseY - imgY) * 0.1;
+            gsap.set(cursorImg, { x: imgX, y: imgY });
+        });
+
+        // Hover over massive text reveals image
+        triggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => {
+                cursorImg.style.transform = `translate(-50%, -50%) scale(1) rotate(${Math.random() * 10 - 5}deg)`;
+                cursorImg.style.opacity = '1';
+                gsap.to(cursorDot, { scale: 0, duration: 0.2 });
+            });
+            trigger.addEventListener('mouseleave', () => {
+                cursorImg.style.transform = 'translate(-50%, -50%) scale(0)';
+                cursorImg.style.opacity = '0';
+                gsap.to(cursorDot, { scale: 1, duration: 0.2 });
+            });
+        });
+
+        // Magnetic Links
+        magnetics.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
+            });
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+
+        // Input Focus Interaction (Dimming the background text)
+        const emailInput = document.getElementById('emailInput');
+        emailInput.addEventListener('focus', () => document.body.classList.add('form-active'));
+        emailInput.addEventListener('blur', () => {
+            if(emailInput.value === '') document.body.classList.remove('form-active');
+        });
+
+        // Entrance Animations
+        gsap.from(".huge-text", {
+            y: 100, opacity: 0, duration: 1.2, stagger: 0.1, ease: "power4.out", delay: 0.2
+        });
+        gsap.from(".gs-up", {
+            y: 40, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.8
+        });
+    </script>
+</body>
+</html>

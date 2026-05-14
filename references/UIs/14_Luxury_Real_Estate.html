@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Luxury Residences</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-light: #f5f5f5;
+            --gold: #d4af37;
+            --gold-dark: #aa8c2c;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Lenis Smooth Scroll Setup */
+        html.lenis {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--gold);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            transform: translateX(0);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop') center/cover;
+            filter: brightness(0.4);
+            transform: scale(1.1);
+            z-index: -1;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: 7vw;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 3rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0.7;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: var(--gold);
+            animation: scrollDown 2s infinite ease-in-out;
+        }
+
+        @keyframes scrollDown {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(200%); }
+        }
+
+        .section {
+            padding: 8rem 4rem;
+        }
+
+        .about {
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .section-label {
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .about-heading {
+            font-family: var(--font-serif);
+            font-size: 4rem;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+        }
+
+        .about-desc {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #aaa;
+            max-width: 500px;
+        }
+
+        .about-image {
+            flex: 1;
+            height: 700px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .about-img-inner {
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop') center/cover;
+            transform: scale(1.2);
+        }
+
+        .features {
+            padding: 8rem 4rem;
+            background: #0f0f0f;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 3rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.03);
+        }
+
+        .feature-number {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            color: rgba(255,255,255,0.1);
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            transition: color 0.4s ease;
+        }
+
+        .feature-card:hover .feature-number {
+            color: var(--gold);
+        }
+
+        .feature-title {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature-desc {
+            color: #888;
+            line-height: 1.6;
+        }
+
+        .gallery {
+            padding: 8rem 0;
+            overflow: hidden;
+        }
+
+        .gallery-track {
+            display: flex;
+            gap: 2rem;
+            width: max-content;
+            padding: 0 4rem;
+        }
+
+        .gallery-item {
+            width: 600px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .btn:hover {
+            color: var(--bg-dark);
+        }
+
+        .btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Char animation */
+        .char {
+            transform: translateY(110%);
+            opacity: 0;
+        }
+
+        /* Line clipping */
+        .line {
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .about { flex-direction: column; }
+            .features-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 12vw; }
+            nav { padding: 1.5rem; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Aura.</div>
+        <ul class="nav-links">
+            <li><a href="#">Residences</a></li>
+            <li><a href="#">Amenities</a></li>
+            <li><a href="#">Neighborhood</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h2 class="hero-subtitle gs-reveal">Uncompromising Luxury</h2>
+            <h1 class="hero-title gs-title">Where Elegance<br>Meets Elevation.</h1>
+        </div>
+        <div class="scroll-indicator">
+            <span style="font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;">Discover</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <section class="section about">
+        <div class="about-text">
+            <span class="section-label gs-fade">The Vision</span>
+            <h2 class="about-heading gs-title">Redefining modern<br>architectural excellence.</h2>
+            <p class="about-desc gs-fade">Every detail at Aura has been meticulously crafted to create a living experience that transcends the ordinary. From the soaring ceiling heights to the bespoke finishes, our residences offer an unparalleled sanctuary in the heart of the city.</p>
+            <a href="#" class="btn gs-fade">Explore Residences</a>
+        </div>
+        <div class="about-image">
+            <div class="about-img-inner"></div>
+        </div>
+    </section>
+
+    <section class="features">
+        <span class="section-label" style="text-align: center;">Amenities</span>
+        <h2 class="about-heading" style="text-align: center; margin-bottom: 1rem;">Curated Living</h2>
+        <div class="features-grid">
+            <div class="feature-card gs-fade-up">
+                <span class="feature-number">01</span>
+                <h3 class="feature-title">Sky Lounge</h3>
+                <p class="feature-desc">Exclusive access to the penthouse-level lounge featuring panoramic city views, private dining rooms, and a curated wine cellar.</p>
+            </div>
+            <div class="feature-card gs-fade-up">
+                <span class="feature-number">02</span>
+                <h3 class="feature-title">Wellness Spa</h3>
+                <p class="feature-desc">A 10,000 sq ft holistic wellness center including thermal baths, private treatment rooms, and a state-of-the-art fitness studio.</p>
+            </div>
+            <div class="feature-card gs-fade-up">
+                <span class="feature-number">03</span>
+                <h3 class="feature-title">Concierge</h3>
+                <p class="feature-desc">24/7 white-glove concierge service, private valet, and dedicated lifestyle management to cater to your every need.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery">
+        <div class="gallery-track">
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=2070&auto=format&fit=crop" alt="Interior"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" alt="Pool"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop" alt="Lounge"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2053&auto=format&fit=crop" alt="Kitchen"></div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script>
+        // Smooth Scrolling
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+            touchMultiplier: 2,
+            infinite: false,
+        })
+
+        function raf(time) {
+            lenis.raf(time)
+            requestAnimationFrame(raf)
+        }
+        requestAnimationFrame(raf)
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Split text
+        const splitTitles = new SplitType('.gs-title', { types: 'lines, words, chars' });
+
+        // Initial Load Animation
+        const tl = gsap.timeline();
+        
+        tl.to('.hero-bg', {
+            scale: 1,
+            duration: 2,
+            ease: 'power3.out'
+        })
+        .from('.hero-subtitle', {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out'
+        }, "-=1.5")
+        .to('.hero-title .char', {
+            y: 0,
+            opacity: 1,
+            stagger: 0.03,
+            duration: 1,
+            ease: 'power4.out'
+        }, "-=1")
+        .from('nav', {
+            y: -50,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out'
+        }, "-=1");
+
+        // Parallax Image
+        gsap.to('.hero-bg', {
+            yPercent: 30,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // About Image Parallax
+        gsap.to('.about-img-inner', {
+            yPercent: 20,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".about-image",
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Scroll Animations
+        gsap.utils.toArray('.about-heading').forEach(heading => {
+            gsap.to(heading.querySelectorAll('.char'), {
+                y: 0,
+                opacity: 1,
+                stagger: 0.02,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: heading,
+                    start: "top 80%",
+                }
+            });
+        });
+
+        gsap.utils.toArray('.gs-fade').forEach(elem => {
+            gsap.from(elem, {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%",
+                }
+            });
+        });
+
+        gsap.utils.toArray('.gs-fade-up').forEach((elem, i) => {
+            gsap.from(elem, {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '.features-grid',
+                    start: "top 80%",
+                },
+                delay: i * 0.2
+            });
+        });
+
+        // Horizontal Gallery Scroll
+        const galleryTrack = document.querySelector('.gallery-track');
+        const galleryWidth = galleryTrack.offsetWidth;
+        const windowWidth = window.innerWidth;
+        
+        gsap.to(galleryTrack, {
+            x: -(galleryWidth - windowWidth + 128), // 128 is padding
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".gallery",
+                start: "top center",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
+    </script>
+</body>
+</html>

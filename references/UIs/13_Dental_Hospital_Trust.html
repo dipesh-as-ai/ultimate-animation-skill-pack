@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Trust Dental Hospital UI</title>
+    
+    <!-- Approachable, clean typography for medical trust -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for gentle, reassuring animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            /* Warm & Cold Medical Palette */
+            --bg-clean: #F8FAFC;      /* Cold: Crisp, sterile white/gray */
+            --bg-warm: #FFF5F2;       /* Warm: Soft peach to reduce clinical anxiety */
+            --text-dark: #1E3A5F;     /* Cold: Deep, trustworthy Navy Blue */
+            --text-body: #5A6B82;     /* Medium slate for readable body text */
+            --accent-cyan: #4A90E2;   /* Cold: Clean medical blue */
+            --accent-coral: #E67E6D;  /* Warm: Friendly, humanizing coral */
+            --shadow-soft: 0 15px 35px rgba(30, 58, 95, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--bg-clean);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Headings use Nunito because its rounded letterforms feel friendly and non-threatening */
+        h1, h2, h3, .friendly-font {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(30, 58, 95, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Using shapes for the logo */
+        .logo-shape {
+            width: 30px; height: 30px;
+            background: var(--accent-cyan);
+            border-radius: 8px 20px 8px 20px; /* A tooth-like/organic shape */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-body);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 50px; /* Pill shapes feel safe and comfortable */
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--text-dark);
+            color: white;
+            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-warm {
+            background: var(--accent-coral);
+            color: white;
+            box-shadow: 0 8px 20px rgba(230, 126, 109, 0.2);
+        }
+
+        /* --- Hero Section with Arch Shapes --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 5% 50px;
+            background: linear-gradient(135deg, var(--bg-clean) 0%, var(--bg-warm) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            width: 50%;
+            z-index: 10;
+        }
+
+        .hero-tag {
+            background: rgba(74, 144, 226, 0.1);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 25px;
+            color: var(--text-dark);
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: var(--text-body);
+            max-width: 500px;
+            margin-bottom: 40px;
+        }
+
+        /* The Medical Image Arch */
+        .hero-visual {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The main arch shape */
+        .arch-container {
+            width: 400px;
+            height: 550px;
+            background: white;
+            border-radius: 200px 200px 20px 20px; /* The classic Arch shape */
+            padding: 15px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            z-index: 2;
+        }
+
+        .arch-image {
+            width: 100%;
+            height: 100%;
+            background: #E2E8F0;
+            border-radius: 185px 185px 10px 10px; /* Inner arch */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-body);
+            font-weight: 600;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .arch-image img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.5;
+        }
+
+        /* Background decorative shapes */
+        .shape-circle {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: var(--bg-warm);
+            border-radius: 50%;
+            top: 10%; right: -5%;
+            z-index: 1;
+        }
+
+        /* Floating Trust Badge */
+        .trust-badge {
+            position: absolute;
+            bottom: 50px;
+            left: -50px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 20px 40px rgba(30, 58, 95, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 5;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- Services/Treatments Section --- */
+        .services {
+            padding: 100px 5%;
+            background: var(--bg-clean);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 30px; /* Soft, friendly corners */
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(30, 58, 95, 0.04);
+            transition: all 0.4s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Service images inside circles */
+        .service-img-wrapper {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            background: var(--bg-warm);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .service-img-inner {
+            width: 100%;
+            height: 100%;
+            background: #E2E8F0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-body);
+            font-size: 0.8rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .service-card p {
+            color: var(--text-body);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .service-link {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: gap 0.3s;
+        }
+
+        .service-card:hover .service-link {
+            gap: 10px;
+        }
+
+        /* --- Patient Comfort / Warmth Section --- */
+        .comfort-section {
+            background: var(--text-dark);
+            color: white;
+            padding: 100px 5%;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Overlapping soft shapes to break up the harsh block */
+        .comfort-shape {
+            position: absolute;
+            top: -100px; left: -100px;
+            width: 400px; height: 400px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .comfort-img {
+            flex: 1;
+            height: 400px;
+            background: #2a476b;
+            border-radius: 20px 100px 20px 100px; /* Leaf shape */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .comfort-content {
+            flex: 1;
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="logo">
+            <div class="logo-shape">✦</div>
+            Apex Dental
+        </div>
+        <div class="nav-links">
+            <a href="#">Treatments</a>
+            <a href="#">Our Specialists</a>
+            <a href="#">Patient Comfort</a>
+            <a href="#">Reviews</a>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <a href="tel:+123" class="btn" style="color: var(--text-dark);">📞 (555) 123-4567</a>
+            <a href="#" class="btn btn-primary">Book Online</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag gs-reveal">Voted #1 Dental Hospital</div>
+            <h1 class="hero-title gs-reveal">
+                Advanced Care.<br>
+                <span style="color: var(--accent-cyan);">Gentle Touch.</span>
+            </h1>
+            <p class="hero-desc gs-reveal">
+                Experience world-class dentistry in a calming, anxiety-free environment. From routine cleanings to complete smile restorations, your comfort is our priority.
+            </p>
+            <div class="gs-reveal" style="display: flex; gap: 20px;">
+                <a href="#" class="btn btn-primary">Schedule Appointment</a>
+                <a href="#" class="btn btn-warm">View Smile Gallery</a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="shape-circle"></div>
+            
+            <div class="arch-container gs-image">
+                <div class="arch-image">
+                    Friendly Doctor Portrait (800x1000)
+                </div>
+                
+                <!-- Floating Trust Badge -->
+                <div class="trust-badge">
+                    <div style="width: 40px; height: 40px; background: #FFF5F2; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.2rem;">⭐</div>
+                    <div>
+                        <div style="font-weight: 800; color: var(--text-dark);">4.9/5 Rating</div>
+                        <div style="font-size: 0.8rem; color: var(--text-body);">Over 2,000 Happy Patients</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Treatments Section -->
+    <section class="services">
+        <div class="section-header">
+            <h2>Comprehensive Treatments</h2>
+            <p style="color: var(--text-body); font-size: 1.1rem;">Everything your family needs for a lifetime of healthy smiles.</p>
+        </div>
+
+        <div class="services-grid">
+            
+            <!-- Card 1 -->
+            <div class="service-card gs-up">
+                <div class="service-img-wrapper">
+                    <div class="service-img-inner">Cosmetic Img</div>
+                </div>
+                <h3>Cosmetic Dentistry</h3>
+                <p>Porcelain veneers, professional whitening, and complete smile makeovers designed to look completely natural.</p>
+                <a href="#" class="service-link">Learn More <span>→</span></a>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="service-card gs-up">
+                <div class="service-img-wrapper">
+                    <div class="service-img-inner">Implant Img</div>
+                </div>
+                <h3>Dental Implants</h3>
+                <p>Permanent, secure replacements for missing teeth using advanced 3D guided surgery for painless placement.</p>
+                <a href="#" class="service-link">Learn More <span>→</span></a>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="service-card gs-up">
+                <div class="service-img-wrapper" style="background: rgba(74, 144, 226, 0.1);">
+                    <div class="service-img-inner">General Img</div>
+                </div>
+                <h3>Preventative Care</h3>
+                <p>Thorough examinations, digital x-rays, and deep cleanings to stop dental issues before they start.</p>
+                <a href="#" class="service-link">Learn More <span>→</span></a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Warmth / Humanizing Section -->
+    <section class="comfort-section">
+        <div class="comfort-shape"></div>
+        <div class="comfort-img gs-image">
+            Relaxing Clinic Interior Image
+        </div>
+        <div class="comfort-content">
+            <h2 class="friendly-font" style="font-size: 3rem; margin-bottom: 20px;">Dental anxiety ends here.</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: rgba(255,255,255,0.8); margin-bottom: 30px;">
+                We understand that visiting the dentist can be stressful. That's why we completely reimagined the experience. Enjoy noise-canceling headphones, warm blankets, ceiling TVs, and sedation options tailored to your comfort level.
+            </p>
+            <a href="#" class="btn btn-warm">Learn about Sleep Dentistry</a>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Gentle Entrance Animations ---
+        // Fast, aggressive animations cause anxiety. These are slow, soft, and reassuring.
+        gsap.from(".gs-reveal", {
+            y: 30,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.15,
+            ease: "power2.out",
+            delay: 0.1
+        });
+
+        gsap.from(".gs-image", {
+            scale: 0.95,
+            opacity: 0,
+            duration: 1.5,
+            ease: "power2.out",
+            delay: 0.4
+        });
+
+        // --- 2. Staggered Service Cards ---
+        gsap.utils.toArray('.gs-up').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out",
+                delay: i * 0.15
+            });
+        });
+
+        // --- 3. Navbar Shadow on Scroll ---
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.style.boxShadow = "0 10px 30px rgba(30, 58, 95, 0.05)";
+                nav.style.padding = "15px 5%";
+            } else {
+                nav.style.boxShadow = "none";
+                nav.style.padding = "20px 5%";
+            }
+        });
+    </script>
+</body>
+</html>

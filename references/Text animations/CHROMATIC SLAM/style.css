@@ -1,0 +1,267 @@
+/* ============================================
+   CHROMATIC SLAM — style.css
+   Effect: RGB split scramble → slam → shimmer
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #04040a;
+  --bg2:         #07070f;
+  --white:       #f0f0f8;
+  --dim:         #6b6b8a;
+  --accent:      #7b6cff;
+  --red:         #ff2255;
+  --blue:        #0af;
+  --gold:        #ffd166;
+  --chroma-r:    -5px;
+  --chroma-b:    5px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* ── Canvas (shockwave rings) ── */
+#shockwave-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Noise grain overlay ── */
+.noise-overlay {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 1;
+  animation: grain 0.4s steps(3) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-2%, -3%); }
+  50%  { transform: translate(3%, 1%); }
+  75%  { transform: translate(-1%, 4%); }
+  100% { transform: translate(2%, -2%); }
+}
+
+/* ── CRT scanlines ── */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.09) 2px,
+    rgba(0, 0, 0, 0.09) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Scene layout ── */
+.scene {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+/* ── Subtle radial spotlight ── */
+.scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(123, 108, 255, 0.06) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── Eyebrow label ── */
+.eyebrow {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  color: var(--dim);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.6s ease forwards 2.8s;
+}
+
+/* ── Main headline ── */
+.slam-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 14vw, 13rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  display: flex;
+  gap: 0.02em;
+  position: relative;
+  user-select: none;
+  cursor: default;
+}
+
+/* ── Sub headline ── */
+.sub-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(0.7rem, 1.8vw, 1rem);
+  letter-spacing: 0.5em;
+  color: var(--dim);
+  display: flex;
+  gap: 0.05em;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.5s ease forwards 3.2s;
+}
+
+.hint {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: rgba(107, 107, 138, 0.4);
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards 3.8s;
+}
+
+/* ── Individual character spans ── */
+.char {
+  display: inline-block;
+  position: relative;
+  color: var(--white);
+  transition: transform 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* shimmer gradient (activated after slam) */
+  background: linear-gradient(
+    135deg,
+    var(--white) 0%,
+    #c8c8ff 20%,
+    var(--white) 40%,
+    #ffe0cc 60%,
+    var(--white) 80%,
+    #c8e8ff 100%
+  );
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 100% 0;
+}
+
+/* After slam: animate shimmer sweep */
+.char.settled {
+  animation: shimmerSweep 4s ease-in-out infinite;
+}
+
+/* Stagger shimmer per character */
+.char.settled:nth-child(1)  { animation-delay: 0.0s; }
+.char.settled:nth-child(2)  { animation-delay: 0.15s; }
+.char.settled:nth-child(3)  { animation-delay: 0.30s; }
+.char.settled:nth-child(4)  { animation-delay: 0.45s; }
+.char.settled:nth-child(5)  { animation-delay: 0.60s; }
+.char.settled:nth-child(6)  { animation-delay: 0.75s; }
+.char.settled:nth-child(7)  { animation-delay: 0.90s; }
+.char.settled:nth-child(8)  { animation-delay: 1.05s; }
+.char.settled:nth-child(9)  { animation-delay: 1.20s; }
+
+@keyframes shimmerSweep {
+  0%   { background-position: 100% 0; }
+  40%  { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* ── Chromatic aberration state ── */
+.char.scrambling {
+  -webkit-text-fill-color: var(--white);
+  background: none;
+  color: var(--white);
+  text-shadow:
+    var(--chroma-r) 0 0 var(--red),
+    var(--chroma-b) 0 0 var(--blue);
+  filter: blur(0.3px);
+}
+
+/* Heavy chroma at start */
+.char.scrambling.heavy {
+  text-shadow:
+    -8px 0 0 var(--red),
+     8px 0 0 var(--blue),
+     0 0 20px rgba(255, 200, 255, 0.3);
+  opacity: 0.85;
+  transform: translateY(calc(var(--rand-y, 0) * 1px)) scaleX(0.9);
+}
+
+/* Slam impact state */
+.char.slamming {
+  -webkit-text-fill-color: var(--white);
+  background: none;
+  color: var(--white);
+  text-shadow:
+    0 0 30px rgba(255, 255, 255, 0.8),
+    0 0 60px rgba(123, 108, 255, 0.5),
+    0 0 100px rgba(123, 108, 255, 0.2);
+  animation: slamImpact 0.35s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes slamImpact {
+  0%   { transform: scale(1.25) translateY(-4px); opacity: 0.7; }
+  40%  { transform: scale(0.95) translateY(2px);  opacity: 1; }
+  65%  { transform: scale(1.04) translateY(-1px); }
+  100% { transform: scale(1)   translateY(0);     }
+}
+
+/* ── Hover magnetic float ── */
+.char.settled:hover {
+  animation-play-state: paused;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  transform: translateY(-12px) scale(1.1);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 0 18px rgba(123, 108, 255, 0.7))
+          drop-shadow(0 0 40px rgba(123, 108, 255, 0.3));
+}
+
+/* ── Utility ── */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Horizontal rule decorations ── */
+.scene::after {
+  content: '';
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, var(--dim), transparent);
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards 4s;
+}

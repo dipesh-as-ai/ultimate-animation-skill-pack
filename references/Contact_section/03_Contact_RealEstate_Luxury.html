@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Contact Section</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0F172A;
+            --gold: #C19B76;
+            --bg-main: #fcfcfc;
+            --text-dark: #1e1e1e;
+            --text-light: #ffffff;
+            --border: #e0e0e0;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hero Image Area */
+        .contact-hero {
+            position: relative;
+            height: 70vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-hero-bg {
+            position: absolute;
+            top: -10%; left: 0;
+            width: 100%; height: 120%;
+            background: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop') center/cover;
+            z-index: 1;
+        }
+
+        .contact-hero-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 2;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            color: var(--text-light);
+            margin-top: -10vh; /* Push up slightly to balance the overlapping card */
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: 4rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        /* The Contact Card (Overlapping) */
+        .contact-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: -15vh auto 5rem auto; /* Overlaps the hero */
+            padding: 0 2rem;
+        }
+
+        .contact-card {
+            background: #ffffff;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
+
+        /* Info Side */
+        .info-side {
+            background: var(--navy);
+            color: var(--text-light);
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--gold);
+        }
+
+        .info-block {
+            margin-bottom: 2rem;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .info-text {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Form Side */
+        .form-side {
+            padding: 4rem;
+        }
+
+        .form-intro {
+            margin-bottom: 3rem;
+        }
+        .form-intro p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .input-group { position: relative; }
+        .input-group.full { grid-column: span 2; }
+
+        .input-control {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 0;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        select.input-control {
+            appearance: none;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-bottom-color: var(--gold);
+        }
+
+        .input-label {
+            position: absolute;
+            top: 0.8rem; left: 0;
+            font-size: 0.85rem;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-control:focus ~ .input-label,
+        .input-control:not(:placeholder-shown) ~ .input-label {
+            top: -10px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gold);
+        }
+
+        textarea.input-control {
+            min-height: 80px;
+            resize: none;
+        }
+
+        .btn-submit {
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            padding: 1.2rem 3rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #a88561;
+        }
+
+        @media (max-width: 900px) {
+            .contact-card { grid-template-columns: 1fr; }
+            .info-side { padding: 3rem 2rem; }
+            .form-side { padding: 3rem 2rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .input-group { grid-column: span 1; }
+            .input-group.full { grid-column: span 1; }
+            .contact-wrapper { margin-top: -5vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="contact-hero">
+        <div class="contact-hero-bg gs-parallax"></div>
+        <div class="contact-hero-overlay"></div>
+        <div class="hero-text gs-fade-down">
+            <span class="hero-subtitle">Estates & Advisory</span>
+            <h1 class="hero-title">Private Consultation</h1>
+        </div>
+    </section>
+
+    <section class="contact-wrapper">
+        <div class="contact-card gs-up">
+            <div class="info-side">
+                <div>
+                    <h2 class="info-title">Global Reach.<br>Local Expertise.</h2>
+                    <div class="info-block">
+                        <span class="info-label">Head Office</span>
+                        <p class="info-text">450 Park Avenue, 21st Floor<br>New York, NY 10022</p>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Direct Line</span>
+                        <p class="info-text">+1 (212) 555-0198</p>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Email</span>
+                        <p class="info-text">advisory@estates.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-side">
+                <div class="form-intro">
+                    <p>To request a private viewing or discuss listing your property, please provide your details below. A senior advisor will contact you within 24 hours.</p>
+                </div>
+                
+                <form action="#" class="form-grid" onsubmit="event.preventDefault();">
+                    <div class="input-group">
+                        <input type="text" id="fname" class="input-control" placeholder=" " required>
+                        <label for="fname" class="input-label">First Name</label>
+                    </div>
+                    
+                    <div class="input-group">
+                        <input type="text" id="lname" class="input-control" placeholder=" " required>
+                        <label for="lname" class="input-label">Last Name</label>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="email" id="email" class="input-control" placeholder=" " required>
+                        <label for="email" class="input-label">Email Address</label>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="tel" id="phone" class="input-control" placeholder=" ">
+                        <label for="phone" class="input-label">Phone Number</label>
+                    </div>
+
+                    <div class="input-group full">
+                        <select class="input-control" required>
+                            <option value="" disabled selected>Select an Inquiry Type</option>
+                            <option value="buy">Acquire a Property</option>
+                            <option value="sell">List a Property</option>
+                            <option value="consult">Portfolio Consultation</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group full">
+                        <textarea id="message" class="input-control" placeholder=" " required></textarea>
+                        <label for="message" class="input-label">Message Details</label>
+                    </div>
+
+                    <div class="input-group full">
+                        <button type="submit" class="btn-submit">Submit Inquiry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Entrance animations
+        const tl = gsap.timeline();
+
+        tl.from(".gs-fade-down", {
+            y: -30, opacity: 0, duration: 1, ease: "power3.out", delay: 0.2
+        })
+        .from(".gs-up", {
+            y: 50, opacity: 0, duration: 1.2, ease: "power3.out"
+        }, "-=0.5")
+        .from(".info-side > div > *", {
+            x: -20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out"
+        }, "-=0.6")
+        .from(".input-group", {
+            y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+        }, "-=0.8");
+
+        // Parallax background image
+        gsap.to(".gs-parallax", {
+            yPercent: 15,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".contact-hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+    </script>
+</body>
+</html>

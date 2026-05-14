@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Chromatic Contact</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #FF0055;
+            --blue: #00F3FF;
+            --dark: #050505;
+            --light: #F0F0F0;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1500px;
+        }
+
+        /* Low blurry bg & noise texture */
+        .blur-orb {
+            position: absolute; border-radius: 50%; filter: blur(100px);
+            opacity: 0.4; z-index: -2; animation: orbMove 10s infinite alternate ease-in-out;
+        }
+        .orb-red { width: 40vw; height: 40vw; background: var(--red); top: -10%; left: -10%; }
+        .orb-blue { width: 35vw; height: 35vw; background: var(--blue); bottom: -10%; right: -10%; animation-delay: -5s;}
+
+        @keyframes orbMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10vw, 10vh); }
+        }
+
+        .noise-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="0.05"/%3E%3C/svg%3E');
+            z-index: -1; pointer-events: none;
+        }
+
+        /* 3D Contact Wrapper */
+        .contact-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+            width: 100%; max-width: 600px;
+            padding: 4rem;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* The 3D Layering Effect for the Form */
+        .form-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent;
+            border: 2px solid;
+            padding: 4rem;
+            box-sizing: border-box;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+            pointer-events: none; /* Only top layer is interactive */
+        }
+
+        .layer-1 { border-color: var(--red); transform: translateZ(-60px); opacity: 0; }
+        .layer-2 { border-color: var(--blue); transform: translateZ(-30px); opacity: 0; }
+        
+        .layer-top {
+            position: relative;
+            border: 2px solid var(--light);
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+            transform: translateZ(0);
+        }
+
+        /* Hovering the wrapper splits the layers */
+        .contact-wrapper:hover .layer-1 {
+            transform: translateZ(-80px) translateX(-15px) translateY(15px);
+            opacity: 1;
+        }
+        .contact-wrapper:hover .layer-2 {
+            transform: translateZ(-40px) translateX(15px) translateY(-15px);
+            opacity: 1;
+        }
+        .contact-wrapper:hover .layer-top {
+            transform: translateZ(40px);
+        }
+
+        /* Content inside the form */
+        h2 {
+            font-size: 3rem; font-weight: 900; margin-bottom: 2rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            text-align: center; transform: translateZ(20px);
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            transform: translateZ(30px);
+            position: relative;
+        }
+
+        .input-control {
+            width: 100%; background: transparent; border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 0; color: var(--light); font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif; outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        /* Input focus chromatic effect */
+        .input-control:focus {
+            border-bottom-color: var(--light);
+            box-shadow: 0 4px 0 -2px var(--blue), 0 8px 0 -4px var(--red);
+        }
+
+        .input-label {
+            position: absolute; top: 10px; left: 0; color: #888;
+            pointer-events: none; transition: 0.3s; font-size: 1.1rem;
+        }
+
+        .input-control:focus ~ .input-label,
+        .input-control:not(:placeholder-shown) ~ .input-label {
+            top: -15px; font-size: 0.8rem; color: var(--blue); font-weight: 600;
+        }
+
+        /* Chromatic Submit Button */
+        .btn-submit {
+            width: 100%; padding: 1rem; margin-top: 1rem;
+            background: var(--light); color: var(--dark);
+            border: none; font-size: 1.2rem; font-weight: 900;
+            text-transform: uppercase; cursor: pointer;
+            position: relative; transform-style: preserve-3d;
+            transition: transform 0.2s;
+        }
+
+        .btn-submit::before, .btn-submit::after {
+            content: 'SEND MESSAGE'; position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none; z-index: -1;
+        }
+        .btn-submit::before { background: var(--red); color: var(--dark); }
+        .btn-submit::after { background: var(--blue); color: var(--dark); }
+
+        .btn-submit:hover { transform: translateZ(50px); background: transparent; color: transparent; border: 2px solid var(--light); }
+        .btn-submit:hover::before { opacity: 1; transform: translateZ(-20px) translateX(-10px) translateY(10px); }
+        .btn-submit:hover::after { opacity: 1; transform: translateZ(-10px) translateX(10px) translateY(-10px); }
+
+    </style>
+</head>
+<body>
+
+    <div class="blur-orb orb-red"></div>
+    <div class="blur-orb orb-blue"></div>
+    <div class="noise-bg"></div>
+
+    <div class="contact-wrapper" id="wrapper">
+        <div class="form-layer layer-1"></div>
+        <div class="form-layer layer-2"></div>
+        
+        <div class="form-layer layer-top">
+            <h2>Let's Talk</h2>
+            <form onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <input type="text" id="name" class="input-control" placeholder=" " required>
+                    <label for="name" class="input-label">Your Name</label>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" class="input-control" placeholder=" " required>
+                    <label for="email" class="input-label">Email Address</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="message" class="input-control" placeholder=" " required>
+                    <label for="message" class="input-label">Message</label>
+                </div>
+                <button type="submit" class="btn-submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('wrapper');
+
+        // 3D Mouse Tracking
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 40;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+            wrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Smooth Reset
+        document.addEventListener('mouseleave', () => {
+            wrapper.style.transition = 'transform 0.5s ease-out';
+            wrapper.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            setTimeout(() => { wrapper.style.transition = 'transform 0.1s ease-out'; }, 500);
+        });
+
+        // Entrance GSAP Animation
+        gsap.from(wrapper, {
+            z: -500,
+            opacity: 0,
+            duration: 1.5,
+            ease: "power4.out"
+        });
+        
+        gsap.from(".input-group", {
+            y: 30, opacity: 0, duration: 0.8, stagger: 0.1, delay: 0.5, ease: "power2.out"
+        });
+    </script>
+</body>
+</html>

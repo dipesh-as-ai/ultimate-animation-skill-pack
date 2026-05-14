@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA | Fine Dining Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Premium Fonts: Playfair for display, Inter for body, Alex Brush for handwritten notes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=Alex+Brush&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Fine Dining Palette: Earthy, warm, appetizing */
+            --cream: #FDFBF7;
+            --burgundy: #2C0B0E;
+            --gold: #C5A059;
+            --olive: #4A5320;
+            --text-dark: #1A1A1A;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--cream);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            /* Smooth scrolling for native feel */
+            scroll-behavior: smooth; 
+        }
+
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 400; }
+        .handwriting { font-family: 'Alex Brush', cursive; font-size: 3.5rem; color: var(--gold); }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 40px 5vw;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; mix-blend-mode: difference; color: #fff;
+        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; letter-spacing: 5px; }
+        .reserve-btn {
+            border: 1px solid #fff; padding: 15px 35px; text-transform: uppercase; letter-spacing: 2px;
+            font-size: 0.8rem; cursor: pointer; transition: all 0.4s ease; background: transparent; color: #fff;
+        }
+        .reserve-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh; position: relative; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; background: #000;
+        }
+        /* The food image needs to be extremely high quality and warmly lit */
+        .hero-img {
+            position: absolute; top: -10%; left: -10%; width: 120%; height: 120%;
+            background: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80') center/cover;
+            opacity: 0.6; z-index: 1;
+        }
+        .hero-content {
+            position: relative; z-index: 2; text-align: center; color: #fff;
+        }
+        .hero-title { font-size: clamp(5rem, 15vw, 12rem); line-height: 0.9; margin-bottom: 20px; overflow: hidden; }
+        .hero-title span { display: inline-block; transform: translateY(100%); }
+        .hero-subtitle { font-size: 1rem; letter-spacing: 10px; text-transform: uppercase; color: var(--gold); opacity: 0; }
+
+        /* --- Story Section (The "Why") --- */
+        .story { padding: 20vh 10vw; display: flex; gap: 8vw; align-items: center; }
+        .story-img-container { flex: 1; height: 80vh; overflow: hidden; position: relative; }
+        .story-img {
+            position: absolute; top: -20%; left: 0; width: 100%; height: 140%;
+            background: url('https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80') center/cover;
+        }
+        .story-text { flex: 1; }
+        .story-text h2 { font-size: clamp(3rem, 5vw, 5rem); margin-bottom: 30px; line-height: 1.1; color: var(--burgundy); }
+        .story-text p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 40px; color: #444; }
+
+        /* --- Visual Menu Section --- */
+        .menu { padding: 15vh 5vw; background: var(--burgundy); color: var(--cream); position: relative; }
+        .menu-header { text-align: center; margin-bottom: 12vh; }
+        .menu-header h2 { font-size: 4rem; color: var(--gold); }
+        .menu-header p { font-family: 'Inter', sans-serif; letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem; opacity: 0.6; margin-top: 10px; }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; max-width: 1300px; margin: 0 auto; }
+        .menu-item { 
+            border-bottom: 1px solid rgba(253,251,247,0.1); padding-bottom: 30px; 
+            display: flex; justify-content: space-between; align-items: flex-start; 
+            cursor: none; /* We use a custom cursor hover here */
+            position: relative; transition: opacity 0.3s;
+        }
+        .menu-grid:hover .menu-item { opacity: 0.3; } /* Fade others out */
+        .menu-grid .menu-item:hover { opacity: 1; } /* Keep hovered fully opaque */
+        
+        .item-info { flex: 1; }
+        .item-name { font-family: 'Playfair Display', serif; font-size: 2.5rem; transition: color 0.3s; }
+        .menu-item:hover .item-name { color: var(--gold); }
+        .item-desc { font-size: 1rem; color: rgba(253,251,247,0.6); margin-top: 10px; max-width: 85%; line-height: 1.6; }
+        .item-price { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); }
+
+        /* The Custom Hover Image Reveal (Liquid/Appetite visual trigger) */
+        .hover-reveal-img {
+            position: fixed; top: 0; left: 0; width: 350px; height: 450px;
+            pointer-events: none; opacity: 0; z-index: 50;
+            background-size: cover; background-position: center;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+            border-radius: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .hover-reveal-img.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        /* --- Instagram Feed Section --- */
+        .social { padding: 0; text-align: center; background: var(--cream); }
+        .social-header { padding: 10vh 0; }
+        .social h2 { font-size: 3rem; color: var(--burgundy); }
+        
+        .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); height: 60vh; }
+        .insta-item { 
+            background-size: cover; background-position: center; 
+            position: relative; overflow: hidden; cursor: pointer; 
+        }
+        .insta-item::before { 
+            content: '@aura.dining'; display: flex; align-items: center; justify-content: center;
+            font-family: 'Inter'; letter-spacing: 2px; color: #fff; font-size: 1.2rem;
+            position: absolute; top:0; left:0; width:100%; height:100%; 
+            background:rgba(44,11,14,0.7); opacity: 0; transition: opacity 0.4s; 
+        }
+        .insta-item:hover::before { opacity: 1; }
+        
+        .i1 { background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80'); }
+        .i2 { background-image: url('https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&q=80'); }
+        .i3 { background-image: url('https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80'); }
+        .i4 { background-image: url('https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&q=80'); }
+
+        @media(max-width: 1024px) {
+            .story { flex-direction: column; }
+            .story-img-container { width: 100%; height: 50vh; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .insta-grid { grid-template-columns: 1fr 1fr; height: 100vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">AURA</div>
+        <button class="reserve-btn">Reservation</button>
+    </nav>
+
+    <!-- 1. The Hero: Elicit hunger immediately with a warm, flatlay/hero food shot -->
+    <section class="hero">
+        <div class="hero-img" id="heroImg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title"><span id="titleAnim">AURA</span></h1>
+            <p class="hero-subtitle" id="subtitleAnim">A Symphony of Taste</p>
+        </div>
+    </section>
+
+    <!-- 2. The Story: The 'Why' behind the food -->
+    <section class="story">
+        <div class="story-img-container gs-reveal">
+            <div class="story-img" id="chefImg"></div>
+        </div>
+        <div class="story-text gs-reveal">
+            <h2>Fire, Earth,<br>and Passion.</h2>
+            <p>We believe that food is a dialogue between nature and the chef. Every ingredient is sourced with profound respect for the earth, and every dish is crafted to elevate the raw essence of its origin.</p>
+            <div class="handwriting">Chef Alessandro</div>
+        </div>
+    </section>
+
+    <!-- 3. The Visual Menu: Not a PDF. An interactive, appetite-inducing experience. -->
+    <section class="menu">
+        <div class="menu-header gs-reveal">
+            <h2>Tasting Menu</h2>
+            <p>Seasonal Offerings</p>
+        </div>
+        
+        <div class="menu-grid">
+            <!-- Data-img holds the URL for the visual reveal -->
+            <div class="menu-item gs-reveal" data-img="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80">
+                <div class="item-info">
+                    <div class="item-name">Wagyu Ribeye</div>
+                    <div class="item-desc">A5 grade Wagyu, charred asparagus, black truffle demi-glace, smoked sea salt.</div>
+                </div>
+                <div class="item-price">$120</div>
+            </div>
+
+            <div class="menu-item gs-reveal" data-img="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&q=80">
+                <div class="item-info">
+                    <div class="item-name">Handcrafted Truffle Pasta</div>
+                    <div class="item-desc">Artisan fettuccine, shaved Alba white truffle, Parmigiano-Reggiano foam, cured yolk.</div>
+                </div>
+                <div class="item-price">$85</div>
+            </div>
+
+            <div class="menu-item gs-reveal" data-img="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&q=80">
+                <div class="item-info">
+                    <div class="item-name">Sea Scallops</div>
+                    <div class="item-desc">Pan-seared diver scallops, cauliflower purée, caper brown butter, micro cilantro.</div>
+                </div>
+                <div class="item-price">$65</div>
+            </div>
+
+            <div class="menu-item gs-reveal" data-img="https://images.unsplash.com/photo-1515443961218-a51367888e4b?auto=format&fit=crop&q=80">
+                <div class="item-info">
+                    <div class="item-name">Dark Chocolate Dome</div>
+                    <div class="item-desc">Valrhona 70% chocolate, molten raspberry center, 24k gold leaf, vanilla bean gelato.</div>
+                </div>
+                <div class="item-price">$35</div>
+            </div>
+        </div>
+        
+        <!-- The invisible div that will follow the mouse and show the food image -->
+        <div class="hover-reveal-img" id="cursorImg"></div>
+    </section>
+
+    <!-- 4. The Social Feed: Food is visual. -->
+    <section class="social">
+        <div class="social-header gs-reveal">
+            <h2>@Aura.Dining</h2>
+        </div>
+        <div class="insta-grid">
+            <div class="insta-item i1 gs-reveal"></div>
+            <div class="insta-item i2 gs-reveal"></div>
+            <div class="insta-item i3 gs-reveal"></div>
+            <div class="insta-item i4 gs-reveal"></div>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Hero Entrance Animation ---
+        const heroTl = gsap.timeline();
+        heroTl.to("#titleAnim", { y: 0, duration: 1.5, ease: "power4.out", delay: 0.2 })
+              .to("#subtitleAnim", { opacity: 1, y: -10, duration: 1, ease: "power2.out" }, "-=1");
+
+        // Subtle infinite scale on background image to make it feel alive
+        gsap.to("#heroImg", { scale: 1.05, duration: 15, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+        // --- 2. Scroll Parallax effects ---
+        // Chef image parallax
+        gsap.to("#chefImg", {
+            yPercent: 20,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".story",
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // --- 3. Staggered Section Reveals ---
+        const reveals = gsap.utils.toArray('.gs-reveal');
+        reveals.forEach(elem => {
+            gsap.from(elem, {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%", // Trigger when element is 85% down the viewport
+                }
+            });
+        });
+
+        // --- 4. Interactive Visual Menu (The "Hunger Trigger") ---
+        const menuItems = document.querySelectorAll('.menu-item');
+        const cursorImg = document.getElementById('cursorImg');
+        
+        // Fast GSAP setters for performance
+        const setX = gsap.quickSetter(cursorImg, "left", "px");
+        const setY = gsap.quickSetter(cursorImg, "top", "px");
+
+        // Track mouse globally for the menu section
+        document.querySelector('.menu').addEventListener('mousemove', (e) => {
+            setX(e.clientX);
+            setY(e.clientY);
+        });
+
+        menuItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const imgUrl = item.getAttribute('data-img');
+                cursorImg.style.backgroundImage = `url(${imgUrl})`;
+                cursorImg.classList.add('active');
+            });
+            item.addEventListener('mouseleave', () => {
+                cursorImg.classList.remove('active');
+            });
+        });
+
+    </script>
+</body>
+</html>

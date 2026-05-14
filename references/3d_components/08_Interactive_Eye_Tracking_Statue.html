@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Eye Tracking Figure on Fountain</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --bg: #0A0F15;
+            --stone: #1E232B;
+            --water: #4FC3F7;
+            --eye-glow: #00FFFF;
+        }
+
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            /* Deep ambient light */
+            background: radial-gradient(circle at 50% 30%, #152233 0%, var(--bg) 100%);
+        }
+
+        /* --- The 3D Parallax Scene --- */
+        .scene {
+            width: 100vw; height: 100vh;
+            position: relative;
+            perspective: 1000px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Group to tilt everything together */
+        .parallax-group {
+            width: 600px; height: 600px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* --- THE FOUNTAIN STRUCTURE (Back) --- */
+        .fountain-back {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%) translateZ(-50px);
+            width: 300px; height: 200px;
+            background: linear-gradient(to bottom, #2A313C, var(--stone));
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        }
+        /* Top basin */
+        .fountain-back::before {
+            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; height: 40px;
+            background: #363E4D; border-radius: 20px; box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* --- THE WATERFALL (CSS Canvas simulation) --- */
+        .waterfall {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%) translateZ(-20px);
+            width: 240px; height: 250px;
+            background: linear-gradient(to bottom, rgba(79, 195, 247, 0.4), rgba(79, 195, 247, 0.1));
+            border-radius: 10px; filter: blur(4px);
+            overflow: hidden;
+        }
+        /* Moving water texture */
+        .waterfall::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 200%;
+            background: repeating-linear-gradient(to bottom, transparent, rgba(255,255,255,0.2) 10px, transparent 20px);
+            animation: flow 1s linear infinite;
+        }
+        @keyframes flow { to { transform: translateY(-50%); } }
+
+        /* --- THE FIGURE (The Man) --- */
+        .figure {
+            position: absolute; bottom: 250px; left: 50%;
+            width: 140px; height: 220px;
+            margin-left: -70px;
+            transform-style: preserve-3d;
+            transform: translateZ(20px); /* Sits exactly on the fountain lip */
+        }
+
+        /* The Cloak / Body */
+        .cloak {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
+            background: linear-gradient(to bottom, #111, #000);
+            border-radius: 40% 40% 10% 10% / 80% 80% 20% 20%;
+            box-shadow: inset 10px 0 30px rgba(255,255,255,0.05);
+        }
+
+        /* The Head */
+        .head {
+            position: absolute; top: -10px; left: 50%; margin-left: -35px;
+            width: 70px; height: 80px;
+            background: #0D0D11;
+            border-radius: 40% 40% 50% 50%;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,1);
+            transform-style: preserve-3d;
+            transform-origin: bottom center;
+            /* We will rotate the head with GSAP */
+        }
+
+        /* Hood overhang shadow */
+        .head::after {
+            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; height: 40px;
+            background: #000; border-radius: 50% 50% 0 0; z-index: 10;
+        }
+
+        /* --- THE EYES (The core interactive element) --- */
+        .eyes-container {
+            position: absolute; top: 35px; left: 0; width: 100%;
+            display: flex; justify-content: center; gap: 12px;
+            transform: translateZ(10px); /* Eyes pop out of the dark head slightly */
+            z-index: 5;
+        }
+
+        .eye-socket {
+            width: 14px; height: 8px;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden; /* Keeps pupil inside the socket bounds */
+        }
+
+        .pupil {
+            position: absolute; top: 50%; left: 50%;
+            width: 6px; height: 6px; margin: -3px 0 0 -3px;
+            background: var(--eye-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--eye-glow), 0 0 20px var(--eye-glow);
+            /* We move this with JS */
+        }
+
+        /* --- THE FOUNTAIN FRONT (Creates depth layering) --- */
+        .fountain-front {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) translateZ(60px);
+            width: 340px; height: 60px;
+            background: var(--stone);
+            border-radius: 10px;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+            border-top: 2px solid #363E4D;
+        }
+
+        /* Decorative ambient dust particles */
+        .dust {
+            position: absolute; width: 3px; height: 3px; background: #FFF; border-radius: 50%;
+            filter: blur(1px); pointer-events: none; opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scene" id="scene">
+        
+        <!-- Generate some ambient dust particles -->
+        <div id="particles-container"></div>
+
+        <div class="parallax-group" id="parallax-group">
+            <!-- Back of fountain -->
+            <div class="fountain-back"></div>
+            
+            <!-- Water flowing -->
+            <div class="waterfall"></div>
+
+            <!-- The Mysterious Figure -->
+            <div class="figure">
+                <div class="cloak"></div>
+                <div class="head" id="head">
+                    <div class="eyes-container">
+                        <!-- Left Eye -->
+                        <div class="eye-socket" id="left-socket">
+                            <div class="pupil" id="left-pupil"></div>
+                        </div>
+                        <!-- Right Eye -->
+                        <div class="eye-socket" id="right-socket">
+                            <div class="pupil" id="right-pupil"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Front lip of fountain -->
+            <div class="fountain-front"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Generate Ambient 3D Dust ---
+        const pContainer = document.getElementById('particles-container');
+        for(let i=0; i<30; i++) {
+            const dust = document.createElement('div');
+            dust.className = 'dust';
+            // Random scatter
+            gsap.set(dust, {
+                x: (Math.random() - 0.5) * window.innerWidth,
+                y: (Math.random() - 0.5) * window.innerHeight,
+                z: (Math.random() - 0.5) * 500, // Deep Z space
+                opacity: Math.random() * 0.5 + 0.1
+            });
+            // Float animation
+            gsap.to(dust, {
+                y: "-=100",
+                rotation: 360,
+                duration: Math.random() * 5 + 5,
+                ease: "none",
+                repeat: -1,
+                yoyo: true
+            });
+            pContainer.appendChild(dust);
+        }
+
+        // --- 2. Interactive Logic (Parallax & Eye Tracking) ---
+        const scene = document.getElementById('scene');
+        const parallaxGroup = document.getElementById('parallax-group');
+        const head = document.getElementById('head');
+        
+        // Eyes
+        const lPupil = document.getElementById('left-pupil');
+        const rPupil = document.getElementById('right-pupil');
+        const lSocket = document.getElementById('left-socket');
+        const rSocket = document.getElementById('right-socket');
+
+        scene.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            // --- A. Whole Scene Parallax ---
+            // Calculate mouse position relative to center (-1 to 1)
+            const cx = (mouseX / window.innerWidth - 0.5) * 2;
+            const cy = (mouseY / window.innerHeight - 0.5) * 2;
+            
+            // Tilt the entire fountain scene slightly
+            gsap.to(parallaxGroup, {
+                rotateX: -cy * 10,
+                rotateY: cx * 15,
+                duration: 1,
+                ease: "power2.out"
+            });
+
+            // --- B. Head Tilt ---
+            // Head turns slightly more aggressively toward the mouse
+            gsap.to(head, {
+                rotateX: -cy * 15,
+                rotateY: cx * 25,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+
+            // --- C. Eye Tracking Math ---
+            // We calculate the exact angle between the socket center and the mouse
+            trackEye(lSocket, lPupil, mouseX, mouseY);
+            trackEye(rSocket, rPupil, mouseX, mouseY);
+        });
+
+        function trackEye(socket, pupil, mouseX, mouseY) {
+            // Get center coordinates of the socket relative to the viewport
+            const rect = socket.getBoundingClientRect();
+            const socketCenterX = rect.left + rect.width / 2;
+            const socketCenterY = rect.top + rect.height / 2;
+
+            // Calculate angle using Math.atan2 (returns radians)
+            const deltaX = mouseX - socketCenterX;
+            const deltaY = mouseY - socketCenterY;
+            const angle = Math.atan2(deltaY, deltaX);
+
+            // Maximum distance the pupil can move from the center without leaving the socket bounds
+            // Socket is 14x8. Pupil is 6x6. Max move is roughly ~4px horizontal, ~1px vertical.
+            const maxRadiusX = 4;
+            const maxRadiusY = 1.5;
+
+            // Calculate new X/Y positions using Cosine (X) and Sine (Y)
+            const moveX = Math.cos(angle) * maxRadiusX;
+            const moveY = Math.sin(angle) * maxRadiusY;
+
+            // Apply movement instantly for snappy, creepy eye tracking
+            gsap.to(pupil, {
+                x: moveX,
+                y: moveY,
+                duration: 0.1, // Very fast reaction time for eyes
+                ease: "power1.out"
+            });
+        }
+
+        // Reset when mouse leaves
+        scene.addEventListener('mouseleave', () => {
+            gsap.to(parallaxGroup, { rotateX: 0, rotateY: 0, duration: 1.5, ease: "elastic.out(1, 0.4)" });
+            gsap.to(head, { rotateX: 0, rotateY: 0, duration: 1 });
+            gsap.to([lPupil, rPupil], { x: 0, y: 0, duration: 0.5 });
+        });
+
+    </script>
+</body>
+</html>

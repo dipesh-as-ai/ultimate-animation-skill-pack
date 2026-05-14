@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNTAX | Digital Agency</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0c0c;
+            --text: #f0f0f0;
+            --accent: #ff4a00;
+            --gray: #888888;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Lenis */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 74, 0, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9998;
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .menu-link {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 10px 0;
+            display: inline-block;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 10vw, 9rem);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title span {
+            color: var(--accent);
+        }
+
+        .hero-desc {
+            font-size: 1.5rem;
+            color: var(--gray);
+            max-width: 600px;
+            line-height: 1.5;
+            margin-bottom: 3rem;
+        }
+
+        /* Video bg abstraction */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 74, 0, 0.2) 0%, transparent 60%);
+            filter: blur(60px);
+            z-index: 1;
+            animation: pulse 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.2) translate(-50px, 50px); }
+        }
+
+        /* Services */
+        .services {
+            padding: 10rem 4rem;
+            border-top: 1px solid #222;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 6rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .service-list {
+            list-style: none;
+            border-top: 1px solid #222;
+        }
+
+        .service-item {
+            border-bottom: 1px solid #222;
+            padding: 3rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--text);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .service-item:hover::before {
+            transform: scaleY(1);
+            transform-origin: top;
+        }
+
+        .service-name {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 600;
+            transition: color 0.4s ease;
+        }
+
+        .service-desc {
+            width: 300px;
+            color: var(--gray);
+            transition: color 0.4s ease;
+        }
+
+        .service-item:hover .service-name,
+        .service-item:hover .service-desc {
+            color: var(--bg);
+        }
+
+        /* Team Section */
+        .team {
+            padding: 10rem 4rem;
+            background: #111;
+        }
+
+        .team-intro {
+            font-size: 2rem;
+            max-width: 800px;
+            margin-bottom: 6rem;
+            line-height: 1.4;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2rem;
+        }
+
+        .team-member {
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .team-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(1.1);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+        }
+
+        .team-member:hover .team-img {
+            transform: scale(1.05);
+            filter: grayscale(0%) contrast(1);
+        }
+
+        .team-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .team-member:hover .team-info {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .team-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .team-role {
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hover Elements */
+        .hover-target {
+            /* JS target */
+        }
+
+        /* Footer */
+        footer {
+            padding: 10rem 4rem 4rem;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-family: var(--font-display);
+            font-size: clamp(5rem, 15vw, 15rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 0.8;
+            margin-bottom: 4rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .footer-title:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .char {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .team-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 1.5rem; }
+            .hero { padding: 0 1.5rem; }
+            .services { padding: 5rem 1.5rem; }
+            .team { padding: 5rem 1.5rem; }
+            .team-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .service-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .service-desc { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav>
+        <div class="logo hover-target">Syntax</div>
+        <div class="menu-link hover-target">Menu</div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title gs-title">We craft<br><span>digital</span><br>experiences.</h1>
+            <p class="hero-desc gs-fade">An award-winning digital agency focused on branding, UI/UX design, and creative development. We build the future of the web.</p>
+        </div>
+    </section>
+
+    <section class="services">
+        <div class="section-header">
+            <h2 class="section-title gs-title">Expertise</h2>
+            <p style="color: var(--gray); max-width: 300px;">We deliver comprehensive solutions tailored to your brand's unique needs.</p>
+        </div>
+        <ul class="service-list">
+            <li class="service-item hover-target">
+                <div class="service-name">Digital Strategy</div>
+                <div class="service-desc">Data-driven insights to position your brand for long-term success.</div>
+            </li>
+            <li class="service-item hover-target">
+                <div class="service-name">Brand Identity</div>
+                <div class="service-desc">Visual systems and narratives that resonate with your audience.</div>
+            </li>
+            <li class="service-item hover-target">
+                <div class="service-name">UI/UX Design</div>
+                <div class="service-desc">Intuitive interfaces combining aesthetics with seamless functionality.</div>
+            </li>
+            <li class="service-item hover-target">
+                <div class="service-name">Creative Dev</div>
+                <div class="service-desc">High-performance websites built with cutting-edge web technologies.</div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="team">
+        <h2 class="section-title gs-title" style="margin-bottom: 2rem;">The Collective</h2>
+        <p class="team-intro gs-fade">A perfectly balanced syndicate of five. No bloat, no layers of management. Just senior talent dedicated to crafting exceptional digital products.</p>
+        
+        <div class="team-grid">
+            <div class="team-member hover-target gs-up">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop" alt="Elena" class="team-img">
+                <div class="team-info">
+                    <div class="team-name">Elena Rostova</div>
+                    <div class="team-role">Creative Director</div>
+                </div>
+            </div>
+            <div class="team-member hover-target gs-up">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop" alt="Marcus" class="team-img">
+                <div class="team-info">
+                    <div class="team-name">Marcus Chen</div>
+                    <div class="team-role">Lead Designer</div>
+                </div>
+            </div>
+            <div class="team-member hover-target gs-up">
+                <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop" alt="Sarah" class="team-img">
+                <div class="team-info">
+                    <div class="team-name">Sarah Jenkins</div>
+                    <div class="team-role">Strategy Director</div>
+                </div>
+            </div>
+            <div class="team-member hover-target gs-up">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop" alt="David" class="team-img">
+                <div class="team-info">
+                    <div class="team-name">David Kim</div>
+                    <div class="team-role">Lead Developer</div>
+                </div>
+            </div>
+            <div class="team-member hover-target gs-up">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop" alt="Sofia" class="team-img">
+                <div class="team-info">
+                    <div class="team-name">Sofia Rossi</div>
+                    <div class="team-role">Motion Designer</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <h2 class="footer-title hover-target">Let's Talk</h2>
+        <div class="footer-bottom">
+            <span>© 2026 Syntax Agency</span>
+            <span>Awwwards Winning Team</span>
+            <span>Based in London</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script>
+        // Smooth Scrolling
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            smooth: true,
+        })
+
+        function raf(time) {
+            lenis.raf(time)
+            requestAnimationFrame(raf)
+        }
+        requestAnimationFrame(raf)
+
+        // Custom Cursor
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Instantly move dot
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Delay on outline
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // Cursor hover effect
+        document.querySelectorAll('.hover-target').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(3)';
+                cursorDot.style.background = 'transparent';
+                cursorDot.style.border = '1px solid var(--accent)';
+                cursorOutline.style.opacity = '0';
+            });
+            link.addEventListener('mouseleave', () => {
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorDot.style.background = 'var(--accent)';
+                cursorDot.style.border = 'none';
+                cursorOutline.style.opacity = '1';
+            });
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Split text
+        const splitTitles = new SplitType('.gs-title', { types: 'lines, words, chars' });
+
+        // Hero Init
+        const tl = gsap.timeline();
+        tl.to('.hero-title .char', {
+            y: 0,
+            opacity: 1,
+            stagger: 0.02,
+            duration: 1.2,
+            ease: 'power4.out',
+            delay: 0.2
+        })
+        .from('.hero-desc', {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out'
+        }, "-=0.8");
+
+        // Scroll Animations
+        gsap.utils.toArray('.section-title').forEach((title, i) => {
+            if(i > 0) { // Skip hero title
+                gsap.to(title.querySelectorAll('.char'), {
+                    y: 0,
+                    opacity: 1,
+                    stagger: 0.02,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: title,
+                        start: "top 80%",
+                    }
+                });
+            }
+        });
+
+        gsap.utils.toArray('.gs-fade').forEach(elem => {
+            gsap.from(elem, {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 85%",
+                }
+            });
+        });
+
+        gsap.utils.toArray('.gs-up').forEach((elem, i) => {
+            gsap.from(elem, {
+                y: 100,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '.team-grid',
+                    start: "top 70%",
+                },
+                delay: i * 0.15
+            });
+        });
+    </script>
+</body>
+</html>

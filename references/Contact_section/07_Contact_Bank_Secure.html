@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Bank Contact</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #F4F5F7;
+            --bg-card: #FFFFFF;
+            --navy: #0A2540;
+            --blue: #0055FF;
+            --text-main: #1A1F36;
+            --text-muted: #4F566B;
+            --border: #E3E8EE;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+        }
+
+        /* Left Column: Routing & Trust */
+        .info-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .secure-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+        }
+        
+        .secure-indicator svg {
+            width: 14px; height: 14px;
+            stroke: var(--text-muted);
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        /* Routing Cards */
+        .route-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .route-card:hover {
+            box-shadow: 0 4px 12px rgba(10, 37, 64, 0.05);
+            border-color: var(--blue);
+        }
+        
+        .route-icon {
+            width: 40px; height: 40px;
+            background: #F9FAFB;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .route-icon svg {
+            width: 20px; height: 20px;
+            stroke: var(--navy);
+        }
+
+        .route-text h4 {
+            font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.2rem;
+        }
+        .route-text p {
+            font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;
+        }
+
+        /* Right Column: Secure Form */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(10, 37, 64, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--blue);
+        }
+
+        .form-header {
+            margin-bottom: 2.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .form-header h3 {
+            font-size: 1.5rem; color: var(--navy); font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        .encryption-notice {
+            font-size: 0.75rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 5px;
+            font-weight: 500;
+        }
+        .encryption-notice svg {
+            width: 14px; height: 14px;
+            stroke: var(--blue);
+        }
+
+        .input-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .input-group { position: relative; }
+        .input-group.full { grid-column: span 2; margin-bottom: 1.5rem; }
+
+        .input-label {
+            display: block; font-size: 0.85rem; font-weight: 500;
+            color: var(--text-main); margin-bottom: 0.5rem;
+        }
+
+        .input-control {
+            width: 100%;
+            background: #F9FAFB;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .input-control:focus {
+            outline: none;
+            background: var(--bg-card);
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0, 85, 255, 0.15);
+        }
+
+        select.input-control {
+            appearance: none; cursor: pointer;
+        }
+
+        textarea.input-control {
+            min-height: 100px; resize: none;
+        }
+
+        /* The Submit Button */
+        .btn-submit {
+            width: 100%;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .btn-submit svg {
+            width: 16px; height: 16px;
+            stroke: #fff;
+            transition: transform 0.2s;
+        }
+
+        .btn-submit:hover { background: #153250; }
+        .btn-submit:hover svg { transform: translateX(3px); }
+        .btn-submit:active { transform: scale(0.99); }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; gap: 3rem; }
+            .input-row { grid-template-columns: 1fr; }
+            .form-card { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="container">
+        
+        <div class="info-col">
+            <div class="secure-indicator gs-fade">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                <span>Secure Connection</span>
+            </div>
+            <h1 class="title gs-slide">Dedicated<br>Support.</h1>
+            <p class="desc gs-fade">Our client service professionals are available 24/7 to assist with your accounts, cards, and wealth management inquiries.</p>
+            
+            <div class="routing-options">
+                <div class="route-card gs-up">
+                    <div class="route-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                        </svg>
+                    </div>
+                    <div class="route-text">
+                        <h4>Report Lost or Stolen Card</h4>
+                        <p>Immediate action required. Call 1-800-BANK.</p>
+                    </div>
+                </div>
+                <div class="route-card gs-up">
+                    <div class="route-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                        </svg>
+                    </div>
+                    <div class="route-text">
+                        <h4>Wealth Management</h4>
+                        <p>Schedule a meeting with your fiduciary advisor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-col gs-scale">
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Secure Message</h3>
+                    <div class="encryption-notice">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                        </svg>
+                        <span>End-to-End Encrypted</span>
+                    </div>
+                </div>
+
+                <form action="#" onsubmit="event.preventDefault();">
+                    
+                    <div class="input-group full">
+                        <label class="input-label">Inquiry Type</label>
+                        <select class="input-control" required>
+                            <option value="" disabled selected>Select an option...</option>
+                            <option>Account Assistance</option>
+                            <option>Loan & Mortgage</option>
+                            <option>Fraud & Disputes</option>
+                            <option>Technical Support</option>
+                        </select>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">First Name</label>
+                            <input type="text" class="input-control" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Last Name</label>
+                            <input type="text" class="input-control" required>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" class="input-control" placeholder="name@company.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Account Number (Last 4 digits)</label>
+                            <input type="text" class="input-control" placeholder="••••" maxlength="4" pattern="\d{4}">
+                        </div>
+                    </div>
+
+                    <div class="input-group full">
+                        <label class="input-label">Message</label>
+                        <textarea class="input-control" placeholder="Please do not include full account numbers or social security numbers in this message." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        Send Secure Message
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </section>
+
+    <script>
+        // GSAP Animations specifically tailored for a "Bank" feel (smooth, heavy, authoritative).
+        const tl = gsap.timeline();
+
+        tl.from(".gs-slide", {
+            x: -30, opacity: 0, duration: 0.8, ease: "power2.out"
+        })
+        .from(".gs-fade", {
+            y: 20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out"
+        }, "-=0.6")
+        .from(".gs-up", {
+            y: 30, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power2.out"
+        }, "-=0.4")
+        .from(".gs-scale", {
+            scale: 0.95, opacity: 0, y: 20, duration: 0.8, ease: "power2.out"
+        }, "-=0.6");
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium UI Elements Kit</title>
+    <!-- GSAP for advanced interactions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030305;
+            --accent: #6366F1; /* Indigo */
+            --accent-glow: rgba(99, 102, 241, 0.5);
+            --text-main: #FFFFFF;
+            --text-muted: #8B8B9E;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- 1. Background Particles Canvas --- */
+        #particleCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: 0.6;
+        }
+
+        /* Layout Structure */
+        .section {
+            min-height: 100vh; padding: 10vh 5vw;
+            display: flex; flex-direction: column; justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .section-title {
+            font-family: 'Space Mono', monospace; font-size: 1rem; color: var(--accent);
+            letter-spacing: 4px; text-transform: uppercase; margin-bottom: 3rem;
+        }
+
+        /* =========================================
+           2. PREMIUM AUTH UI (LOGIN / SIGNUP)
+           ========================================= */
+        .auth-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; }
+        
+        .premium-form {
+            width: 100%; max-width: 420px;
+            background: rgba(20, 20, 25, 0.4);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px; padding: 50px 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+        }
+
+        /* Subtle radial glow behind the form */
+        .premium-form::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at center, rgba(99,102,241,0.1) 0%, transparent 50%);
+            pointer-events: none; z-index: -1;
+        }
+
+        .premium-form h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+        .premium-form p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 40px; }
+
+        /* Floating Label Inputs */
+        .input-group { position: relative; margin-bottom: 25px; }
+        .input-group input {
+            width: 100%; background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 16px 20px; color: #fff; font-size: 1rem;
+            outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(99,102,241,0.2); }
+        
+        .input-group label {
+            position: absolute; top: 18px; left: 20px; color: var(--text-muted);
+            pointer-events: none; transition: all 0.3s ease; font-size: 1rem;
+        }
+        
+        /* The magic: when input is focused or has valid text, shrink label to top */
+        .input-group input:focus ~ label, 
+        .input-group input:valid ~ label {
+            top: -10px; left: 15px; font-size: 0.75rem; 
+            background: #0D0D12; padding: 0 8px; color: var(--accent); border-radius: 4px;
+        }
+
+        .submit-btn {
+            width: 100%; padding: 16px; margin-top: 10px;
+            background: var(--text-main); color: #000;
+            border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+
+        /* =========================================
+           3. FANCY BUTTON LAYOUTS
+           ========================================= */
+        .button-grid { display: flex; gap: 40px; flex-wrap: wrap; align-items: center; }
+
+        /* Button A: Liquid Fill Hover */
+        .btn-liquid {
+            padding: 18px 45px; border-radius: 50px; background: transparent;
+            border: 1px solid rgba(255,255,255,0.3); color: #fff;
+            font-size: 1rem; font-weight: 500; cursor: pointer;
+            position: relative; overflow: hidden; transition: color 0.4s;
+        }
+        .btn-liquid::before {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 0%; background: #fff;
+            transition: height 0.4s cubic-bezier(0.7, 0, 0.2, 1); z-index: -1;
+        }
+        .btn-liquid:hover { color: #000; border-color: #fff; }
+        .btn-liquid:hover::before { height: 100%; }
+
+        /* Button B: Cyberpunk Bounds */
+        .btn-cyber {
+            padding: 18px 45px; background: rgba(99,102,241,0.05); border: none;
+            color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.9rem;
+            letter-spacing: 2px; cursor: pointer; position: relative;
+        }
+        .btn-cyber::before, .btn-cyber::after {
+            content: ''; position: absolute; width: 15px; height: 15px;
+            border: 2px solid var(--accent); transition: all 0.3s ease;
+        }
+        .btn-cyber::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .btn-cyber::after { bottom: 0; right: 0; border-left: none; border-top: none; }
+        .btn-cyber:hover { background: rgba(99,102,241,0.1); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-cyber:hover::before, .btn-cyber:hover::after { width: 100%; height: 100%; }
+
+        /* Button C: GSAP Magnetic (Class for JS hook) */
+        .btn-magnetic {
+            padding: 25px; background: #1A1A24; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            width: 100px; height: 100px; font-weight: 800;
+        }
+
+        /* =========================================
+           4. 3D INTERACTIVE ELEMENTS (CSS + GSAP)
+           ========================================= */
+        .scene-3d {
+            perspective: 1000px; /* Crucial for 3D depth */
+            width: 350px; height: 450px; margin: 0 auto;
+        }
+        .card-3d {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; /* Allows children to pop out */
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        /* The content pops out of the glass using translateZ */
+        .card-3d-content {
+            transform: translateZ(80px); /* 3D depth */
+            text-align: center; pointer-events: none;
+        }
+        .card-3d-content h3 { font-size: 2.5rem; margin-bottom: 10px; }
+        .card-3d-content p { color: var(--accent); font-family: 'Space Mono'; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. Background Particles Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- 2. Auth UI -->
+    <section class="section">
+        <div class="section-title">01 // Premium Authentication UI</div>
+        <div class="auth-wrapper">
+            <form class="premium-form" onsubmit="event.preventDefault()">
+                <h2>Welcome back</h2>
+                <p>Enter your credentials to access the terminal.</p>
+                
+                <div class="input-group">
+                    <input type="email" id="email" required>
+                    <label for="email">Email Address</label>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="password" required>
+                    <label for="password">Password</label>
+                </div>
+                
+                <button type="submit" class="submit-btn">Initialize Session</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- 3. Button Layouts -->
+    <section class="section">
+        <div class="section-title">02 // Advanced Interaction Buttons</div>
+        <div class="button-grid">
+            <button class="btn-liquid">Liquid Fill Hover</button>
+            <button class="btn-cyber">Cyber Bounds</button>
+            <button class="btn-magnetic" id="magneticBtn">Pull Me</button>
+        </div>
+    </section>
+
+    <!-- 4. Small 3D Elements -->
+    <section class="section">
+        <div class="section-title">03 // Interactive 3D CSS Elements</div>
+        <div class="scene-3d">
+            <!-- This card will tilt based on mouse position via GSAP -->
+            <div class="card-3d" id="glassCard">
+                <div class="card-3d-content">
+                    <h3>Hover Me</h3>
+                    <p>CSS + GSAP 3D</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        /* =========================================
+           1. HTML5 Canvas Particles (Constellation)
+           ========================================= */
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function initParticles() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            // Create 80 particles
+            for(let i=0; i<80; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw & Move
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                // Bounce off edges
+                if(p.x < 0 || p.x > width) p.vx *= -1;
+                if(p.y < 0 || p.y > height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fill();
+            });
+
+            // Connect nearby particles with lines
+            for(let i=0; i<particles.length; i++) {
+                for(let j=i+1; j<particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 - dist/750})`; // Fades out over distance
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        animateParticles();
+
+        /* =========================================
+           2. GSAP Magnetic Button Logic
+           ========================================= */
+        const magBtn = document.getElementById('magneticBtn');
+        
+        magBtn.addEventListener('mousemove', (e) => {
+            const rect = magBtn.getBoundingClientRect();
+            // Calculate distance from center of button (-1 to 1)
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+            
+            // Move button slightly towards mouse
+            gsap.to(magBtn, { x: x * 30, y: y * 30, duration: 0.3, ease: "power2.out" });
+        });
+
+        magBtn.addEventListener('mouseleave', () => {
+            // Snap back to center
+            gsap.to(magBtn, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+        });
+
+
+        /* =========================================
+           3. GSAP 3D Card Mouse Tilt Logic
+           ========================================= */
+        const card3d = document.getElementById('glassCard');
+        const cardScene = document.querySelector('.scene-3d');
+
+        // Fast setters for 60fps performance
+        const setRotateX = gsap.quickSetter(card3d, "rotateX", "deg");
+        const setRotateY = gsap.quickSetter(card3d, "rotateY", "deg");
+
+        cardScene.addEventListener('mousemove', (e) => {
+            const rect = cardScene.getBoundingClientRect();
+            // Map mouse position to -1 to 1 range
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            
+            // Tilt card (multiply by max degrees of tilt)
+            setRotateX(-y * 30); // Negative so it tilts *towards* mouse
+            setRotateY(x * 30);
+        });
+
+        cardScene.addEventListener('mouseleave', () => {
+            // Smoothly reset back to 0
+            gsap.to(card3d, { rotateX: 0, rotateY: 0, duration: 0.5, ease: "power2.out" });
+        });
+
+    </script>
+</body>
+</html>

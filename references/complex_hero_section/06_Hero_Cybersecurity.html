@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Cybersecurity Hero</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #02040A;
+            --grid-color: rgba(0, 255, 65, 0.05);
+            --neon-green: #00FF41;
+            --neon-dim: rgba(0, 255, 65, 0.2);
+            --alert-red: #FF003C;
+            --text-light: #E0E0E0;
+            --font-display: 'Rajdhani', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-light);
+            font-family: var(--font-display);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Radar / Grid Background */
+        .cyber-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            perspective: 1000px;
+            transform: rotateX(60deg) translateY(-100px) translateZ(-200px);
+            transform-origin: top center;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 500px; }
+        }
+
+        /* Radial Vignette to hide grid edges */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 10%, var(--bg-base) 80%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        /* Left Side: Typography */
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .status-badge {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--neon-dim);
+            padding: 6px 16px;
+            background: rgba(0, 255, 65, 0.05);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .status-blinker {
+            width: 8px; height: 8px;
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 6vw, 6.5rem);
+            font-weight: 700;
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .hero-title span { display: block; }
+        .hero-title .highlight { color: var(--neon-green); }
+
+        .terminal-box {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: #A0A0A0;
+            background: rgba(2, 4, 10, 0.8);
+            border-left: 2px solid var(--neon-green);
+            padding: 1rem 1.5rem;
+            margin-bottom: 3rem;
+            max-width: 550px;
+            line-height: 1.6;
+        }
+
+        .terminal-box::before {
+            content: '> ';
+            color: var(--neon-green);
+        }
+
+        /* Cyber Buttons */
+        .btn-group { display: flex; gap: 1.5rem; }
+
+        .cyber-btn {
+            position: relative;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .cyber-btn::before {
+            content: ''; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: var(--neon-green);
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
+        }
+
+        .cyber-btn:hover { color: var(--bg-base); box-shadow: 0 0 20px var(--neon-dim); }
+        .cyber-btn:hover::before { left: 0; }
+
+        .cyber-btn.secondary {
+            color: var(--text-light);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .cyber-btn.secondary::before { background: var(--text-light); }
+        .cyber-btn.secondary:hover { color: var(--bg-base); box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+
+        /* Right Side: The Threat Map / Terminal */
+        .hud-wrapper {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border: 1px solid var(--neon-dim);
+            background: rgba(0, 255, 65, 0.02);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HUD Corners */
+        .hud-corner { position: absolute; width: 15px; height: 15px; border: 2px solid var(--neon-green); }
+        .c-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .c-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+        .c-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+        .c-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+        .hud-header {
+            display: flex; justify-content: space-between;
+            font-family: var(--font-mono); font-size: 0.75rem;
+            color: var(--neon-green);
+            border-bottom: 1px dashed var(--neon-dim);
+            padding-bottom: 1rem; margin-bottom: 1.5rem;
+        }
+
+        /* Simulated Data Streams */
+        .data-stream {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Feed grows from bottom */
+        }
+
+        .data-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .data-line.alert { color: var(--alert-red); background: rgba(255, 0, 60, 0.1); }
+        .data-line.safe { color: var(--neon-green); }
+
+        /* Radar Scanner Graphic */
+        .radar-box {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px; height: 250px;
+            border: 1px solid var(--neon-dim);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .radar-box::before {
+            content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 1px dashed var(--neon-dim); transform: scale(0.6);
+        }
+
+        .scanner-sweep {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 125px; height: 125px;
+            background: conic-gradient(from 0deg, var(--neon-dim), transparent 60deg);
+            transform-origin: 0 0;
+            animation: radarSweep 4s linear infinite;
+        }
+
+        @keyframes radarSweep { 100% { transform: rotate(360deg); } }
+
+        /* Floating Target Nodes */
+        .target-node {
+            position: absolute; width: 6px; height: 6px; background: var(--alert-red); border-radius: 50%;
+            box-shadow: 0 0 10px var(--alert-red);
+            opacity: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-container { grid-template-columns: 1fr; padding: 2rem; padding-top: 6rem; height: 100vh; overflow-y: auto;}
+            .hud-wrapper { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid"></div>
+    <div class="vignette"></div>
+
+    <main class="hero-container">
+        
+        <div class="hero-content">
+            <div class="status-badge gs-up">
+                <div class="status-blinker"></div>
+                System Active // Threat Level: Alpha
+            </div>
+
+            <h1 class="hero-title">
+                <span class="gs-up">Autonomous</span>
+                <span class="gs-up highlight">Defense Matrix</span>
+            </h1>
+
+            <div class="terminal-box gs-up">
+                <span id="typewriter"></span><span class="status-blinker" style="display:inline-block; margin-left: 4px; vertical-align: middle;"></span>
+            </div>
+
+            <div class="btn-group gs-up">
+                <button class="cyber-btn">Initialize Core</button>
+                <button class="cyber-btn secondary">View Protocols</button>
+            </div>
+        </div>
+
+        <div class="hud-wrapper gs-hud">
+            <!-- HUD Corners -->
+            <div class="hud-corner c-tl"></div>
+            <div class="hud-corner c-tr"></div>
+            <div class="hud-corner c-bl"></div>
+            <div class="hud-corner c-br"></div>
+
+            <div class="hud-header">
+                <span>GLOBAL_NODE_09</span>
+                <span>LATENCY: 12ms</span>
+                <span>PACKETS: <span id="packet-counter">8,409,211</span></span>
+            </div>
+
+            <!-- The Radar -->
+            <div class="radar-box">
+                <div class="scanner-sweep"></div>
+                <!-- Target nodes injected by JS -->
+            </div>
+
+            <!-- The Data Feed -->
+            <div class="data-stream" id="data-feed">
+                <!-- Lines injected by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. Typewriter Effect for Terminal ---
+        const textToType = "Detect, isolate, and neutralize zero-day threats in real-time using neural predictive models. Your infrastructure, secured autonomously.";
+        let i = 0;
+        function typeWriter() {
+            if (i < textToType.length) {
+                document.getElementById("typewriter").innerHTML += textToType.charAt(i);
+                i++;
+                setTimeout(typeWriter, 30); // Typing speed
+            }
+        }
+
+        // --- 2. Live Data Feed Simulation ---
+        const dataFeed = document.getElementById('data-feed');
+        const ips = ["192.168.1.44", "10.0.0.2", "172.16.254.1", "198.51.100.14"];
+        const actions = ["PACKET_ROUTED", "PORT_SCAN_BLOCKED", "AUTH_SUCCESS", "DDoS_MITIGATED"];
+        
+        function addDataLine() {
+            const isAlert = Math.random() > 0.8;
+            const line = document.createElement('div');
+            line.className = `data-line ${isAlert ? 'alert' : 'safe'}`;
+            
+            const time = new Date().toISOString().split('T')[1].slice(0,-1);
+            const ip = ips[Math.floor(Math.random() * ips.length)];
+            const action = isAlert ? "INTRUSION_DETECTED" : actions[Math.floor(Math.random() * actions.length)];
+            
+            line.innerHTML = `<span>[${time}]</span><span>${ip}</span><span>${action}</span>`;
+            dataFeed.appendChild(line);
+            
+            // Keep only last 8 lines
+            if(dataFeed.childElementCount > 8) {
+                dataFeed.removeChild(dataFeed.firstChild);
+            }
+        }
+
+        setInterval(addDataLine, 800);
+
+        // --- 3. Radar Targets Simulation ---
+        const radarBox = document.querySelector('.radar-box');
+        function spawnTarget() {
+            const target = document.createElement('div');
+            target.className = 'target-node';
+            // Random position within radar
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 100;
+            target.style.left = `calc(50% + ${Math.cos(angle) * radius}px)`;
+            target.style.top = `calc(50% + ${Math.sin(angle) * radius}px)`;
+            
+            radarBox.appendChild(target);
+
+            // Animate target appearing, getting "neutralized" (turns green), and fading out
+            gsap.timeline()
+                .to(target, { opacity: 1, duration: 0.2 })
+                .to(target, { backgroundColor: "#00FF41", boxShadow: "0 0 10px #00FF41", delay: 1, duration: 0.2 })
+                .to(target, { opacity: 0, scale: 2, duration: 0.5, delay: 0.5, onComplete: () => target.remove() });
+        }
+
+        setInterval(spawnTarget, 2000);
+
+        // --- 4. Packet Counter ---
+        let packets = 8409211;
+        setInterval(() => {
+            packets += Math.floor(Math.random() * 50);
+            document.getElementById('packet-counter').innerText = packets.toLocaleString();
+        }, 100);
+
+        // --- 5. Initial GSAP Entrance Animation ---
+        const tl = gsap.timeline({ delay: 0.2, onComplete: typeWriter });
+
+        tl.from(".gs-up", {
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.15,
+            ease: "power2.out"
+        })
+        .from(".gs-hud", {
+            x: 50,
+            opacity: 0,
+            clipPath: "inset(0 100% 0 0)", // Wipe reveal
+            duration: 1.2,
+            ease: "power3.inOut"
+        }, "-=0.5")
+        .from(".hud-corner", {
+            scale: 0,
+            duration: 0.4,
+            stagger: 0.1,
+            ease: "back.out(2)"
+        }, "-=0.2");
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Artist Horizontal Gallery</title>
+    
+    <!-- Bold, Wide Typography for a Badass Gallery Feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #030303;
+            --accent-acid: #ccff00;
+            --accent-pink: #ff007f;
+            --accent-blue: #00e5ff;
+            --text-light: #f4f4f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-light);
+            font-family: 'Syncopate', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-acid); }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 30px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: 'Anton', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: var(--text-light);
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-left: 40px;
+        }
+
+        /* --- Fixed Background Title --- */
+        .bg-title {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Anton', sans-serif;
+            font-size: 25vw;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+            z-index: -1;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* --- The GSAP Horizontal Scroll Section --- */
+        .gallery-container {
+            width: 400vw; /* 4 sections = 400vw */
+            height: 100vh;
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .gallery-item {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 0 10%;
+        }
+
+        /* The Artwork Placeholder */
+        .art-wrapper {
+            position: relative;
+            width: 50vw;
+            height: 70vh;
+            max-width: 800px;
+            /* Filter transitions handled by GSAP */
+            filter: grayscale(100%) brightness(0.5); 
+            transform: scale(0.8);
+            transition: filter 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .art-wrapper.active {
+            filter: grayscale(0%) brightness(1);
+            transform: scale(1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 100px var(--glow-color, rgba(204, 255, 0, 0.2));
+            z-index: 10;
+        }
+
+        .art-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Anton', sans-serif;
+            font-size: 2rem;
+            color: #555;
+            letter-spacing: 5px;
+        }
+
+        /* The Reflection Effect */
+        .art-reflection {
+            position: absolute;
+            bottom: -70vh; /* Mirror height */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #222;
+            border-radius: 10px;
+            transform: scaleY(-1); /* Flip vertically */
+            mask-image: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        /* Overlapping Typography */
+        .art-title {
+            position: absolute;
+            bottom: 10%;
+            left: -10%;
+            font-family: 'Anton', sans-serif;
+            font-size: 8rem;
+            line-height: 0.9;
+            text-transform: uppercase;
+            color: var(--text-light);
+            z-index: 20;
+            /* 3D Drop shadow for depth against the image */
+            text-shadow: 10px 10px 20px rgba(0,0,0,0.8);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .active .art-title {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.8s ease 0.3s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+        }
+
+        .art-meta {
+            position: absolute;
+            top: 10%;
+            right: -5%;
+            text-align: right;
+            z-index: 20;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .active .art-meta {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+        }
+
+        .meta-year {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-acid);
+            margin-bottom: 10px;
+        }
+
+        .meta-desc {
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            color: #aaa;
+            max-width: 250px;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">OBLIVION // GALLERY</div>
+        <div class="nav-links">
+            <a href="#">Exhibitions</a>
+            <a href="#">Artists</a>
+            <a href="#">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Massive background text that stays fixed -->
+    <div class="bg-title" id="bgTitle">MUSEUM</div>
+
+    <!-- The container that gets pinned and scrolled horizontally -->
+    <div class="gallery-container" id="horizontalGallery">
+        
+        <!-- Piece 1 -->
+        <div class="gallery-item">
+            <div class="art-wrapper" style="--glow-color: rgba(204, 255, 0, 0.3);">
+                <div class="art-img" style="background: linear-gradient(45deg, #111, #333);">PIECE 01 (800x1000)</div>
+                <div class="art-reflection"></div>
+                
+                <div class="art-title">NEON<br><span style="color: var(--accent-acid);">GENESIS</span></div>
+                
+                <div class="art-meta">
+                    <div class="meta-year">2026</div>
+                    <div class="meta-desc">Mixed media on canvas. A brutalist exploration of modern technological dependency.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Piece 2 -->
+        <div class="gallery-item">
+            <div class="art-wrapper" style="--glow-color: rgba(255, 0, 127, 0.3);">
+                <div class="art-img" style="background: linear-gradient(45deg, #1a0010, #ff007f);">PIECE 02 (800x1000)</div>
+                <div class="art-reflection"></div>
+                
+                <div class="art-title">CRIMSON<br><span style="color: var(--accent-pink);">VOID</span></div>
+                
+                <div class="art-meta">
+                    <div class="meta-year">2025</div>
+                    <div class="meta-desc">Digital sculpture rendered in realtime. Examining the spaces between realities.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Piece 3 -->
+        <div class="gallery-item">
+            <div class="art-wrapper" style="--glow-color: rgba(0, 229, 255, 0.3);">
+                <div class="art-img" style="background: linear-gradient(45deg, #001a1f, #00e5ff);">PIECE 03 (800x1000)</div>
+                <div class="art-reflection"></div>
+                
+                <div class="art-title">LIQUID<br><span style="color: var(--accent-blue);">CHROME</span></div>
+                
+                <div class="art-meta">
+                    <div class="meta-year">2024</div>
+                    <div class="meta-desc">Fluid dynamics captured at 10,000 frames per second.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Piece 4 -->
+        <div class="gallery-item">
+            <div class="art-wrapper" style="--glow-color: rgba(255, 255, 255, 0.2);">
+                <div class="art-img" style="background: linear-gradient(45deg, #000, #444);">PIECE 04 (800x1000)</div>
+                <div class="art-reflection"></div>
+                
+                <div class="art-title">FINAL<br><span style="color: #fff;">ECLIPSE</span></div>
+                
+                <div class="art-meta">
+                    <div class="meta-year">2026</div>
+                    <div class="meta-desc">The culmination of the oblivion series. Oil and acrylic.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Padding section at the bottom so you can scroll past the gallery -->
+    <section style="height: 50vh; display: flex; justify-content: center; align-items: center; background: #000;">
+        <h2 style="font-family: 'Anton'; font-size: 4rem; letter-spacing: 5px; color: #333;">END OF EXHIBITION</h2>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const gallery = document.getElementById("horizontalGallery");
+        const items = gsap.utils.toArray(".gallery-item");
+
+        // 1. The Horizontal Scroll Pinning Logic
+        let scrollTween = gsap.to(items, {
+            xPercent: -100 * (items.length - 1), // Move all items left
+            ease: "none",
+            scrollTrigger: {
+                trigger: gallery,
+                pin: true,
+                scrub: 1, // Smooth scrubbing
+                end: () => "+=" + gallery.offsetWidth // Scroll duration = width of container
+            }
+        });
+
+        // 2. Center Activation Logic (The Badass Image Focus)
+        // As an image reaches the center of the screen, we add the 'active' class to it.
+        // This removes the grayscale, scales it up, adds the glow, and reveals the typography.
+        items.forEach((item, i) => {
+            let wrapper = item.querySelector('.art-wrapper');
+            
+            ScrollTrigger.create({
+                trigger: item,
+                containerAnimation: scrollTween, // Tie this trigger to the horizontal animation!
+                start: "left center", // When the left side of the item hits the center of screen
+                end: "right center", // When the right side hits the center
+                onEnter: () => wrapper.classList.add("active"),
+                onLeave: () => wrapper.classList.remove("active"),
+                onEnterBack: () => wrapper.classList.add("active"),
+                onLeaveBack: () => wrapper.classList.remove("active"),
+            });
+        });
+
+        // 3. Magnetic Hover Effect on Artworks
+        const wrappers = document.querySelectorAll('.art-wrapper');
+        wrappers.forEach(wrapper => {
+            wrapper.addEventListener('mousemove', (e) => {
+                if(wrapper.classList.contains('active')) {
+                    const rect = wrapper.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - rect.width/2) / 20;
+                    const y = (e.clientY - rect.top - rect.height/2) / 20;
+                    
+                    // Slightly tilt the image based on mouse position
+                    gsap.to(wrapper, {
+                        rotateX: -y,
+                        rotateY: x,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                }
+            });
+
+            wrapper.addEventListener('mouseleave', () => {
+                gsap.to(wrapper, {
+                    rotateX: 0,
+                    rotateY: 0,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        // Subtle Parallax on Background Text
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            gsap.to("#bgTitle", {
+                x: -(scrolled * 0.1) - (window.innerWidth / 2),
+                duration: 0.5,
+                ease: "none"
+            });
+        });
+
+    </script>
+</body>
+</html>

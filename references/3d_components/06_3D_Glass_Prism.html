@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Luxury 3D Glass Prism</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            /* Complex mesh gradient colors for the background so refraction looks good */
+            --c1: #4A00E0;
+            --c2: #8E2DE2;
+            --c3: #FF0080;
+            --c4: #7928CA;
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --prism-size: 250px;
+        }
+
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background-color: #000; overflow: hidden;
+            font-family: 'Helvetica Neue', sans-serif;
+            /* Mesh gradient background */
+            background: 
+                radial-gradient(circle at 15% 50%, var(--c1) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, var(--c2) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, var(--c3) 0%, transparent 50%);
+            background-size: 150% 150%;
+            animation: meshFlow 10s ease infinite alternate;
+        }
+
+        @keyframes meshFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* 3D Scene Configuration */
+        .scene {
+            width: var(--prism-size);
+            height: var(--prism-size);
+            perspective: 1500px; /* Deep perspective for dramatic 3D */
+            position: relative;
+        }
+
+        /* The Box Assembly */
+        .prism {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(45deg); /* Default angle */
+        }
+
+        /* Generic Face Styles */
+        .face {
+            position: absolute; top: 0; left: 0;
+            width: var(--prism-size); height: var(--prism-size);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            /* Refraction effect */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            /* Inner shadow for thickness */
+            box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; justify-content: center;
+            /* Add sweeping glare that changes constantly */
+            background-image: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 200%;
+            animation: glare 4s linear infinite;
+        }
+
+        @keyframes glare { 0% { background-position: 200% 200%; } 100% { background-position: -100% -100%; } }
+
+        /* Positioning the 6 faces to form a cube */
+        /* Translate Z is half of the prism size (125px) */
+        .front  { transform: translateZ(125px); }
+        .back   { transform: rotateY(180deg) translateZ(125px); }
+        .right  { transform: rotateY(90deg) translateZ(125px); }
+        .left   { transform: rotateY(-90deg) translateZ(125px); }
+        .top    { transform: rotateX(90deg) translateZ(125px); }
+        .bottom { transform: rotateX(-90deg) translateZ(125px); }
+
+        /* Remove blur from top so we can "look into" it easily */
+        .top { backdrop-filter: blur(2px); background: rgba(255,255,255,0.01); }
+        /* Make bottom darker (floor) */
+        .bottom { background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); box-shadow: 0 50px 100px rgba(0,0,0,1); }
+
+        /* --- THE CORE ITEM (Floating inside the box) --- */
+        .core {
+            position: absolute; top: 50%; left: 50%;
+            width: 100px; height: 100px;
+            margin: -50px 0 0 -50px;
+            /* It sits exactly in the 3D center (Z=0) */
+            transform-style: preserve-3d;
+            animation: floatCore 4s ease-in-out infinite;
+        }
+
+        @keyframes floatCore {
+            0%, 100% { transform: translateY(-10px) rotateY(0deg); }
+            50% { transform: translateY(10px) rotateY(180deg); }
+        }
+
+        /* For this example, the core is a glowing diamond/orb made of overlapping divs */
+        .diamond-part {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #FFF 0%, #AAA 100%);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            box-shadow: 0 0 50px rgba(255,255,255,0.8);
+        }
+        .dp1 { transform: translateZ(20px) scale(0.8); background: rgba(255,255,255,0.8); }
+        .dp2 { transform: translateZ(-20px) scale(0.8); background: rgba(200,200,255,0.5); }
+        .dp3 { transform: rotateY(90deg) translateZ(20px) scale(0.8); background: rgba(255,200,255,0.6); }
+        .dp4 { transform: rotateY(90deg) translateZ(-20px) scale(0.8); background: rgba(255,255,255,0.4); }
+
+        /* Typography */
+        h1 {
+            position: absolute; bottom: 10%; left: 0; width: 100%; text-align: center;
+            color: #FFF; font-size: 1.5rem; letter-spacing: 10px; font-weight: 300; text-transform: uppercase;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 10; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene" id="scene">
+        <div class="prism" id="prism">
+            <!-- Floating Core Object -->
+            <div class="core">
+                <div class="diamond-part dp1"></div>
+                <div class="diamond-part dp2"></div>
+                <div class="diamond-part dp3"></div>
+                <div class="diamond-part dp4"></div>
+            </div>
+
+            <!-- The 6 Glass Faces -->
+            <div class="face front"></div>
+            <div class="face back"></div>
+            <div class="face right"></div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+        </div>
+    </div>
+
+    <h1>The Aether Vault</h1>
+
+    <script>
+        const prism = document.getElementById('prism');
+        
+        // Auto spin variable
+        let autoSpin = gsap.to(prism, {
+            rotationY: "+=360",
+            duration: 20,
+            ease: "none",
+            repeat: -1
+        });
+
+        // Interactive Drag/Mouse Logic
+        let isHovering = false;
+        let startX = 0, startY = 0;
+        let currentRotX = -15; // Starting X rotation
+        let currentRotY = 45;  // Starting Y rotation
+
+        const scene = document.getElementById('scene');
+
+        scene.addEventListener('mouseenter', () => {
+            isHovering = true;
+            autoSpin.pause(); // Stop auto rotation so user can control it
+            // Read current rotation from GSAP so we don't snap
+            const currentTransform = gsap.getProperty(prism, "rotationY");
+            currentRotY = currentTransform % 360; 
+        });
+
+        scene.addEventListener('mousemove', (e) => {
+            if (!isHovering) return;
+            
+            const rect = scene.getBoundingClientRect();
+            // Normalized mouse coordinates (-1 to 1)
+            const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+            // Target rotations based on mouse position
+            // Mouse X controls Y rotation (spinning left/right)
+            // Mouse Y controls X rotation (tilting up/down)
+            const targetRotX = currentRotX + (-y * 40);
+            const targetRotY = currentRotY + (x * 60);
+
+            gsap.to(prism, {
+                rotateX: targetRotX,
+                rotateY: targetRotY,
+                duration: 1, // Smooth dampening
+                ease: "power2.out"
+            });
+        });
+
+        scene.addEventListener('mouseleave', () => {
+            isHovering = false;
+            // Record where user left it so auto-spin resumes smoothly from there
+            currentRotY = gsap.getProperty(prism, "rotationY");
+            
+            // Resume gentle auto-spin from current position
+            autoSpin.kill(); // Kill old tween
+            autoSpin = gsap.fromTo(prism, 
+                { rotationY: currentRotY, rotationX: -15 }, // Snap X back to default, keep Y
+                { rotationY: currentRotY + 360, duration: 20, ease: "none", repeat: -1 }
+            );
+        });
+
+    </script>
+</body>
+</html>

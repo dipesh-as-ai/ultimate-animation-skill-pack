@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Flat 'O' Scroll Reveal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d0d0d;
+            height: 400vh; /* Provides plenty of scroll room */
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+        }
+
+        .fixed-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Critical for the 3D flip effect on the O */
+            perspective: 1000px; 
+            pointer-events: none;
+        }
+
+        .word-container {
+            display: flex;
+            align-items: center;
+            font-size: 15vw;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            /* To make the 3D rotation pivot from the exact center of the letters */
+            transform-style: preserve-3d;
+        }
+
+        .letter {
+            display: inline-block;
+            transform-style: preserve-3d;
+            /* A nice premium gradient applied to the text */
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Spacing for the specific letters */
+        .letter-h, .letter-e, .letter-l1, .letter-l2 {
+            opacity: 0;
+            transform: translateY(150px);
+        }
+
+        .letter-o {
+            /* The O will start completely flat (rotated 90deg on X axis) and pushed to the right */
+            opacity: 0;
+            transform: translateX(400px) rotateX(90deg);
+            /* Add a specific highlight color to the O so it stands out as the hero */
+            background: linear-gradient(180deg, #00f3ff 0%, #0066ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .scroll-line {
+            width: 2px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 10px auto 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #00f3ff;
+            animation: dropDown 1.5s infinite;
+        }
+
+        @keyframes dropDown {
+            0% { top: -50%; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fixed-wrapper">
+        <div class="word-container" id="wordContainer">
+            <span class="letter hell-letter letter-h">H</span>
+            <span class="letter hell-letter letter-e">E</span>
+            <span class="letter hell-letter letter-l1">L</span>
+            <span class="letter hell-letter letter-l2">L</span>
+            <span class="letter letter-o" id="letterO">O</span>
+        </div>
+    </div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+        Scroll Down
+        <div class="scroll-line"></div>
+    </div>
+
+    <script>
+        let targetScroll = 0;
+        let currentScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            targetScroll = window.scrollY / maxScroll;
+            
+            if (targetScroll > 0.02) {
+                document.getElementById('scrollIndicator').style.opacity = '0';
+            } else {
+                document.getElementById('scrollIndicator').style.opacity = '1';
+            }
+        });
+
+        // Helper function to map a specific scroll range to a 0.0 - 1.0 progress value
+        function mapRange(value, start, end) {
+            if (value <= start) return 0;
+            if (value >= end) return 1;
+            return (value - start) / (end - start);
+        }
+
+        // Custom easing functions for professional, snappy motion
+        function easeOutCubic(x) {
+            return 1 - Math.pow(1 - x, 3);
+        }
+
+        function easeInOutCubic(x) {
+            return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+        }
+
+        const hellLetters = document.querySelectorAll('.hell-letter');
+        const letterO = document.getElementById('letterO');
+        const wordContainer = document.getElementById('wordContainer');
+
+        function render() {
+            // Smooth lerp for buttery scroll scrubbing
+            currentScroll += (targetScroll - currentScroll) * 0.08;
+
+            // --- PHASE 1: "H E L L" Staggered Reveal (0.0 to 0.25) ---
+            hellLetters.forEach((letter, index) => {
+                // Each letter starts 3% after the previous one
+                let start = index * 0.03; 
+                let end = start + 0.15;
+                
+                let progress = mapRange(currentScroll, start, end);
+                let ease = easeOutCubic(progress);
+                
+                let yOffset = 150 * (1 - ease);
+                
+                letter.style.transform = `translateY(${yOffset}px)`;
+                letter.style.opacity = progress;
+            });
+
+            // --- PHASE 2: "O" Comes in Late & Flat (0.2 to 0.45) ---
+            // It slides in from the right, but remains rotateX(90deg) so it looks like a flat dash '-'
+            let slideProgress = mapRange(currentScroll, 0.2, 0.45);
+            let easeSlide = easeOutCubic(slideProgress);
+            
+            // X offset starts at 400px to the right and ends at 0
+            let xOffset = 400 * (1 - easeSlide);
+            
+            // --- PHASE 3: "O" Flips Up to Become an 'O' (0.45 to 0.7) ---
+            let flipProgress = mapRange(currentScroll, 0.45, 0.7);
+            let easeFlip = easeInOutCubic(flipProgress);
+            
+            // Rotation starts at 90deg (flat) and ends at 0deg (standing up)
+            let rotationX = 90 * (1 - easeFlip);
+            
+            // Apply Phase 2 and Phase 3 simultaneously to the O
+            letterO.style.transform = `translateX(${xOffset}px) rotateX(${rotationX}deg)`;
+            letterO.style.opacity = slideProgress; // Fades in as it slides
+
+            // --- PHASE 4: Final Ambient Glow (0.7 to 1.0) ---
+            // Once the word is completely formed, we make the whole thing glow
+            let glowProgress = mapRange(currentScroll, 0.7, 0.9);
+            wordContainer.style.filter = `drop-shadow(0px 0px ${glowProgress * 30}px rgba(0, 243, 255, ${glowProgress * 0.6}))`;
+
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>

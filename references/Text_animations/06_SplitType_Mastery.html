@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced SplitType Mastery</title>
+    <script src="https://unpkg.com/split-type"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --text-main: #FFFFFF;
+            --text-accent: #FF3366;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .spacer { height: 100vh; display: flex; align-items: center; justify-content: center; opacity: 0.5; }
+
+        /* --- Section 1: Masked Cascading Reveal --- */
+        .section-cascade {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 0 5vw;
+        }
+
+        .cascade-text {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+
+        /* SplitType adds .line, .word, .char classes. 
+           To do a mask reveal, we must set overflow hidden on the line */
+        .cascade-text .line { overflow: hidden; }
+        .cascade-text .char { transform: translateY(100%); } /* initial state */
+
+        /* --- Section 2: Data Scramble --- */
+        .section-scramble {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: #111;
+        }
+
+        .scramble-container { text-align: center; }
+        .scramble-label { font-family: 'Space Mono', monospace; color: var(--text-accent); font-size: 1rem; margin-bottom: 1rem; letter-spacing: 4px; }
+        .scramble-text {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(2rem, 5vw, 5rem);
+            font-weight: 700;
+        }
+
+        /* --- Section 3: Kinetic Velocity Marquee --- */
+        .section-kinetic {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            overflow: hidden;
+        }
+
+        .marquee-container {
+            display: flex; white-space: nowrap;
+            margin-bottom: 2rem;
+        }
+
+        .marquee-text {
+            font-size: clamp(4rem, 10vw, 10rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            padding-right: 50px;
+            /* Hollow stroke text */
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.2);
+            transition: color 0.3s;
+        }
+
+        .marquee-text.filled {
+            color: var(--text-main);
+            -webkit-text-stroke: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="spacer">Scroll Down ↓</div>
+
+    <!-- 1. Cascading Reveal -->
+    <section class="section-cascade">
+        <h1 class="cascade-text" id="cascadeTarget">
+            Engineering<br>Digital<br>Perfection.
+        </h1>
+    </section>
+
+    <!-- 2. Cyberpunk Scramble -->
+    <section class="section-scramble">
+        <div class="scramble-container">
+            <div class="scramble-label" id="scrambleTrigger">SECURITY PROTOCOL</div>
+            <h2 class="scramble-text" id="scrambleTarget" data-text="ACCESS GRANTED">################</h2>
+        </div>
+    </section>
+
+    <!-- 3. Kinetic Velocity Scroll -->
+    <section class="section-kinetic" id="kineticTrigger">
+        <div class="marquee-container" id="marquee1">
+            <div class="marquee-text filled">AWWWARDS LEVEL DESIGN • </div>
+            <div class="marquee-text filled">AWWWARDS LEVEL DESIGN • </div>
+            <div class="marquee-text filled">AWWWARDS LEVEL DESIGN • </div>
+        </div>
+        <div class="marquee-container" id="marquee2">
+            <div class="marquee-text">UNCOMPROMISING MOTION • </div>
+            <div class="marquee-text">UNCOMPROMISING MOTION • </div>
+            <div class="marquee-text">UNCOMPROMISING MOTION • </div>
+        </div>
+    </section>
+
+    <div class="spacer">End of Typography</div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Cascading Reveal with SplitType ---
+        // Split text into lines, then characters.
+        const cascadeSplit = new SplitType('#cascadeTarget', { types: 'lines, chars' });
+        
+        gsap.to(cascadeSplit.chars, {
+            y: 0,
+            duration: 1,
+            stagger: 0.05,
+            ease: "power4.out",
+            scrollTrigger: {
+                trigger: ".section-cascade",
+                start: "top 70%", 
+                toggleActions: "play none none reverse" // Animates in, and reverses if scrolled back up
+            }
+        });
+
+        // --- 2. Custom Scramble Text Effect (No Paid Plugins) ---
+        const scrambleElement = document.getElementById('scrambleTarget');
+        const finalWord = scrambleElement.getAttribute('data-text');
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        
+        ScrollTrigger.create({
+            trigger: ".section-scramble",
+            start: "top 60%",
+            onEnter: () => scrambleText(scrambleElement, finalWord),
+            onEnterBack: () => scrambleText(scrambleElement, finalWord)
+        });
+
+        function scrambleText(element, finalString) {
+            let iteration = 0;
+            const maxIterations = 20;
+            
+            gsap.ticker.add(updateScramble);
+            
+            function updateScramble() {
+                // Every frame, generate a mixed string
+                let mixed = finalString.split('').map((letter, index) => {
+                    if (index < iteration) {
+                        return finalString[index]; // Reveal correct letter over time
+                    }
+                    if (letter === " ") return " ";
+                    return chars[Math.floor(Math.random() * chars.length)];
+                }).join('');
+                
+                element.innerText = mixed;
+                
+                // Slow down the reveal
+                iteration += 1 / 3; 
+                
+                if (iteration >= finalString.length) {
+                    element.innerText = finalString;
+                    gsap.ticker.remove(updateScramble); // Stop loop
+                }
+            }
+        }
+
+        // --- 3. Kinetic Velocity Marquee ---
+        // Setup infinite looping timelines
+        const tl1 = gsap.to("#marquee1 .marquee-text", {
+            xPercent: -100, repeat: -1, duration: 10, ease: "linear"
+        }).totalProgress(0.5); // start halfway
+
+        const tl2 = gsap.to("#marquee2 .marquee-text", {
+            xPercent: 100, repeat: -1, duration: 15, ease: "linear" // Reverse direction
+        }).totalProgress(0.5);
+
+        // Hook into ScrollTrigger to detect scroll velocity and speed up the marquees
+        ScrollTrigger.create({
+            trigger: "body",
+            start: "top top",
+            end: "bottom bottom",
+            onUpdate: (self) => {
+                // velocity is positive scrolling down, negative scrolling up
+                const velocity = self.getVelocity(); 
+                // We map velocity to timescale. Normally timescale is 1.
+                // If velocity is massive, timescale increases temporarily.
+                let targetTimeScale = 1 + Math.abs(velocity / 200);
+                
+                // Clamp it so it doesn't go completely insane
+                targetTimeScale = Math.min(targetTimeScale, 8); 
+
+                // Animate the timescale smoothly up and then back to 1
+                gsap.to([tl1, tl2], {
+                    timeScale: targetTimeScale,
+                    duration: 0.1,
+                    overwrite: "auto",
+                    onComplete: () => {
+                        gsap.to([tl1, tl2], { timeScale: 1, duration: 1, ease: "power2.out" });
+                    }
+                });
+                
+                // Reverse direction if scrolling up
+                if (velocity < 0) {
+                    gsap.to(tl1, { timeScale: -targetTimeScale, duration: 0.1 });
+                    gsap.to(tl2, { timeScale: targetTimeScale, duration: 0.1 }); // tl2 already reversed
+                } else {
+                    gsap.to(tl1, { timeScale: targetTimeScale, duration: 0.1 });
+                    gsap.to(tl2, { timeScale: -targetTimeScale, duration: 0.1 });
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

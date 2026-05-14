@@ -2,11 +2,14 @@ node_modules/
 reference_repo/
 chibi-parts/
 
-# Demo/test files
-*.html
+# Demo/test files (root level only — NOT references/)
+/*.html
 wolf.png
 chibi.png
 ChatGPT*.png
+
+# Keep ALL reference templates tracked
+!references/**/*.html
 
 # OS junk
 .DS_Store
@@ -16,3 +19,6 @@ desktop.ini
 # CLI bundled assets (regenerated via sync)
 cli/assets/
 cli/test-project/
+
+# Large media (GIFs in Website UI — tracked via Git LFS or excluded)
+references/Website UI/*.gif

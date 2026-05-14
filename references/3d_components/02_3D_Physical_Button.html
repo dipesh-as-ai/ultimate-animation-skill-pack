@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Physical Button</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #E5E7EB;
+            --btn-color: #4F46E5; /* Indigo */
+            --btn-edge: #3730A3; /* Darker Indigo */
+            --btn-shadow: rgba(0, 0, 0, 0.2);
+            --btn-highlight: rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg); font-family: 'Inter', sans-serif;
+            gap: 50px; flex-wrap: wrap;
+        }
+
+        /* The 3D wrapper */
+        .btn-3d {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            outline: none;
+            border: 0;
+            vertical-align: middle;
+            text-decoration: none;
+            background: transparent;
+            padding: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            /* Allow scaling on hover without breaking 3d */
+            transition: transform 0.2s cubic-bezier(0.3, 0.7, 0.4, 1);
+        }
+
+        /* The Shadow (Floor) */
+        .btn-shadow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--btn-shadow);
+            border-radius: 16px;
+            transform: translateY(12px);
+            filter: blur(8px);
+            transition: transform 0.1s cubic-bezier(0.3, 0.7, 0.4, 1), filter 0.1s;
+        }
+
+        /* The Edge (Side of the button) */
+        .btn-edge {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--btn-edge);
+            border-radius: 16px;
+            /* Adding a slight gradient to the edge makes it look rounder */
+            background: linear-gradient(
+                to right,
+                #312E81 0%,
+                #3730A3 8%,
+                #3730A3 92%,
+                #312E81 100%
+            );
+        }
+
+        /* The Top Face (What you actually click) */
+        .btn-top {
+            position: relative; display: block;
+            padding: 24px 48px;
+            border-radius: 16px;
+            background: var(--btn-color);
+            color: white;
+            transform: translateY(-12px);
+            transition: transform 0.1s cubic-bezier(0.3, 0.7, 0.4, 1);
+            
+            /* Inner lighting for realism */
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 2px 0 var(--btn-highlight);
+        }
+
+        /* --- Interactions --- */
+
+        /* Hover state: slight lift */
+        .btn-3d:hover {
+            transform: scale(1.05);
+        }
+
+        /* Active state: Compress the button down */
+        .btn-3d:active .btn-top {
+            transform: translateY(-2px); /* Moves down 10px */
+        }
+        
+        /* When pressed, the shadow gets tighter and darker */
+        .btn-3d:active .btn-shadow {
+            transform: translateY(4px);
+            filter: blur(4px);
+        }
+
+        /* Variant: Success Green */
+        .btn-3d.success {
+            --btn-color: #10B981;
+            --btn-edge: #047857;
+        }
+        .btn-3d.success .btn-edge { background: linear-gradient(to right, #064E3B 0%, #047857 8%, #047857 92%, #064E3B 100%); }
+
+        /* Variant: Danger Red */
+        .btn-3d.danger {
+            --btn-color: #EF4444;
+            --btn-edge: #B91C1C;
+        }
+        .btn-3d.danger .btn-edge { background: linear-gradient(to right, #7F1D1D 0%, #B91C1C 8%, #B91C1C 92%, #7F1D1D 100%); }
+
+    </style>
+</head>
+<body>
+
+    <button class="btn-3d">
+        <span class="btn-shadow"></span>
+        <span class="btn-edge"></span>
+        <span class="btn-top">Launch</span>
+    </button>
+
+    <button class="btn-3d success">
+        <span class="btn-shadow"></span>
+        <span class="btn-edge"></span>
+        <span class="btn-top">Confirm</span>
+    </button>
+
+    <button class="btn-3d danger">
+        <span class="btn-shadow"></span>
+        <span class="btn-edge"></span>
+        <span class="btn-top">Delete</span>
+    </button>
+
+</body>
+</html>

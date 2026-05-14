@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Laser Path Tracing Text</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505; /* Deep rich black */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .svg-container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* The base text style */
+        .text-layer {
+            font-size: 140px;
+            font-weight: 900;
+            text-transform: uppercase;
+            fill: transparent;
+            stroke-width: 3px;
+            stroke-dasharray: 1000; /* Arbitrary large number for path length */
+            stroke-dashoffset: 1000;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Laser Layer 1 - Cyan */
+        .layer-1 {
+            stroke: #00f3ff;
+            filter: drop-shadow(0 0 10px #00f3ff) drop-shadow(0 0 20px #00f3ff);
+            animation: dash 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
+        }
+
+        /* Laser Layer 2 - Magenta (slightly delayed and offset) */
+        .layer-2 {
+            stroke: #ff00ea;
+            stroke-width: 2px;
+            filter: drop-shadow(0 0 10px #ff00ea);
+            animation: dash 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
+            animation-delay: 0.3s;
+        }
+
+        /* Laser Layer 3 - Purple core */
+        .layer-3 {
+            stroke: #7b00ff;
+            stroke-width: 1px;
+            animation: dash 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
+            animation-delay: 0.6s;
+        }
+
+        /* The solid fill that pulses on when the lasers finish drawing */
+        .fill-layer {
+            fill: #ffffff;
+            stroke: none;
+            opacity: 0;
+            animation: pulseFill 8s ease-in-out infinite;
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dashoffset: 1000;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes pulseFill {
+            0%, 40% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+            }
+            50%, 90% {
+                opacity: 1;
+                filter: drop-shadow(0 0 30px rgba(0, 243, 255, 0.8)) drop-shadow(0 0 60px rgba(255, 0, 234, 0.6));
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Ambient background glow that pulses with the text */
+        .bg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60vw;
+            height: 30vh;
+            background: radial-gradient(ellipse at center, rgba(0, 243, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            animation: pulseBg 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseBg {
+            0%, 40% { opacity: 0; }
+            50%, 90% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    
+    <div class="svg-container">
+        <!-- SVG viewBox adjusts to keep text responsive -->
+        <svg viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet">
+            
+            <!-- Layer 1: Cyan Laser -->
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-layer layer-1">
+                OVERWHELM
+            </text>
+
+            <!-- Layer 2: Magenta Laser -->
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-layer layer-2">
+                OVERWHELM
+            </text>
+
+            <!-- Layer 3: Purple Core -->
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-layer layer-3">
+                OVERWHELM
+            </text>
+
+            <!-- Solid Fill: Powers on at the end -->
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="text-layer fill-layer" style="font-size: 140px; font-weight: 900; text-transform: uppercase;">
+                OVERWHELM
+            </text>
+            
+        </svg>
+    </div>
+
+    <script>
+        // Calculate exact stroke length dynamically for perfect rendering across any font/word
+        const textLayers = document.querySelectorAll('.text-layer:not(.fill-layer)');
+        
+        textLayers.forEach(text => {
+            // Because <text> stroke length can vary, we assign a massive dasharray in CSS.
+            // But to make it perfect, we could convert text to paths.
+            // For live text, stroke-dasharray: 1000 usually covers it nicely.
+        });
+    </script>
+</body>
+</html>

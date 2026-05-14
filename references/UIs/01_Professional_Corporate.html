@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Professional UI</title>
+    
+    <!-- Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & ScrollTrigger for Award-Winning Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --text-main: #0a0a0a;
+            --text-muted: #666666;
+            --accent: #0055ff;
+            --accent-hover: #0044cc;
+            --card-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Glassmorphism Navbar --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            background: rgba(250, 250, 250, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 85, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 85, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 5% 60px;
+            position: relative;
+        }
+
+        /* Background Gradient Orb */
+        .hero-orb {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 85, 255, 0.1) 0%, rgba(250, 250, 250, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(40px);
+        }
+
+        /* Masked Text Reveal styling (from our animations) */
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            max-width: 900px;
+        }
+
+        .mask-line {
+            overflow: hidden;
+            display: block;
+        }
+
+        .mask-text {
+            display: block;
+            transform: translateY(110%);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* --- Image Placeholder Section --- */
+        .img-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 600px;
+            margin-top: 80px;
+            border-radius: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .img-placeholder-text {
+            color: #999;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Glassmorphism tag on the image */
+        .glass-tag {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* --- Bento Box Features Section --- */
+        .features {
+            padding: 100px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 300px);
+            gap: 24px;
+        }
+
+        .bento-card {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border-color: rgba(0, 85, 255, 0.2);
+        }
+
+        /* Grid Spans for the Award-Winning asymmetric look */
+        .card-large {
+            grid-column: span 2;
+        }
+
+        .card-tall {
+            grid-row: span 2;
+        }
+
+        .bento-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(0, 85, 255, 0.1);
+            color: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+
+        .bento-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .bento-content p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Small image placeholder inside bento card */
+        .bento-img {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 60%;
+            height: 50%;
+            background: #f5f5f5;
+            border-top-left-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #bbb;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            .card-large, .card-tall {
+                grid-column: span 1;
+                grid-row: span 1;
+                height: 300px;
+            }
+            .hero-title {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">AcmeCorp.</div>
+        <div class="nav-links">
+            <a href="#">Products</a>
+            <a href="#">Solutions</a>
+            <a href="#">Pricing</a>
+            <a href="#">Enterprise</a>
+        </div>
+        <div class="nav-actions">
+            <a href="#" class="btn btn-secondary" style="margin-right: 12px;">Log In</a>
+            <a href="#" class="btn btn-primary">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-orb"></div>
+        
+        <h1 class="hero-title">
+            <span class="mask-line"><span class="mask-text">The professional standard</span></span>
+            <span class="mask-line"><span class="mask-text">for modern business.</span></span>
+        </h1>
+        
+        <p class="hero-subtitle">
+            Scale your enterprise with our award-winning platform. Built for performance, security, and absolute reliability.
+        </p>
+        
+        <div class="hero-cta">
+            <a href="#" class="btn btn-primary">Start Free Trial</a>
+            <a href="#" class="btn btn-secondary">Book a Demo</a>
+        </div>
+
+        <!-- Hero Image Placeholder -->
+        <div class="img-container hero-img">
+            <span class="img-placeholder-text">Hero Image Placeholder (1100x600)</span>
+            
+            <div class="glass-tag">
+                <strong style="display:block; margin-bottom: 4px;">Performance</strong>
+                <span style="color: var(--accent); font-weight: 600;">+300% ROI</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-header">
+            <h2>Everything you need.</h2>
+            <p style="color: var(--text-muted); font-size: 1.2rem;">Powerful tools wrapped in an elegant interface.</p>
+        </div>
+
+        <div class="bento-grid">
+            <!-- Card 1: Large -->
+            <div class="bento-card card-large">
+                <div>
+                    <div class="bento-icon">⚡</div>
+                    <div class="bento-content">
+                        <h3>Lightning Fast</h3>
+                        <p>Optimized infrastructure ensures your data loads instantly across the globe.</p>
+                    </div>
+                </div>
+                <div class="bento-img">Image (400x150)</div>
+            </div>
+
+            <!-- Card 2: Tall -->
+            <div class="bento-card card-tall">
+                <div>
+                    <div class="bento-icon">🔒</div>
+                    <div class="bento-content">
+                        <h3>Bank-grade Security</h3>
+                        <p>End-to-end encryption, SOC2 compliance, and continuous monitoring keep your data safe.</p>
+                    </div>
+                </div>
+                <div class="bento-img" style="width: 100%; height: 40%; border-top-left-radius: 0; border-left: none;">Image (300x200)</div>
+            </div>
+
+            <!-- Card 3: Normal -->
+            <div class="bento-card">
+                <div>
+                    <div class="bento-icon">📊</div>
+                    <div class="bento-content">
+                        <h3>Advanced Analytics</h3>
+                        <p>Make data-driven decisions with real-time reporting.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Normal -->
+            <div class="bento-card">
+                <div>
+                    <div class="bento-icon">🤝</div>
+                    <div class="bento-content">
+                        <h3>Team Collaboration</h3>
+                        <p>Work seamlessly with your entire organization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Register GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Hero Entrance Animations ---
+        const tl = gsap.timeline();
+
+        // 1. Masked Text Reveal for the Headline
+        tl.to(".mask-text", {
+            y: "0%",
+            duration: 1,
+            stagger: 0.15,
+            ease: "power4.out",
+            delay: 0.2
+        })
+        // 2. Fade in subtitle
+        .to(".hero-subtitle", {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.6")
+        // 3. Fade in buttons
+        .to(".hero-cta", {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.6")
+        // 4. Reveal the Hero Image Placeholder with a subtle scale & lift
+        .to(".hero-img", {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            ease: "expo.out"
+        }, "-=0.4");
+
+        // --- Scroll Animations for Bento Grid ---
+        // Staggered fade up for the bento cards when they enter the viewport
+        gsap.from(".bento-card", {
+            scrollTrigger: {
+                trigger: ".bento-grid",
+                start: "top 80%", // Triggers when the top of the grid hits 80% down the screen
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out"
+        });
+
+        // Simple Parallax for the Hero Image while scrolling down
+        gsap.to(".hero-img", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: 100, // Pushes it down slightly slower than the scroll speed
+            opacity: 0.5
+        });
+    </script>
+</body>
+</html>

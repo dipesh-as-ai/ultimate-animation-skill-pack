@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced UI Structures</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0A0A0A;
+            --bg-card: rgba(25, 25, 25, 0.6);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --text-main: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+
+        .header { padding: 10vh 5vw; font-size: 3rem; font-weight: 800; }
+
+        /* --- 1. Asymmetric Bento Grid --- */
+        .bento-section { padding: 5vw; }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 250px;
+            gap: 20px;
+            max-width: 1400px; margin: 0 auto;
+        }
+
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            position: relative; overflow: hidden;
+        }
+
+        .bento-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.3); }
+        .bento-card h3 { font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem; z-index: 2;}
+        .bento-card p { font-size: 0.9rem; color: #888; z-index: 2;}
+
+        /* Complex Areas */
+        .card-main { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #111, #222); }
+        .card-wide { grid-column: span 2; grid-row: span 1; }
+        .card-tall { grid-column: span 1; grid-row: span 2; }
+        .card-small { grid-column: span 1; grid-row: span 1; }
+
+        /* Floating decoration in main card */
+        .deco-sphere {
+            position: absolute; top: -50px; right: -50px;
+            width: 200px; height: 200px; border-radius: 50%;
+            background: radial-gradient(circle, #4A00E0, transparent 70%);
+            opacity: 0.5; z-index: 1;
+        }
+
+        /* --- 2. Horizontal Scrolling Gallery --- */
+        .h-scroll-container {
+            /* The wrapper that will be pinned */
+            width: 100%; height: 100vh;
+            display: flex; align-items: center;
+            background: #111; overflow: hidden;
+            position: relative;
+        }
+
+        .h-scroll-track {
+            /* The element that physically moves left */
+            display: flex; gap: 4vw; padding: 0 5vw;
+            width: fit-content;
+        }
+
+        .gallery-item {
+            width: 60vw; height: 60vh;
+            background: #222; border-radius: 12px;
+            flex-shrink: 0; overflow: hidden;
+            position: relative;
+        }
+
+        /* Image parallax setup */
+        .gallery-img {
+            width: 130%; height: 100%;
+            background-size: cover; background-position: center;
+            /* width is larger than container so it can parallax inside */
+            margin-left: -15%; 
+        }
+
+        .g1 { background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80'); }
+        .g2 { background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80'); }
+        .g3 { background-image: url('https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80'); }
+
+        .gallery-title { position: absolute; bottom: 2rem; left: 2rem; font-size: 3rem; font-weight: 800; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+
+        /* --- 3. Curtain Reveal Mega Footer --- */
+        /* To create a curtain reveal, the main content must sit above the footer, 
+           and the footer must be fixed to the bottom with z-index: -1 */
+        
+        .main-content-wrapper {
+            position: relative;
+            z-index: 10; /* Above footer */
+            background-color: var(--bg-dark); /* Solid background to hide footer */
+            margin-bottom: 100vh; /* Create empty space for the fixed footer to show through */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .mega-footer {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%; height: 100vh;
+            background: #050505;
+            z-index: 1; /* Below main content */
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 5vw;
+        }
+
+        .footer-huge-text {
+            font-size: 15vw; font-weight: 800; letter-spacing: -5px; line-height: 0.8;
+            background: linear-gradient(to bottom, #FFF, #555);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-align: center; margin-top: auto;
+        }
+        
+        .footer-links { display: flex; justify-content: space-between; border-top: 1px solid #333; padding-top: 2rem; }
+        .footer-links a { color: #FFF; text-decoration: none; font-size: 1.2rem; }
+
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: 1fr 1fr; }
+            .card-main, .card-wide, .card-tall, .card-small { grid-column: span 1; grid-row: span 1; }
+            .gallery-item { width: 85vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Wrapper is required for the curtain footer effect -->
+    <div class="main-content-wrapper">
+        
+        <div class="header">Advanced UI References</div>
+
+        <!-- 1. Bento Grid -->
+        <section class="bento-section">
+            <div class="bento-grid gs-bento">
+                <div class="bento-card card-main">
+                    <div class="deco-sphere"></div>
+                    <h3>Analytics Core</h3>
+                    <p>Real-time data visualization engine.</p>
+                </div>
+                <div class="bento-card card-wide">
+                    <h3>Global Sync</h3>
+                    <p>Distributed node architecture.</p>
+                </div>
+                <div class="bento-card card-tall">
+                    <h3>Security</h3>
+                    <p>Military-grade encryption.</p>
+                </div>
+                <div class="bento-card card-small">
+                    <h3>Speed</h3>
+                    <p>Zero latency.</p>
+                </div>
+                <div class="bento-card card-small">
+                    <h3>Scale</h3>
+                    <p>Infinite.</p>
+                </div>
+                <div class="bento-card card-wide">
+                    <h3>Integrations</h3>
+                    <p>Connect with 1000+ APIs.</p>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 20vh;"></div>
+
+        <!-- 2. Horizontal Scroll Gallery -->
+        <section class="h-scroll-container" id="hScrollWrapper">
+            <div class="h-scroll-track" id="hScrollTrack">
+                <div class="gallery-item">
+                    <div class="gallery-img g1"></div>
+                    <h2 class="gallery-title">VILLA ONE</h2>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img g2"></div>
+                    <h2 class="gallery-title">THE ESTATE</h2>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img g3"></div>
+                    <h2 class="gallery-title">PENTHOUSE</h2>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 50vh;"></div>
+    </div>
+
+    <!-- 3. Mega Footer (Fixed to bottom, revealed as wrapper scrolls up) -->
+    <footer class="mega-footer">
+        <div class="footer-links">
+            <a href="#">Instagram</a>
+            <a href="#">Twitter</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">Careers</a>
+        </div>
+        <div class="footer-huge-text gs-footer-text">
+            ANTIGRAVITY.
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Bento Grid Entrance ---
+        gsap.from(".bento-card", {
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: ".bento-section",
+                start: "top 70%"
+            }
+        });
+
+        // --- 2. Horizontal Scroll Logic ---
+        const track = document.getElementById("hScrollTrack");
+        
+        // Calculate how far to move the track to the left to reach the end
+        // It's the total width of the track minus the viewport width
+        function getScrollAmount() {
+            let trackWidth = track.scrollWidth;
+            return -(trackWidth - window.innerWidth);
+        }
+
+        const tween = gsap.to(track, {
+            x: getScrollAmount,
+            ease: "none"
+        });
+
+        ScrollTrigger.create({
+            trigger: "#hScrollWrapper",
+            start: "top top",
+            end: () => `+=${getScrollAmount() * -1}`, // Scroll for exactly the width of the track
+            pin: true,
+            animation: tween,
+            scrub: 1, // Smooth scrubbing
+            invalidateOnRefresh: true // Recalculate on resize
+        });
+
+        // Add Parallax to images inside the horizontal scroll
+        gsap.utils.toArray('.gallery-img').forEach(img => {
+            // As the track moves left, the image moves right (inside its masked container)
+            gsap.to(img, {
+                xPercent: 15,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#hScrollWrapper",
+                    start: "top top",
+                    end: () => `+=${getScrollAmount() * -1}`,
+                    scrub: 1,
+                    invalidateOnRefresh: true
+                }
+            });
+        });
+
+        // --- 3. Footer Text Parallax ---
+        // Subtle effect: As the footer is revealed, the text slides up slightly
+        gsap.from(".gs-footer-text", {
+            y: 100,
+            opacity: 0.5,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".main-content-wrapper",
+                start: "bottom bottom", // When bottom of main content hits bottom of screen
+                end: "bottom top", // Until main content is completely off screen
+                scrub: 1
+            }
+        });
+    </script>
+</body>
+</html>

@@ -58,17 +58,45 @@ triggers:
 
 ### If you are an AI AGENT reading this skill pack:
 
-1. **Check `presets/animation-meta.json`** — structured metadata for intelligent pattern selection
-2. Parse the **Decision Tree** to select the right animation approach
-3. Read the target module's `.md` file for rules, patterns, and constraints
-4. Reference `templates/*.tsx` for drop-in React components
-5. Import tokens from `presets/` — never hardcode easing, color, or timing values:
+> ⚠️ **ZERO-TOLERANCE RULE:** If you produce a basic, cheap, Bootstrap-looking website,
+> you have FAILED. Every output must look like it could win an Awwwards SOTD.
+
+#### Phase 0 — Mandatory Study (BEFORE writing any code):
+
+1. **Read `references/AI_CORE_BUILD_LOGIC.md` FIRST** — The "Anti-Ugly" Manifesto. Contains zero-tolerance build rules, industry-specific logic, and known issue fixes.
+2. **Read `references/inspiration.md`** — The Industry Matrix. Contains niche-specific color palettes, typography, motion profiles, and the 5 Pillars of Premium Interaction.
+3. **Read `references/EXECUTION_FLOW_PIPELINE.md`** — The 4-Phase Build Pipeline. You MUST build in this order: Skeleton → Grid → Paint → Motion. NEVER skip phases.
+4. **STUDY the `references/` folder** — This is your learning library. Before building anything new, browse relevant reference templates to absorb patterns, layouts, and aesthetic standards:
+   - `references/UIs/` — 29 full-page industry templates (SaaS, Gaming, Creative, Dental, etc.)
+   - `references/complex_hero_section/` — 10 premium hero sections per industry
+   - `references/Contact_section/` — 16 award-level contact sections
+   - `references/3d_components/` — 11 interactive 3D UI components (holographic cards, weapons, HUDs)
+   - `references/Text_animations/` — 20 advanced text animation patterns (liquid, particle, shatter, tunnel)
+   - `references/Text animations/` — 9 curated external text effects (morphing, cipher, scroll reveals)
+   
+   **Rule: Never copy a reference template verbatim. Study them, then create something NEW but BETTER — different layout, different color palette, different animation orchestration. Every build must be unique.**
+
+#### Phase 1 — Select Animation Strategy:
+
+5. **Check `presets/animation-meta.json`** — structured metadata for intelligent pattern selection (performance cost, complexity, device compatibility, and which patterns pair together)
+6. Parse the **Decision Tree** below to select the right animation approach
+7. Read the target module's `.md` file for rules, patterns, and constraints
+8. Reference `templates/*.tsx` for drop-in React components
+
+#### Phase 2 — Apply Design Tokens (NEVER hardcode):
+
+9. Import tokens from `presets/` — never hardcode easing, color, or timing values:
    - `presets/easings.js` — easing curves
    - `presets/colors.js` — color palette
    - `presets/themes.js` — dark/light theme tokens
    - `presets/responsive-motion.ts` — mobile-adaptive values
-6. **Read `RECIPES.md`** for full-page composition (which templates to combine)
-7. Follow the **5 Laws** below — they apply to every animation in every module
+   - `presets/reduced-motion.ts` — accessibility hooks
+
+#### Phase 3 — Compose & Validate:
+
+10. **Read `RECIPES.md`** for full-page composition (which templates to combine, timing orchestration)
+11. Follow the **5 Laws** below — they apply to every animation in every module
+12. Run through the **Pre-Delivery Checklist** at the bottom before shipping
 
 ### The 3 Tiers — Start at Tier 1, go deeper as needed:
 

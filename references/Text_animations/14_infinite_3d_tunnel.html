@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite 3D Text Tunnel</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Teko', sans-serif; /* Tall, aggressive, brutalist font */
+            overflow: hidden;
+            /* Creates the intense deep space vibe */
+            background: radial-gradient(circle at center, #1a1a24 0%, #000000 100%);
+        }
+
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            perspective: 600px; /* Extremely aggressive perspective for tunnel depth */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* The wrapper that holds all the text layers */
+        .tunnel {
+            position: relative;
+            transform-style: preserve-3d;
+            /* The infinite flight animation */
+            animation: flyThrough 0.8s linear infinite;
+        }
+
+        /* The trick to the infinite loop: 
+           We move the entire tunnel forward by exactly the distance between one layer and the next (300px).
+           When it resets to 0, it perfectly matches the frame, creating an endless loop. */
+        @keyframes flyThrough {
+            from { transform: translateZ(0px); }
+            to { transform: translateZ(300px); }
+        }
+
+        /* The base text layer */
+        .text-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25vw; /* Massive responsive font */
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1;
+            /* Glowing stroke effect */
+            color: transparent;
+            -webkit-text-stroke: 2px #00f3ff;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            /* Center alignment */
+            margin-top: -12vw;
+            margin-left: -1vw;
+        }
+
+        /* The layer closest to the camera (Layer 0) is solid */
+        .layer-0 {
+            color: #ffffff;
+            -webkit-text-stroke: 0px;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(0, 243, 255, 0.8);
+            z-index: 100;
+        }
+
+        /* Alternating colors for a Cyberpunk aesthetic deeper in the tunnel */
+        .color-alt {
+            -webkit-text-stroke: 2px #ff00ea;
+            text-shadow: 0 0 20px rgba(255, 0, 234, 0.2);
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        /* A glass overlay to make it feel like you are looking through a HUD */
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(0,0,0,1);
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hud-overlay"></div>
+
+    <div class="scene" id="scene">
+        <div class="tunnel" id="tunnel">
+            <!-- JavaScript will inject 40 layers of text going infinitely deep into the screen -->
+        </div>
+    </div>
+
+    <div class="hint">Move your mouse to bend the tunnel</div>
+
+    <script>
+        const tunnel = document.getElementById('tunnel');
+        const scene = document.getElementById('scene');
+        
+        const TEXT = "OVERWHELM";
+        const NUM_LAYERS = 40;
+        const Z_SPACING = 300; // Distance between each text layer
+
+        // Generate the 3D layers
+        for (let i = 0; i < NUM_LAYERS; i++) {
+            const layer = document.createElement('div');
+            layer.classList.add('text-layer');
+            layer.textContent = TEXT;
+            
+            // Push the layer deep into the screen
+            // The first layer is at Z=0, the second at Z=-300, the third at Z=-600, etc.
+            layer.style.transform = `translate(-50%, -50%) translateZ(-${i * Z_SPACING}px)`;
+            
+            // Make the closest layer solid
+            if (i === 0) {
+                layer.classList.add('layer-0');
+            }
+            
+            // Alternate colors for every other layer
+            if (i % 2 !== 0) {
+                layer.classList.add('color-alt');
+            }
+            
+            // Fade out the layers that are very far away so it blends into the darkness perfectly
+            // This prevents a hard "pop in" at the back of the tunnel
+            const opacity = 1 - (i / NUM_LAYERS);
+            layer.style.opacity = Math.pow(opacity, 1.5); // Exponential fade
+            
+            tunnel.appendChild(layer);
+        }
+
+        // --- Interactive Tunnel Bending ---
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        // When the mouse moves, we change the perspective origin of the entire scene.
+        // This causes the straight 3D tunnel to bend and warp towards the cursor like a wormhole.
+        document.addEventListener('mousemove', (e) => {
+            // Calculate mouse position as a percentage from the center of the screen (-1 to 1)
+            const xVal = (e.clientX / window.innerWidth - 0.5) * 2;
+            const yVal = (e.clientY / window.innerHeight - 0.5) * 2;
+            
+            // Multiply by a huge number to aggressively shift the vanishing point
+            targetX = xVal * 800; 
+            targetY = yVal * 800;
+        });
+
+        // Touch support for mobile
+        document.addEventListener('touchmove', (e) => {
+            const xVal = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+            const yVal = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
+            targetX = xVal * 800; 
+            targetY = yVal * 800;
+        });
+
+        // Animation loop for smooth interpolation (Lerp) of the mouse movement
+        function render() {
+            // Smoothly ease the current coordinates towards the target coordinates
+            currentX += (targetX - currentX) * 0.1;
+            currentY += (targetY - currentY) * 0.1;
+            
+            // Shift the 3D vanishing point
+            scene.style.perspectiveOrigin = `calc(50% + ${currentX}px) calc(50% + ${currentY}px)`;
+            
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>

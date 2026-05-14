@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Creative Artist Portfolio</title>
+    
+    <!-- High-Fashion Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-stone: #EAE8E3; /* Warm, high-fashion bone color */
+            --text-dark: #1A1A1A;
+            --accent: #D44D27; /* Burnt orange/terracotta */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Hide default cursor for custom cursor */
+        }
+
+        body {
+            background-color: var(--bg-stone);
+            color: var(--text-dark);
+            font-family: 'Syne', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Custom Cursor --- */
+        .cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 10px; height: 10px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+        }
+        .cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 40px; height: 40px;
+            border: 1px solid var(--text-dark);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+        }
+
+        /* Hover States for cursor */
+        .cursor-hover .cursor-dot {
+            width: 80px; height: 80px;
+            background-color: var(--text-dark);
+            mix-blend-mode: difference;
+        }
+        .cursor-hover .cursor-ring {
+            width: 0; height: 0; opacity: 0;
+        }
+
+        /* --- Global Image Placeholders --- */
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #d0cec9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(26, 26, 26, 0.4);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            padding: 40px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            mix-blend-mode: difference;
+            color: white;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .hero-title {
+            font-size: 8rem;
+            line-height: 0.9;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -2px;
+            text-align: center;
+        }
+
+        .hero-title i {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            text-transform: lowercase;
+            color: var(--accent);
+        }
+
+        /* --- Cinematic Image Reveal Gallery --- */
+        .gallery-section {
+            padding: 100px 5%;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        /* The Mask Wrapper */
+        .img-reveal-mask {
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* The Image inside starts scaled up */
+        .img-reveal-mask .img-placeholder {
+            transform: scale(1.4);
+            transform-origin: center center;
+            transition: transform 0.5s ease;
+        }
+
+        /* Specific grid placements for an asymmetric, high-fashion layout */
+        .grid-item-1 { grid-column: 1 / 8; height: 70vh; }
+        .grid-item-2 { grid-column: 9 / 13; height: 50vh; margin-top: 20vh; }
+        .grid-item-3 { grid-column: 3 / 11; height: 80vh; margin-top: 100px; }
+
+        .img-reveal-mask:hover .img-placeholder {
+            transform: scale(1.05) !important; /* Slight zoom out on hover */
+            background: #b8b6b1;
+        }
+
+        /* --- Interactive Hover Project List --- */
+        .project-list-section {
+            padding: 150px 0;
+            border-top: 1px solid rgba(26, 26, 26, 0.1);
+        }
+
+        .project-row {
+            padding: 40px 5%;
+            border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project-row h2 {
+            font-size: 4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+        }
+
+        .project-row span {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .project-row:hover h2 {
+            transform: translateX(40px);
+            color: var(--accent);
+        }
+
+        /* --- Floating Cursor Image Tracker --- */
+        /* This is the hidden image that tracks the mouse when hovering over project rows */
+        .floating-image-tracker {
+            position: fixed;
+            top: 0; left: 0;
+            width: 400px; height: 500px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            transform: scale(0.5) translate(-50%, -50%);
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .floating-image-tracker .img-placeholder {
+            background: #2a2a2a;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- Floating Image that tracks cursor during hover -->
+    <div class="floating-image-tracker" id="trackerWrap">
+        <div class="img-placeholder" id="trackerImg">IMG</div>
+    </div>
+
+    <nav>
+        <a href="#" class="hover-target">Studio</a>
+        <a href="#" class="hover-target">Contact</a>
+    </nav>
+
+    <section class="hero">
+        <h1 class="hero-title">
+            Visuals.<br>
+            <i>unbound.</i>
+        </h1>
+    </section>
+
+    <!-- Interactive Project Hover List -->
+    <section class="project-list-section">
+        <div style="padding: 0 5%; margin-bottom: 40px;">
+            <p style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 2rem;">Selected Works</p>
+        </div>
+
+        <div class="project-row hover-target" data-img="VOGUE EDITORIAL">
+            <h2>Editorial</h2>
+            <span>2026</span>
+        </div>
+        <div class="project-row hover-target" data-img="NEON CAMPAIGN">
+            <h2>Campaign</h2>
+            <span>2025</span>
+        </div>
+        <div class="project-row hover-target" data-img="SCULPTURE SERIES">
+            <h2>Sculpture</h2>
+            <span>2024</span>
+        </div>
+    </section>
+
+    <!-- Cinematic Scroll Reveal Gallery -->
+    <section class="gallery-section">
+        <div class="gallery-grid">
+            
+            <div class="img-reveal-mask grid-item-1 hover-target">
+                <div class="img-placeholder parallax-img">Primary Image Placeholder (800x600)</div>
+            </div>
+
+            <div class="img-reveal-mask grid-item-2 hover-target">
+                <div class="img-placeholder parallax-img">Secondary Image (400x500)</div>
+            </div>
+
+            <div class="img-reveal-mask grid-item-3 hover-target">
+                <div class="img-placeholder parallax-img">Hero Portrait (1000x800)</div>
+            </div>
+
+        </div>
+    </section>
+
+    <section style="height: 30vh; display: flex; justify-content: center; align-items: center;">
+        <h2 style="font-family: 'Playfair Display'; font-style: italic; font-size: 3rem;">Fin.</h2>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Custom Cursor Logic ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorRing = document.querySelector('.cursor-ring');
+        
+        // GSAP quickTo is incredibly optimized for mouse tracking
+        const xToDot = gsap.quickTo(cursorDot, "x", {duration: 0.1, ease: "power3"});
+        const yToDot = gsap.quickTo(cursorDot, "y", {duration: 0.1, ease: "power3"});
+        
+        const xToRing = gsap.quickTo(cursorRing, "x", {duration: 0.3, ease: "power3"});
+        const yToRing = gsap.quickTo(cursorRing, "y", {duration: 0.3, ease: "power3"});
+
+        window.addEventListener("mousemove", (e) => {
+            xToDot(e.clientX);
+            yToDot(e.clientY);
+            xToRing(e.clientX);
+            yToRing(e.clientY);
+        });
+
+        // Add hover effect to anything with class 'hover-target'
+        document.querySelectorAll('.hover-target, nav a').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        // --- Cinematic Image Scroll Reveals ---
+        // For every image wrapper, animate the image scaling down from 1.4 to 1 as it enters the viewport
+        gsap.utils.toArray('.img-reveal-mask').forEach(mask => {
+            const img = mask.querySelector('.parallax-img');
+            
+            gsap.fromTo(img, 
+                { scale: 1.4 }, 
+                { 
+                    scale: 1, 
+                    duration: 1.8, 
+                    ease: "expo.out",
+                    scrollTrigger: {
+                        trigger: mask,
+                        start: "top 85%", // Trigger when top of image hits 85% of screen height
+                        toggleActions: "play none none reverse" // Play on enter, reverse on scroll up
+                    }
+                }
+            );
+        });
+
+        // --- Floating Image Hover Tracker (The Award-Winning Trick) ---
+        const trackerWrap = document.getElementById('trackerWrap');
+        const trackerImg = document.getElementById('trackerImg');
+        
+        const xToTracker = gsap.quickTo(trackerWrap, "x", {duration: 0.4, ease: "power3"});
+        const yToTracker = gsap.quickTo(trackerWrap, "y", {duration: 0.4, ease: "power3"});
+
+        // Track mouse position specifically for the floating image
+        window.addEventListener("mousemove", (e) => {
+            // Offset slightly so it follows the cursor beautifully
+            xToTracker(e.clientX);
+            yToTracker(e.clientY);
+        });
+
+        // Show image and change content when hovering over a project row
+        document.querySelectorAll('.project-row').forEach(row => {
+            row.addEventListener('mouseenter', (e) => {
+                // Change the text inside the placeholder (in a real app, change the img src here)
+                trackerImg.textContent = row.getAttribute('data-img');
+                
+                // Pop the image open
+                gsap.to(trackerWrap, {
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "back.out(1.5)",
+                    transformOrigin: "center center"
+                });
+            });
+
+            row.addEventListener('mouseleave', () => {
+                // Shrink and fade out
+                gsap.to(trackerWrap, {
+                    scale: 0.5,
+                    opacity: 0,
+                    duration: 0.4,
+                    ease: "power3.in"
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

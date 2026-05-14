@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Contact Section - Refined</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;1,500;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #E8E6E1; /* Gallery Stone */
+            --text-color: #121212;
+            --accent-color: #0044FF; /* Cobalt Blue */
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Marquee */
+        .marquee-container {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 1rem 0; border-bottom: 1px solid rgba(18, 18, 18, 0.1);
+            overflow: hidden; white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block; font-size: 0.8rem; text-transform: uppercase;
+            letter-spacing: 4px; font-weight: 500;
+            animation: marquee 20s linear infinite;
+        }
+        .marquee-content span { margin-right: 4rem; }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Layout */
+        .layout-grid {
+            width: 100%; max-width: 1600px; margin: 0 auto;
+            padding: 8rem 4rem 4rem 4rem;
+            display: grid; grid-template-columns: 1fr 2.5fr; gap: 4rem;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .sidebar-title {
+            font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 4rem;
+        }
+        .contact-details {
+            display: flex; flex-direction: column; gap: 2rem;
+        }
+        .detail-group { display: flex; flex-direction: column; }
+        .detail-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .detail-link { font-size: 1.2rem; color: var(--text-color); text-decoration: none; font-family: var(--font-serif); font-style: italic; transition: color 0.3s; }
+        .detail-link:hover { color: var(--accent-color); }
+
+        /* Right Form Area */
+        .form-area {
+            position: relative;
+        }
+
+        .nl-form {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1.6;
+            font-weight: 400;
+            letter-spacing: -1px;
+            max-width: 1100px;
+        }
+
+        .form-word { display: inline-block; }
+
+        .nl-input {
+            background: transparent; border: none;
+            border-bottom: 2px solid rgba(18, 18, 18, 0.2);
+            color: var(--accent-color); font-family: var(--font-serif); font-style: italic;
+            font-size: inherit; text-align: center;
+            width: 280px; padding: 0 10px; margin: 0 5px;
+            transition: border-color 0.3s; border-radius: 0;
+        }
+        .nl-input:focus {
+            outline: none; border-bottom-color: var(--accent-color);
+        }
+        .nl-input::placeholder {
+            color: rgba(0, 68, 255, 0.2); font-style: italic; font-weight: 400;
+        }
+
+        /* Massive Submit Button */
+        .submit-wrap {
+            margin-top: 6rem;
+            display: flex; justify-content: flex-end;
+            border-top: 1px solid rgba(18, 18, 18, 0.1);
+            padding-top: 2rem;
+        }
+
+        .btn-submit {
+            background: transparent; border: none; cursor: pointer;
+            display: flex; align-items: center; gap: 1rem;
+            font-size: 2rem; font-weight: 500; font-family: var(--font-sans);
+            text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-color); transition: color 0.3s, gap 0.3s;
+        }
+        .btn-submit .arrow {
+            font-family: var(--font-serif); font-style: italic;
+            font-size: 3rem; transition: transform 0.3s; color: var(--accent-color);
+        }
+        .btn-submit:hover { color: var(--accent-color); gap: 2rem; }
+        .btn-submit:hover .arrow { transform: translateX(10px); }
+
+        @media (max-width: 1024px) {
+            .layout-grid { grid-template-columns: 1fr; gap: 4rem; padding: 6rem 2rem; }
+            .sidebar { flex-direction: row; flex-wrap: wrap; gap: 2rem; }
+            .sidebar-title { width: 100%; margin-bottom: 1rem; }
+            .nl-input { width: 200px; }
+        }
+        @media (max-width: 600px) {
+            .nl-input { width: 100%; margin: 10px 0; text-align: left; border-bottom-color: var(--accent-color);}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span>Open for commissions</span>
+            <span>Let's collaborate</span>
+            <span>Worldwide availability</span>
+            <span>Open for commissions</span>
+            <span>Let's collaborate</span>
+            <span>Worldwide availability</span>
+        </div>
+    </div>
+
+    <section class="layout-grid">
+        <div class="sidebar gs-reveal">
+            <div class="sidebar-title">Contact & Info</div>
+            <div class="contact-details">
+                <div class="detail-group">
+                    <span class="detail-label">General Inquiries</span>
+                    <a href="mailto:studio@artist.com" class="detail-link">studio@artist.com</a>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Representation</span>
+                    <a href="#" class="detail-link">Gagosian Gallery</a>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Socials</span>
+                    <a href="#" class="detail-link">Instagram ↗</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-area">
+            <form class="nl-form" action="#" onsubmit="event.preventDefault();">
+                <span class="form-word gs-word">Hi,</span>
+                <span class="form-word gs-word">my</span>
+                <span class="form-word gs-word">name</span>
+                <span class="form-word gs-word">is</span>
+                <input type="text" class="nl-input gs-word" placeholder="Your Name" required>
+                <span class="form-word gs-word">from</span>
+                <input type="text" class="nl-input gs-word" placeholder="Company/Studio">
+                <span class="form-word gs-word">.</span>
+                <br><br>
+                <span class="form-word gs-word">I'm</span>
+                <span class="form-word gs-word">looking</span>
+                <span class="form-word gs-word">to</span>
+                <span class="form-word gs-word">partner</span>
+                <span class="form-word gs-word">on</span>
+                <span class="form-word gs-word">a</span>
+                <input type="text" class="nl-input gs-word" placeholder="Project Type" required>
+                <span class="form-word gs-word">project.</span>
+                <br><br>
+                <span class="form-word gs-word">My</span>
+                <span class="form-word gs-word">budget</span>
+                <span class="form-word gs-word">is</span>
+                <span class="form-word gs-word">roughly</span>
+                <input type="text" class="nl-input gs-word" placeholder="$0,000">
+                <span class="form-word gs-word">.</span>
+                <span class="form-word gs-word">You</span>
+                <span class="form-word gs-word">can</span>
+                <span class="form-word gs-word">reach</span>
+                <span class="form-word gs-word">me</span>
+                <span class="form-word gs-word">at</span>
+                <input type="email" class="nl-input gs-word" placeholder="Email Address" required>
+                <span class="form-word gs-word">.</span>
+                
+                <div class="submit-wrap gs-reveal-up">
+                    <button type="submit" class="btn-submit">
+                        Send Request <span class="arrow">→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Entrance Animations
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        tl.from(".gs-reveal", {
+            x: -30, opacity: 0, duration: 1, ease: "power3.out"
+        })
+        .from(".gs-word", {
+            y: 30, opacity: 0, duration: 0.8, stagger: 0.03, ease: "power3.out"
+        }, "-=0.5")
+        .from(".gs-reveal-up", {
+            y: 30, opacity: 0, duration: 1, ease: "power3.out"
+        }, "-=0.2");
+    </script>
+</body>
+</html>

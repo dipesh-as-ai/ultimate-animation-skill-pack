@@ -33,6 +33,7 @@
   ],
   "entryPoint": "SKILL.md",
   "modules": 12,
-  "templates": 39,
-  "totalFiles": 63
+  "templates": 25,
+  "referenceTemplates": 86,
+  "totalFiles": 150
 }

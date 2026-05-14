@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium UI Text Intros Vol 2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f1016; /* Clean dark blue/grey */
+            color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .text-container {
+            position: relative;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* 
+         =========================================
+         ANIMATION 1: THE BLOCK REVEAL
+         =========================================
+        */
+        .anim-block {
+            position: relative;
+            font-size: 7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            display: inline-block;
+        }
+
+        .block-text {
+            opacity: 0; /* Hidden initially */
+        }
+
+        .block-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #00f3ff;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        /* The JS will apply these classes to trigger the timeline */
+        .play-block .block-cover {
+            animation: blockSwipe 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+        .play-block .block-text {
+            animation: textShow 0.1s forwards;
+            animation-delay: 0.5s; /* Shows up exactly when the block is covering it */
+        }
+
+        @keyframes blockSwipe {
+            0% { transform-origin: left; transform: scaleX(0); }
+            45% { transform-origin: left; transform: scaleX(1); }
+            50% { transform-origin: right; transform: scaleX(1); }
+            100% { transform-origin: right; transform: scaleX(0); }
+        }
+        @keyframes textShow {
+            to { opacity: 1; }
+        }
+
+        /* 
+         =========================================
+         ANIMATION 2: CINEMATIC TRACKING IN
+         =========================================
+        */
+        .anim-tracking {
+            font-size: 6rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            color: #ffaa00;
+            opacity: 0;
+            letter-spacing: 2em; /* Starts extremely wide */
+        }
+
+        .play-tracking {
+            animation: trackingIn 1.5s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
+        }
+
+        @keyframes trackingIn {
+            0% { letter-spacing: 1.5em; opacity: 0; transform: translateZ(-200px); }
+            50% { opacity: 1; }
+            100% { letter-spacing: 0.1em; opacity: 1; transform: translateZ(0); }
+        }
+
+        /* 
+         =========================================
+         ANIMATION 3: THE TYPEWRITER TERMINAL
+         =========================================
+        */
+        .anim-typewriter {
+            font-size: 6rem;
+            font-weight: 400;
+            font-family: monospace;
+            color: #00ffaa;
+            display: flex;
+            align-items: center;
+        }
+
+        .tw-cursor {
+            display: inline-block;
+            width: 30px;
+            height: 6rem;
+            background-color: #00ffaa;
+            margin-left: 10px;
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 
+         =========================================
+         ANIMATION 4: THE DROP BOUNCE STAGGER
+         =========================================
+        */
+        .anim-bounce {
+            display: flex;
+            font-size: 8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ff0055;
+        }
+
+        .bounce-letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(-200px);
+        }
+
+        .play-bounce .bounce-letter {
+            animation: dropBounce 1s cubic-bezier(0.280, 0.840, 0.420, 1) forwards;
+        }
+
+        @keyframes dropBounce {
+            0% { transform: translateY(-300px); opacity: 0; }
+            30% { transform: translateY(0px); opacity: 1; } /* Hits the ground */
+            50% { transform: translateY(-40px); opacity: 1; } /* Bounces up */
+            70% { transform: translateY(0px); opacity: 1; } /* Hits the ground */
+            85% { transform: translateY(-15px); opacity: 1; } /* Small bounce */
+            100% { transform: translateY(0px); opacity: 1; } /* Rests */
+        }
+
+        /* --- UI Controls --- */
+        .controls {
+            position: absolute;
+            bottom: 50px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="text-container">
+        <!-- 1. Block Reveal -->
+        <div id="elBlock" class="anim-block hidden">
+            <span class="block-text">REVEALED</span>
+            <div class="block-cover"></div>
+        </div>
+        
+        <!-- 2. Cinematic Tracking -->
+        <div id="elTracking" class="anim-tracking hidden">EXPANDING</div>
+        
+        <!-- 3. Typewriter -->
+        <div id="elTypewriter" class="anim-typewriter hidden">
+            <span id="twText"></span><span class="tw-cursor"></span>
+        </div>
+
+        <!-- 4. Drop Bounce -->
+        <div id="elBounce" class="anim-bounce hidden">
+            <div class="bounce-letter">B</div>
+            <div class="bounce-letter">O</div>
+            <div class="bounce-letter">U</div>
+            <div class="bounce-letter">N</div>
+            <div class="bounce-letter">C</div>
+            <div class="bounce-letter">E</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="playBlock()">Block Swipe Reveal</button>
+        <button onclick="playTracking()">Cinematic Tracking</button>
+        <button onclick="playTypewriter()">Typewriter Terminal</button>
+        <button onclick="playBounce()">Drop Bounce Stagger</button>
+    </div>
+
+    <script>
+        let typewriterTimeout;
+
+        function resetAll() {
+            clearTimeout(typewriterTimeout);
+            
+            document.getElementById('elBlock').classList.add('hidden');
+            document.getElementById('elBlock').classList.remove('play-block');
+
+            document.getElementById('elTracking').classList.add('hidden');
+            document.getElementById('elTracking').classList.remove('play-tracking');
+
+            document.getElementById('elTypewriter').classList.add('hidden');
+            document.getElementById('twText').textContent = "";
+
+            document.getElementById('elBounce').classList.add('hidden');
+            document.getElementById('elBounce').classList.remove('play-bounce');
+            
+            // Reset bounce letters
+            document.querySelectorAll('.bounce-letter').forEach(l => {
+                l.style.animation = 'none';
+            });
+        }
+
+        function playBlock() {
+            resetAll();
+            const el = document.getElementById('elBlock');
+            el.classList.remove('hidden');
+            void el.offsetWidth; // Force reflow
+            el.classList.add('play-block');
+        }
+
+        function playTracking() {
+            resetAll();
+            const el = document.getElementById('elTracking');
+            el.classList.remove('hidden');
+            void el.offsetWidth;
+            el.classList.add('play-tracking');
+        }
+
+        function playTypewriter() {
+            resetAll();
+            const el = document.getElementById('elTypewriter');
+            el.classList.remove('hidden');
+            
+            const targetText = "TERMINAL_READY";
+            const textEl = document.getElementById('twText');
+            let i = 0;
+            
+            function typeChar() {
+                if (i < targetText.length) {
+                    textEl.textContent += targetText.charAt(i);
+                    i++;
+                    // Randomize typing speed for realism (50ms to 150ms)
+                    typewriterTimeout = setTimeout(typeChar, Math.random() * 100 + 50);
+                }
+            }
+            typeChar();
+        }
+
+        function playBounce() {
+            resetAll();
+            const el = document.getElementById('elBounce');
+            el.classList.remove('hidden');
+            
+            const letters = document.querySelectorAll('.bounce-letter');
+            
+            // Stagger the bounce animation for each letter
+            letters.forEach((letter, index) => {
+                // Apply the animation delay (70ms per letter)
+                letter.style.animationDelay = `${index * 0.07}s`;
+            });
+            
+            void el.offsetWidth;
+            el.classList.add('play-bounce');
+        }
+
+        // Start with the first animation on load
+        window.onload = playBlock;
+    </script>
+</body>
+</html>

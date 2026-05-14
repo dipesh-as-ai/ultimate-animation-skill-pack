@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare & MedTech Hero</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #FAFCFF; /* Ultra clean hospital white/blue */
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --med-blue: #0284C7;
+            --med-teal: #0D9488;
+            --soft-blue: #E0F2FE;
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-dark);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Organic Background Blobs */
+        .organic-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at top left, #FFFFFF, var(--bg-base));
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            z-index: 1;
+            animation: morph 15s ease-in-out infinite alternate;
+        }
+
+        .blob-1 {
+            top: -10%; left: -10%;
+            width: 50vw; height: 50vw;
+            background: linear-gradient(135deg, var(--med-blue), var(--soft-blue));
+        }
+
+        .blob-2 {
+            bottom: -20%; right: -10%;
+            width: 60vw; height: 60vw;
+            background: linear-gradient(135deg, var(--med-teal), #CCFBF1);
+            animation-delay: -5s;
+        }
+
+        @keyframes morph {
+            0% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; transform: scale(1) rotate(0deg); }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1.1) rotate(20deg); }
+        }
+
+        /* Frosted Glass Overlay to soften the blobs further */
+        .glass-overlay {
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(100px);
+            -webkit-backdrop-filter: blur(100px);
+            z-index: 2;
+        }
+
+        /* Main Container */
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        /* Left Content */
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .trust-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FFF;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--med-blue);
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid var(--soft-blue);
+        }
+
+        .pulse-dot {
+            width: 8px; height: 8px; background: var(--med-teal); border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(13, 148, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 5vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .hero-title .highlight {
+            color: var(--med-blue);
+            position: relative;
+            display: inline-block;
+        }
+
+        /* SVG swoosh underline */
+        .hero-title .highlight svg {
+            position: absolute;
+            bottom: -5px; left: 0; width: 100%; height: 12px;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .btn-group { display: flex; gap: 1rem; align-items: center; }
+
+        .btn-primary {
+            background: var(--med-blue);
+            color: #FFF;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1.1rem 2.5rem;
+            border-radius: 100px; /* Highly rounded for healthcare */
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(2, 132, 199, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(2, 132, 199, 0.3);
+            background: #0369A1;
+        }
+
+        .btn-secondary {
+            background: #FFF;
+            color: var(--text-dark);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1.1rem 2.5rem;
+            border-radius: 100px;
+            border: 1px solid #E2E8F0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--med-blue);
+            color: var(--med-blue);
+        }
+
+        /* Right Side: Medical UI Dashboard */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+        }
+
+        /* Floating 3D "Cells" */
+        .cell {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFF, var(--soft-blue));
+            box-shadow: inset -5px -5px 15px rgba(2, 132, 199, 0.1), 0 15px 30px rgba(0,0,0,0.05);
+            z-index: 1;
+        }
+        .cell-1 { width: 80px; height: 80px; top: 10%; right: 10%; }
+        .cell-2 { width: 120px; height: 120px; bottom: 10%; left: 0%; background: linear-gradient(135deg, #FFF, #CCFBF1); }
+        .cell-3 { width: 40px; height: 40px; top: 30%; left: -5%; }
+
+        /* Main Glass Dashboard */
+        .med-dashboard {
+            width: 420px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #FFFFFF;
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.05), inset 0 0 0 1px rgba(255,255,255,0.5);
+            z-index: 5;
+            position: relative;
+        }
+
+        .patient-card {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 2rem;
+            padding-bottom: 1.5rem; border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        }
+
+        .patient-avatar {
+            width: 50px; height: 50px; border-radius: 50%; background: var(--soft-blue);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--med-blue);
+        }
+
+        .metric-group { margin-bottom: 1.5rem; }
+        .metric-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500;}
+        .metric-val { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: baseline; gap: 5px;}
+        .metric-unit { font-size: 1rem; color: var(--text-muted); font-weight: 500;}
+
+        /* Live ECG SVG */
+        .ecg-box {
+            width: 100%; height: 80px; background: #FFF; border-radius: 12px;
+            border: 1px solid #F1F5F9; position: relative; overflow: hidden;
+            display: flex; align-items: center;
+        }
+
+        .ecg-line {
+            fill: none; stroke: var(--med-teal); stroke-width: 2.5;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        /* Floating Alert Panel */
+        .alert-panel {
+            position: absolute;
+            right: -40px; bottom: 50px;
+            background: #FFF;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.08);
+            display: flex; align-items: center; gap: 12px;
+            z-index: 6;
+            border: 1px solid #F8FAFC;
+        }
+
+        .alert-icon {
+            width: 35px; height: 35px; border-radius: 50%; background: #DCFCE7;
+            color: #16A34A; display: flex; align-items: center; justify-content: center;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-container { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding: 0 2rem; }
+            .hero-content { align-items: center; }
+            .hero-desc { margin: 0 auto 2.5rem auto; }
+            .hero-visual { height: 500px; }
+            .med-dashboard { width: 100%; max-width: 420px; }
+            .alert-panel { right: 10px; bottom: 20px; }
+            .cell-1 { right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="organic-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="glass-overlay"></div>
+    </div>
+
+    <main class="hero-container">
+        
+        <div class="hero-content">
+            <div class="trust-pill gs-up">
+                <div class="pulse-dot"></div>
+                AI-Powered Diagnostics
+            </div>
+
+            <h1 class="hero-title">
+                <span style="display:block" class="gs-up">Precision care.</span>
+                <span style="display:block" class="gs-up">Human <span class="highlight">touch.
+                    <svg viewBox="0 0 200 12" preserveAspectRatio="none">
+                        <path d="M0,10 Q100,-5 200,10" class="gs-swoosh" />
+                    </svg>
+                </span></span>
+            </h1>
+
+            <p class="hero-desc gs-up">
+                Empowering clinical decisions with real-time predictive analytics. We bridge the gap between advanced neural networks and compassionate patient outcomes.
+            </p>
+
+            <div class="btn-group gs-up">
+                <button class="btn-primary">Request Demo</button>
+                <button class="btn-secondary">Clinical Studies</button>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            
+            <div class="cell cell-1 gs-float" data-speed="2"></div>
+            <div class="cell cell-2 gs-float" data-speed="-1.5"></div>
+            <div class="cell cell-3 gs-float" data-speed="3"></div>
+
+            <div class="med-dashboard gs-board">
+                <div class="patient-card">
+                    <div class="patient-avatar">EM</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 1.1rem;">E. Martinez</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Patient ID: #88492-B</div>
+                    </div>
+                    <div style="margin-left: auto; background: var(--soft-blue); color: var(--med-blue); padding: 4px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600;">STABLE</div>
+                </div>
+
+                <div class="metric-group">
+                    <div class="metric-header"><span>Heart Rate</span> <span>Avg: 72</span></div>
+                    <div class="metric-val"><span id="hr-val">76</span> <span class="metric-unit">BPM</span></div>
+                </div>
+
+                <div class="ecg-box">
+                    <svg width="400" height="80" viewBox="0 0 400 80">
+                        <!-- Repeated ECG Pattern -->
+                        <path class="ecg-line" d="M0,40 L40,40 L50,20 L60,60 L70,10 L80,70 L90,40 L140,40 L150,20 L160,60 L170,10 L180,70 L190,40 L240,40 L250,20 L260,60 L270,10 L280,70 L290,40 L340,40 L350,20 L360,60 L370,10 L380,70 L390,40 L440,40"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="alert-panel gs-alert">
+                <div class="alert-icon">✓</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;">Vitals Normalized</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Just now</div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // --- Continuous ECG Animation ---
+        gsap.to(".ecg-line", {
+            x: -100, // Shift by exactly one wave period
+            duration: 1.5,
+            ease: "linear",
+            repeat: -1
+        });
+
+        // --- Live Heart Rate Simulation ---
+        const hrVal = document.getElementById('hr-val');
+        setInterval(() => {
+            // Randomly fluctuate heart rate between 74 and 78
+            const current = parseInt(hrVal.innerText);
+            const next = current + (Math.random() > 0.5 ? 1 : -1);
+            if (next >= 74 && next <= 78) {
+                hrVal.innerText = next;
+            }
+        }, 2000);
+
+        // --- Floating Cells Animation ---
+        gsap.utils.toArray('.gs-float').forEach(cell => {
+            const speed = cell.getAttribute('data-speed');
+            gsap.to(cell, {
+                y: 20 * speed,
+                x: 10 * speed,
+                rotation: 15 * speed,
+                duration: 4,
+                ease: "sine.inOut",
+                yoyo: true,
+                repeat: -1
+            });
+        });
+
+        // --- Entrance Animations ---
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        tl.from(".gs-up", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out"
+        })
+        // Swoosh drawn under "touch"
+        .to(".gs-swoosh", {
+            strokeDashoffset: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, "-=0.5")
+        // Dashboard slides up
+        .from(".gs-board", {
+            y: 50,
+            opacity: 0,
+            duration: 1.2,
+            ease: "expo.out"
+        }, "-=1")
+        // Alert panel pops in
+        .from(".gs-alert", {
+            x: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "back.out(1.5)"
+        }, "-=0.8")
+        // Cells fade in
+        .from(".gs-float", {
+            scale: 0,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "back.out(2)"
+        }, "-=1");
+
+        // --- Mouse Parallax for Dashboard ---
+        const visualArea = document.querySelector('.hero-visual');
+        const board = document.querySelector('.med-dashboard');
+        const alertPanel = document.querySelector('.alert-panel');
+
+        visualArea.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 1024) {
+                const rect = visualArea.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+                // Move board slightly
+                gsap.to(board, { x: -x * 20, y: -y * 20, duration: 1, ease: "power2.out" });
+                // Move alert panel aggressively opposite
+                gsap.to(alertPanel, { x: x * 40, y: y * 40, duration: 1, ease: "power2.out" });
+            }
+        });
+
+        visualArea.addEventListener('mouseleave', () => {
+            gsap.to(board, { x: 0, y: 0, duration: 1, ease: "power2.out" });
+            gsap.to(alertPanel, { x: 0, y: 0, duration: 1, ease: "power2.out" });
+        });
+    </script>
+</body>
+</html>

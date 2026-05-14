@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award-Winning Premium SaaS UI</title>
+    
+    <!-- Modern Tech Fonts: Inter for UI, JetBrains Mono for Data -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-black: #000000;
+            --surface-dark: #0A0A0A;
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            /* Vivid, high-end tech gradients */
+            --gradient-start: #8A2BE2; /* Vivid Purple */
+            --gradient-end: #00F3FF;   /* Electric Cyan */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: var(--bg-black);
+            border: 1px solid transparent;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--surface-border);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 150px 5% 0;
+            position: relative;
+            text-align: center;
+        }
+
+        /* The Animated Mesh Gradient Glow behind the text */
+        .hero-glow {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(138, 43, 226, 0.4) 0%, rgba(0, 243, 255, 0.2) 50%, transparent 70%);
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.8;
+            animation: pulse-glow 6s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.5; }
+            100% { transform: translateX(-50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .tagline {
+            display: inline-block;
+            padding: 6px 12px;
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #b084e8;
+            margin-bottom: 30px;
+            background: rgba(138, 43, 226, 0.1);
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            max-width: 900px;
+            margin-bottom: 30px;
+            /* Gradient text */
+            background: linear-gradient(to right, #ffffff 30%, #aaaaaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        /* The 3D Floating Dashboard Placeholder */
+        .dashboard-mockup {
+            width: 80%;
+            max-width: 1000px;
+            height: 500px;
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px 16px 0 0;
+            backdrop-filter: blur(20px);
+            margin-top: 50px;
+            /* Isometric 3D tilt */
+            transform: perspective(1000px) rotateX(15deg);
+            transform-origin: bottom center;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(138, 43, 226, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-muted);
+        }
+
+        /* --- Sticky Stacking Cards Section --- */
+        /* This is the advanced scroll tech requested */
+        .features-section {
+            padding: 100px 5% 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            letter-spacing: -1px;
+        }
+
+        .stack-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px; /* Space between cards */
+        }
+
+        .stack-card {
+            position: sticky;
+            /* Each card sticks at a slightly different height so they layer perfectly like a deck */
+            height: 60vh;
+            background: var(--surface-dark);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* Massive shadow to create depth over the card beneath it */
+            box-shadow: 0 -30px 60px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        /* Set specific sticky top positions to create the overlapping deck effect */
+        .card-1 { top: 120px; }
+        .card-2 { top: 140px; }
+        .card-3 { top: 160px; }
+
+        .card-content {
+            width: 45%;
+        }
+
+        .card-content h3 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .card-content p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Premium Conic Gradient Glowing Border Placeholder inside the card */
+        .card-visual {
+            width: 45%;
+            height: 100%;
+            position: relative;
+            border-radius: 16px;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The actual spinning glowing border */
+        .card-visual::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: conic-gradient(from 0deg, transparent 60%, var(--gradient-start) 80%, var(--gradient-end) 100%);
+            border-radius: 18px;
+            z-index: -1;
+            animation: spin 4s linear infinite;
+        }
+
+        /* Inner mask to hide the center of the gradient, making it look like just a border */
+        .card-visual::after {
+            content: '';
+            position: absolute;
+            top: 1px; left: 1px; right: 1px; bottom: 1px;
+            background: #0d0d0d;
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Live Data Counter Styling */
+        .data-counter {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--gradient-end);
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-icon"></div>
+            NEXUS
+        </div>
+        <div class="nav-links">
+            <a href="#">Platform</a>
+            <a href="#">Developers</a>
+            <a href="#">Security</a>
+            <a href="#">Pricing</a>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <a href="#" class="btn" style="color: var(--text-muted);">Sign In</a>
+            <a href="#" class="btn btn-primary">Start Building</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="tagline">NEXUS V2.0 IS LIVE</div>
+        <h1 class="hero-title">Financial infrastructure<br>for the internet.</h1>
+        <p class="hero-subtitle">
+            Millions of companies of all sizes—from startups to Fortune 500s—use Nexus's software and APIs to accept payments, send payouts, and manage their businesses online.
+        </p>
+        <div style="display: flex; gap: 15px;">
+            <a href="#" class="btn btn-primary">Start now</a>
+            <a href="#" class="btn" style="border: 1px solid var(--surface-border);">Contact sales</a>
+        </div>
+
+        <div class="dashboard-mockup">
+            <span class="mono">dashboard_ui_render.png (1000x500)</span>
+        </div>
+    </section>
+
+    <!-- Sticky Stacking Cards Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>A fully integrated suite.</h2>
+            <p style="color: var(--text-muted);">Reduce friction. Increase revenue. Globally.</p>
+        </div>
+
+        <div class="stack-container">
+            
+            <!-- Card 1 -->
+            <div class="stack-card card-1">
+                <div class="card-content">
+                    <h3>Global Payments</h3>
+                    <p>Accept payments in 135+ currencies with local payment methods. Our dynamic routing maximizes conversion rates instantly.</p>
+                </div>
+                <div class="card-visual">
+                    <!-- Dynamic Counter -->
+                    <div class="data-counter mono" id="count1">0</div>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Transactions Processed (Sec)</span>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="stack-card card-2">
+                <div class="card-content">
+                    <h3>Fraud Prevention</h3>
+                    <p>Machine learning models trained on billions of data points catch sophisticated fraud rings before they impact your bottom line.</p>
+                </div>
+                <div class="card-visual" style="--gradient-start: #FF0055; --gradient-end: #FFaa00;">
+                    <div class="data-counter mono" id="count2">0.00%</div>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Fraud Rate</span>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="stack-card card-3">
+                <div class="card-content">
+                    <h3>Revenue Recognition</h3>
+                    <p>Automate your accounting. Sync all your billing data directly to your ERP with zero engineering required.</p>
+                </div>
+                <div class="card-visual" style="--gradient-start: #00FF88; --gradient-end: #00F3FF;">
+                    <div class="data-counter mono" id="count3">$0M</div>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Revenue Recovered</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section style="height: 50vh; display: flex; justify-content: center; align-items: center; border-top: 1px solid var(--surface-border);">
+        <h2 style="font-size: 3rem; color: var(--text-muted);">Ready to scale?</h2>
+    </section>
+
+    <script>
+        // GSAP Hero Entrance
+        gsap.from(".tagline", {y: 20, opacity: 0, duration: 0.8, delay: 0.2});
+        gsap.from(".hero-title", {y: 30, opacity: 0, duration: 1, delay: 0.4});
+        gsap.from(".hero-subtitle", {y: 30, opacity: 0, duration: 1, delay: 0.6});
+        gsap.from(".btn", {y: 20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 0.8});
+        
+        // Dashboard 3D Parallax Tilt Entrance
+        gsap.fromTo(".dashboard-mockup", 
+            { y: 100, opacity: 0, rotateX: 40 },
+            { y: 0, opacity: 1, rotateX: 15, duration: 1.5, ease: "power3.out", delay: 1 }
+        );
+
+        // Advanced Number Counters using GSAP
+        // Triggers when the user scrolls down to see the card
+        
+        // Counter 1: High speed transactions
+        let count1 = { val: 0 };
+        gsap.to(count1, {
+            val: 8452,
+            duration: 3,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".card-1",
+                start: "top 60%"
+            },
+            onUpdate: function() {
+                document.getElementById('count1').innerText = Math.floor(count1.val).toLocaleString();
+            }
+        });
+
+        // Counter 2: Fraud Rate (Decimals)
+        let count2 = { val: 5.4 };
+        gsap.to(count2, {
+            val: 0.01,
+            duration: 2.5,
+            ease: "power4.out",
+            scrollTrigger: {
+                trigger: ".card-2",
+                start: "top 60%"
+            },
+            onUpdate: function() {
+                document.getElementById('count2').innerText = count2.val.toFixed(2) + '%';
+            }
+        });
+
+        // Counter 3: Revenue (Millions)
+        let count3 = { val: 0 };
+        gsap.to(count3, {
+            val: 420,
+            duration: 3,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: ".card-3",
+                start: "top 60%"
+            },
+            onUpdate: function() {
+                document.getElementById('count3').innerText = '$' + Math.floor(count3.val) + 'M';
+            }
+        });
+
+        // Note: The "Sticky Stacking Cards" scrolling effect is achieved entirely through CSS
+        // using `position: sticky` and specific top offsets. It is highly performant!
+    </script>
+</body>
+</html>

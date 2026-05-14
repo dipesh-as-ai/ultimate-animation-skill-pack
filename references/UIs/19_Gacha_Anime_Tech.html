@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHERIA | Technical Protocol</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --text-main: #f0f0f5;
+            --text-dim: #8a8a8c;
+            --accent: #ffb13b; /* Arknights-esque warm gold/orange */
+            --glass-bg: rgba(20, 20, 25, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-tech: 'Rajdhani', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center center;
+        }
+
+        /* Technical Cursor */
+        .cursor-ring {
+            position: fixed; width: 40px; height: 40px;
+            border: 1px solid var(--accent); border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+        .cursor-ring::after {
+            content: ''; position: absolute;
+            top: 50%; left: 50%; width: 4px; height: 4px;
+            background: var(--text-main); border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Abstract Ring Animation Background */
+        .bg-ring {
+            position: fixed; top: 50%; left: 70%;
+            width: 800px; height: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: rotateSlow 60s linear infinite;
+        }
+        .bg-ring::before {
+            content: ''; position: absolute;
+            top: -10px; left: 50%; width: 20px; height: 20px;
+            background: var(--bg-dark); border: 2px solid var(--accent);
+            transform: translateX(-50%);
+        }
+        @keyframes rotateSlow { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* Nav */
+        nav {
+            position: fixed; top: 0; width: 100%;
+            padding: 2rem 4rem; display: flex;
+            justify-content: space-between; align-items: center;
+            z-index: 100;
+        }
+        .logo {
+            font-family: var(--font-tech); font-size: 1.5rem; font-weight: 700;
+            letter-spacing: 4px; display: flex; align-items: center; gap: 10px;
+        }
+        .logo::before {
+            content: ''; width: 12px; height: 12px; background: var(--accent);
+            display: inline-block; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        .nav-links { display: flex; gap: 3rem; }
+        .nav-links a {
+            color: var(--text-dim); text-decoration: none;
+            font-family: var(--font-tech); font-size: 1.1rem;
+            font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+        .nav-links a::before { content: '/// '; color: var(--accent); opacity: 0; transition: opacity 0.3s; }
+        .nav-links a:hover::before { opacity: 1; }
+
+        /* Hero */
+        .hero {
+            height: 100vh; display: flex; align-items: center;
+            padding: 0 4rem; position: relative;
+        }
+        .hero-layout {
+            display: flex; width: 100%; justify-content: space-between; align-items: center;
+        }
+        
+        .hero-left { max-width: 600px; z-index: 2; }
+        
+        .tech-badge {
+            font-family: var(--font-tech); color: var(--accent);
+            font-size: 1rem; letter-spacing: 4px; margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .tech-badge::before { content: '['; }
+        .tech-badge::after { content: ']'; }
+
+        .hero-title {
+            font-family: var(--font-main); font-size: clamp(4rem, 8vw, 7rem);
+            font-weight: 800; line-height: 0.9; letter-spacing: -2px;
+            text-transform: uppercase; margin-bottom: 2rem;
+            position: relative;
+        }
+        .hero-title span { display: block; overflow: hidden; }
+        .hero-title .outline { color: transparent; -webkit-text-stroke: 1px var(--text-dim); }
+
+        .hero-desc {
+            color: var(--text-dim); font-size: 1.1rem; line-height: 1.6;
+            max-width: 450px; margin-bottom: 3rem; border-left: 2px solid var(--accent); padding-left: 1.5rem;
+        }
+
+        .btn-tech {
+            background: var(--text-main); color: var(--bg-dark);
+            border: none; padding: 1rem 3rem;
+            font-family: var(--font-tech); font-size: 1.2rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; cursor: none;
+            position: relative; overflow: hidden; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+            transition: background 0.3s, color 0.3s;
+        }
+        .btn-tech:hover { background: var(--accent); color: #000; }
+        
+        /* Hero Right - Character Graphic */
+        .hero-right {
+            position: absolute; right: 0; top: 0;
+            width: 55%; height: 100%; z-index: 1;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+        }
+        .hero-img {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.8; filter: contrast(1.1) brightness(0.9);
+            transform-origin: right;
+        }
+        /* Geometric overlays */
+        .geo-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(10,10,12,0.8) 0%, rgba(10,10,12,0) 50%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* Glassmorphism Data Panel */
+        .data-panel {
+            position: absolute; bottom: 4rem; right: 4rem;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); padding: 2rem;
+            width: 350px; z-index: 3;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+        }
+        .data-header {
+            font-family: var(--font-tech); color: var(--accent); font-size: 1rem;
+            letter-spacing: 2px; margin-bottom: 1rem; display: flex; justify-content: space-between;
+        }
+        .data-list { list-style: none; }
+        .data-list li {
+            font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.8rem;
+            display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 0.5rem;
+        }
+        .data-list li span:last-child { color: var(--text-main); font-family: var(--font-tech); font-weight: 600;}
+
+        /* Operator Roster Section */
+        .roster { padding: 8rem 4rem; position: relative; }
+        .section-header {
+            font-family: var(--font-tech); font-size: 3rem; font-weight: 700;
+            text-transform: uppercase; margin-bottom: 4rem;
+            display: flex; align-items: baseline; gap: 2rem;
+        }
+        .section-header span { color: var(--text-dim); font-size: 1.5rem; font-weight: 500; letter-spacing: 5px; }
+
+        .operator-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+        }
+        .op-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+            height: 600px; position: relative; overflow: hidden; cursor: none;
+            transition: border-color 0.4s;
+        }
+        .op-img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(100%) contrast(1.2); opacity: 0.6;
+            transition: filter 0.5s, opacity 0.5s, transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .op-card:hover { border-color: var(--accent); }
+        .op-card:hover .op-img {
+            filter: grayscale(0%) contrast(1.1); opacity: 1; transform: scale(1.05);
+        }
+        .op-info {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 2rem; background: linear-gradient(to top, rgba(10,10,12,1), transparent);
+            transform: translateY(20px); opacity: 0; transition: all 0.4s ease;
+        }
+        .op-card:hover .op-info { transform: translateY(0); opacity: 1; }
+        
+        .op-class {
+            font-family: var(--font-tech); color: var(--accent);
+            font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 0.5rem;
+        }
+        .op-name {
+            font-family: var(--font-main); font-size: 2rem; font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Tech decorations */
+        .dec-cross {
+            position: absolute; width: 10px; height: 10px;
+        }
+        .dec-cross::before, .dec-cross::after {
+            content: ''; position: absolute; background: var(--text-dim);
+        }
+        .dec-cross::before { top: 50%; left: 0; width: 100%; height: 1px; }
+        .dec-cross::after { left: 50%; top: 0; height: 100%; width: 1px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="cursor-ring"></div>
+    <div class="bg-ring"></div>
+
+    <nav>
+        <div class="logo hover-target">AETHERIA</div>
+        <div class="nav-links">
+            <a href="#" class="hover-target">Terminal</a>
+            <a href="#" class="hover-target">Archives</a>
+            <a href="#" class="hover-target">Roster</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-layout">
+            <div class="hero-left">
+                <div class="tech-badge gs-fade">SYSTEM ONLINE</div>
+                <h1 class="hero-title">
+                    <span class="gs-title-line">ASTRAL</span>
+                    <span class="gs-title-line outline">RESONANCE</span>
+                </h1>
+                <p class="hero-desc gs-fade">Initiate protocol sequence. Establish connection with orbital structures and synchronize with the ether-grid. Humanity's next frontier awaits.</p>
+                <div class="gs-fade">
+                    <button class="btn-tech hover-target">Initialize</button>
+                </div>
+            </div>
+            
+            <div class="hero-right gs-img-reveal">
+                <img src="https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=1964&auto=format&fit=crop" class="hero-img" alt="Hero Render">
+                <div class="geo-overlay"></div>
+                
+                <!-- Floating Data Panel -->
+                <div class="data-panel gs-panel">
+                    <div class="data-header">
+                        <span>/// SYS.STATS</span>
+                        <span>ACT.1</span>
+                    </div>
+                    <ul class="data-list">
+                        <li><span>Server Status</span> <span>NOMINAL</span></li>
+                        <li><span>Ether Density</span> <span>94.2%</span></li>
+                        <li><span>Active Nodes</span> <span>1,024</span></li>
+                        <li><span>Threat Level</span> <span style="color: var(--accent);">ELEVATED</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dec-cross" style="bottom: 4rem; left: 4rem;"></div>
+    </section>
+
+    <section class="roster">
+        <h2 class="section-header gs-fade">OPERATORS <span>/// CLASS_A</span></h2>
+        
+        <div class="operator-grid">
+            <div class="op-card gs-up hover-target">
+                <!-- Using aesthetic tech portraits -->
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop" class="op-img" alt="Op 1">
+                <div class="op-info">
+                    <div class="op-class">/// VANGUARD</div>
+                    <div class="op-name">Chén</div>
+                </div>
+            </div>
+            <div class="op-card gs-up hover-target">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974&auto=format&fit=crop" class="op-img" alt="Op 2">
+                <div class="op-info">
+                    <div class="op-class">/// GUARD</div>
+                    <div class="op-name">SilverAsh</div>
+                </div>
+            </div>
+            <div class="op-card gs-up hover-target">
+                <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop" class="op-img" alt="Op 3">
+                <div class="op-info">
+                    <div class="op-class">/// CASTER</div>
+                    <div class="op-name">Amiya</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Custom Cursor
+        const cursorRing = document.querySelector('.cursor-ring');
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursorRing, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.15,
+                ease: 'power2.out'
+            });
+        });
+
+        document.querySelectorAll('.hover-target').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorRing.style.width = '60px';
+                cursorRing.style.height = '60px';
+                cursorRing.style.background = 'rgba(255, 177, 59, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorRing.style.width = '40px';
+                cursorRing.style.height = '40px';
+                cursorRing.style.background = 'transparent';
+            });
+        });
+
+        // Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline();
+        
+        // Hero Image Mask Reveal
+        tl.from('.hero-img', {
+            scale: 1.2,
+            duration: 2,
+            ease: 'power3.out'
+        })
+        .from('.gs-title-line', {
+            y: 100,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.1,
+            ease: 'power4.out'
+        }, "-=1.5")
+        .from('.gs-fade', {
+            x: -30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.15,
+            ease: 'power3.out'
+        }, "-=1")
+        .from('.gs-panel', {
+            y: 50,
+            opacity: 0,
+            backdropFilter: "blur(0px)",
+            duration: 1,
+            ease: 'power3.out'
+        }, "-=1");
+
+        // Roster Scroll Reveal
+        gsap.utils.toArray('.gs-up').forEach((elem, i) => {
+            gsap.from(elem, {
+                y: 100,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'power4.out',
+                scrollTrigger: {
+                    trigger: '.roster',
+                    start: "top 75%",
+                },
+                delay: i * 0.15
+            });
+        });
+        
+        // Image Parallax
+        gsap.to('.hero-img', {
+            xPercent: 10,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+    </script>
+</body>
+</html>

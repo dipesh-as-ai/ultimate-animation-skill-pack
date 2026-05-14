@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinetic 3D Typography Cylinder</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f0f11;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Oswald', sans-serif;
+            overflow: hidden;
+            perspective: 1200px; /* Massive perspective for deep 3D scale */
+        }
+
+        /* A subtle ambient spotlight in the center of the screen */
+        .ambient-light {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 60, 0, 0.15) 0%, rgba(0,0,0,0) 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .scene {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Allows mouse dragging anywhere on screen */
+            cursor: grab;
+        }
+        
+        .scene:active {
+            cursor: grabbing;
+        }
+
+        /* The rotating 3D cylinder */
+        .cylinder {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            transform-style: preserve-3d;
+            /* Initial rotation to look down slightly at the cylinder */
+            transform: rotateX(-15deg) rotateY(0deg); 
+        }
+
+        .text-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 150px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #fff;
+            line-height: 150px;
+            letter-spacing: 5px;
+            /* The back of the text faces inward, so we hide it or let it show for chaos */
+            backface-visibility: hidden; 
+            
+            /* Premium aesthetic: transparent text with a harsh colored stroke */
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8);
+            transition: color 0.3s ease, text-shadow 0.3s ease, -webkit-text-stroke 0.3s ease;
+        }
+
+        /* When the text is facing the front, it lights up */
+        .front-facing {
+            color: #ff3c00 !important; /* Intense neon orange/red */
+            -webkit-text-stroke: 0px transparent !important;
+            text-shadow: 0 0 30px rgba(255, 60, 0, 0.8), 0 0 60px rgba(255, 60, 0, 0.4);
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: sans-serif;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-light"></div>
+
+    <div class="scene" id="scene">
+        <div class="cylinder" id="cylinder">
+            <!-- 
+                12 panels of text wrapped in a 3D circle.
+                Each is rotated by exactly 30 degrees (360 / 12) on the X axis, 
+                and pushed out on the Z axis to form the cylinder.
+            -->
+            <!-- Handled by JS for cleaner code and dynamic generation -->
+        </div>
+    </div>
+    
+    <div class="hint">Click and drag to spin the cylinder</div>
+
+    <script>
+        const cylinder = document.getElementById('cylinder');
+        const scene = document.getElementById('scene');
+        
+        const text = "KINETIC";
+        const numberOfPanels = 12; // Creates a massive ring
+        const radius = 350; // How wide the cylinder is
+        
+        let panels = [];
+
+        // Generate the 3D text panels dynamically
+        for (let i = 0; i < numberOfPanels; i++) {
+            const panel = document.createElement('div');
+            panel.classList.add('text-ring');
+            panel.textContent = text;
+            
+            // Math for the 3D cylinder
+            const angle = (i / numberOfPanels) * 360;
+            // Rotate on X axis to make a vertical wheel (like a slot machine or drum)
+            panel.style.transform = `rotateX(${angle}deg) translateZ(${radius}px)`;
+            
+            cylinder.appendChild(panel);
+            panels.push({ element: panel, angle: angle });
+        }
+
+        // --- Interaction & Physics Engine ---
+        let currentRotation = 0;
+        let targetRotation = 0;
+        let isDragging = false;
+        let startY = 0;
+        let velocity = 0;
+        
+        // Auto-spin speed
+        const autoSpinSpeed = -0.5; 
+
+        // Mouse Events
+        scene.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startY = e.clientY;
+            velocity = 0; // Stop auto-spin when caught
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaY = e.clientY - startY;
+            startY = e.clientY;
+            
+            // The drag velocity
+            velocity = deltaY * 0.4;
+            targetRotation -= velocity;
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch Events for Mobile
+        scene.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startY = e.touches[0].clientY;
+            velocity = 0;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const deltaY = e.touches[0].clientY - startY;
+            startY = e.touches[0].clientY;
+            velocity = deltaY * 0.4;
+            targetRotation -= velocity;
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Animation Loop with Inertia/Friction
+        function animate() {
+            if (!isDragging) {
+                // If not dragging, apply friction to the throw velocity
+                velocity *= 0.95; // Friction multiplier
+                
+                // If the throw velocity dies down, resume the constant slow auto-spin
+                if (Math.abs(velocity) < 0.1) {
+                    velocity = autoSpinSpeed;
+                }
+                
+                targetRotation -= velocity;
+            }
+            
+            // Smoothly interpolate current rotation to target rotation (Lerp)
+            currentRotation += (targetRotation - currentRotation) * 0.1;
+            
+            // Apply the rotation to the whole cylinder
+            // Note: We rotate it on the X-axis to spin it like a drum. 
+            // We also add a permanent Y-axis rotation so you look at it slightly from an angle.
+            cylinder.style.transform = `rotateY(-15deg) rotateX(${currentRotation}deg)`;
+            
+            // Highlight the text that is currently facing the user
+            // We calculate the global angle of each panel by adding the cylinder's rotation
+            panels.forEach(panelData => {
+                // Normalize the angle to 0-360
+                let globalAngle = (panelData.angle + currentRotation) % 360;
+                if (globalAngle < 0) globalAngle += 360;
+                
+                // If the angle is close to 0 or 360, it's facing the front
+                if (globalAngle > 340 || globalAngle < 20) {
+                    panelData.element.classList.add('front-facing');
+                } else {
+                    panelData.element.classList.remove('front-facing');
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

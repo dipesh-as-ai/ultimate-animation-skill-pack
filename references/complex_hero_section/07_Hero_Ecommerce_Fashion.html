@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-End E-Commerce Hero</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F7F7F5;
+            --text-dark: #121212;
+            --text-gray: #888888;
+            --font-main: 'Jost', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: none; /* Custom cursor */
+        }
+
+        /* Editorial Custom Cursor */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 6px; height: 6px;
+            background-color: var(--text-dark);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor-ring {
+            position: fixed; top: 0; left: 0;
+            width: 80px; height: 80px;
+            border: 1px solid var(--text-dark);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s, border-color 0.4s;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-main);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: transparent;
+            opacity: 0;
+        }
+
+        /* Minimalist Navigation */
+        nav {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 2.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+            width: 0%; height: 1px; background: var(--text-dark); transition: width 0.4s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        .cart {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cart-count {
+            display: flex; align-items: center; justify-content: center;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--text-dark); color: #fff; font-size: 0.65rem;
+        }
+
+        /* The Lookbook Layout */
+        .hero-container {
+            width: 100%; height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Background Giant Typography */
+        .bg-typography {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            text-align: center;
+            font-size: clamp(8rem, 20vw, 18rem);
+            font-weight: 600;
+            line-height: 0.8;
+            letter-spacing: -8px;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.03);
+            white-space: nowrap;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Foreground Content */
+        .lookbook-grid {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Center Main Image */
+        .main-image-wrapper {
+            position: relative;
+            width: 35vw;
+            max-width: 500px;
+            height: 65vh;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1); /* Prep for parallax */
+        }
+
+        /* Main Image Overlay Text */
+        .collection-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FFF;
+            font-family: var(--font-serif);
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-style: italic;
+            white-space: nowrap;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+
+        /* Floating Secondary Image (Parallax) */
+        .floating-image-wrapper {
+            position: absolute;
+            top: 20%; right: 15%;
+            width: 20vw;
+            max-width: 300px;
+            height: 40vh;
+            overflow: hidden;
+            z-index: 5;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        }
+
+        .floating-image {
+            width: 100%; height: 100%; object-fit: cover;
+            transform: scale(1.1);
+        }
+
+        /* Left Side Typography */
+        .hero-text {
+            position: absolute;
+            left: 8%; top: 45%;
+            transform: translateY(-50%);
+            z-index: 20;
+        }
+
+        .season-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .hero-headline {
+            font-size: clamp(3rem, 5vw, 4.5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+        }
+
+        .hero-headline span { display: block; overflow: hidden; }
+        .hero-headline .word { display: block; }
+        .hero-headline i { font-family: var(--font-serif); font-style: italic; text-transform: lowercase; }
+
+        /* Shop Button */
+        .shop-btn {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dark);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .shop-btn::before {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.2);
+        }
+        .shop-btn::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0%; height: 1px; background: var(--text-dark); transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .shop-btn:hover::after { width: 100%; }
+
+        .btn-arrow {
+            width: 30px; height: 1px; background: var(--text-dark); position: relative;
+            transition: width 0.3s;
+        }
+        .btn-arrow::after {
+            content: ''; position: absolute; right: 0; top: -4px; width: 8px; height: 1px; background: var(--text-dark); transform: rotate(45deg); transform-origin: right center;
+        }
+        .btn-arrow::before {
+            content: ''; position: absolute; right: 0; bottom: -4px; width: 8px; height: 1px; background: var(--text-dark); transform: rotate(-45deg); transform-origin: right center;
+        }
+
+        .shop-btn:hover .btn-arrow { width: 45px; }
+
+        /* Bottom Pagination / Stats */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            padding: 2.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            z-index: 50;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-gray);
+        }
+
+        @media (max-width: 1024px) {
+            nav, .bottom-bar { padding: 1.5rem 2rem; }
+            .nav-links { display: none; }
+            .hero-container { flex-direction: column; }
+            .bg-typography { font-size: 6rem; }
+            .hero-text { position: relative; left: 0; top: 0; transform: none; text-align: center; margin-bottom: 2rem; margin-top: 6rem;}
+            .main-image-wrapper { width: 80vw; height: 50vh; }
+            .floating-image-wrapper { display: none; }
+            .cursor-dot, .cursor-ring { display: none; }
+            body { cursor: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Editorial Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <nav class="gs-fade">
+        <div class="logo">AURA</div>
+        <div class="nav-links">
+            <span class="nav-link hover-target">Ready to Wear</span>
+            <span class="nav-link hover-target">Accessories</span>
+            <span class="nav-link hover-target">Campaigns</span>
+        </div>
+        <div class="cart hover-target">
+            Bag <div class="cart-count">2</div>
+        </div>
+    </nav>
+
+    <div class="bg-typography gs-bg-text">FALL / WINTER</div>
+
+    <main class="hero-container">
+        
+        <div class="hero-text">
+            <span class="season-label gs-fade">FW 2026</span>
+            <h1 class="hero-headline">
+                <span><span class="word gs-word">Modern</span></span>
+                <span><span class="word gs-word"><i>silhouettes,</i></span></span>
+                <span><span class="word gs-word">Elevated.</span></span>
+            </h1>
+            <div class="gs-fade">
+                <a href="#" class="shop-btn hover-target">
+                    Explore Collection <div class="btn-arrow"></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="lookbook-grid">
+            
+            <div class="main-image-wrapper img-hover-trigger gs-img-main-wrap">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80" alt="Fashion Editorial" class="main-image gs-img-main">
+                <div class="collection-text gs-fade-slow">Edition 01</div>
+            </div>
+
+            <div class="floating-image-wrapper gs-img-float-wrap">
+                <img src="https://images.unsplash.com/photo-1550614000-4b95d4edfa76?auto=format&fit=crop&q=80" alt="Fashion Detail" class="floating-image gs-img-float">
+            </div>
+
+        </div>
+
+    </main>
+
+    <div class="bottom-bar gs-fade">
+        <span>Designed in Paris</span>
+        <span>01 / 05</span>
+    </div>
+
+    <script>
+        // --- Custom Cursor & Hover Logic ---
+        const dot = document.querySelector('.cursor-dot');
+        const ring = document.querySelector('.cursor-ring');
+        const hoverTargets = document.querySelectorAll('.hover-target');
+        const imgTrigger = document.querySelector('.img-hover-trigger');
+
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0 });
+            gsap.to(ring, { x: e.clientX, y: e.clientY, duration: 0.15, ease: "power2.out" });
+        });
+
+        // Small UI targets
+        hoverTargets.forEach(target => {
+            target.addEventListener('mouseenter', () => {
+                gsap.to(dot, { scale: 0, duration: 0.2 });
+                gsap.to(ring, { opacity: 1, scale: 0.6, backgroundColor: 'rgba(0,0,0,0.1)', borderColor: 'transparent', duration: 0.3 });
+            });
+            target.addEventListener('mouseleave', () => {
+                gsap.to(dot, { scale: 1, duration: 0.2 });
+                gsap.to(ring, { opacity: 0, scale: 0.5, backgroundColor: 'transparent', borderColor: 'var(--text-dark)', duration: 0.3 });
+            });
+        });
+
+        // Main Image Hover (DRAG state)
+        imgTrigger.addEventListener('mouseenter', () => {
+            gsap.to(dot, { scale: 0, duration: 0.2 });
+            gsap.to(ring, { 
+                opacity: 1, 
+                scale: 1, 
+                backgroundColor: '#fff', 
+                borderColor: 'transparent',
+                color: '#000',
+                duration: 0.4,
+                ease: "back.out(1.5)"
+            });
+            ring.innerHTML = "DRAG";
+            
+            // Image squeeze effect
+            gsap.to(".main-image", { scale: 1.05, duration: 0.6, ease: "power2.out" });
+        });
+
+        imgTrigger.addEventListener('mouseleave', () => {
+            gsap.to(dot, { scale: 1, duration: 0.2 });
+            gsap.to(ring, { 
+                opacity: 0, 
+                scale: 0.5, 
+                backgroundColor: 'transparent', 
+                color: 'transparent',
+                duration: 0.3 
+            });
+            ring.innerHTML = "";
+            
+            // Image release
+            gsap.to(".main-image", { scale: 1.1, duration: 0.6, ease: "power2.out" });
+        });
+
+        // --- GSAP Entrance Animations ---
+        const tl = gsap.timeline({ delay: 0.2 });
+
+        // Image wrappers slide up and unmask
+        tl.from(".gs-img-main-wrap", {
+            y: 100, clipPath: "inset(100% 0 0 0)", duration: 1.5, ease: "power4.out"
+        })
+        .from(".gs-img-float-wrap", {
+            y: 100, clipPath: "inset(100% 0 0 0)", duration: 1.5, ease: "power4.out"
+        }, "-=1.2")
+        // Images slowly scale down
+        .from(".gs-img-main, .gs-img-float", {
+            scale: 1.4, duration: 2, ease: "power2.out"
+        }, "-=1.5")
+        // Typography reveals
+        .from(".gs-word", {
+            y: "110%", duration: 1, stagger: 0.1, ease: "power3.out"
+        }, "-=1.5")
+        // Fades
+        .from(".gs-fade", {
+            y: 20, opacity: 0, duration: 1, stagger: 0.1, ease: "power2.out"
+        }, "-=1")
+        .from(".gs-fade-slow", {
+            opacity: 0, duration: 2, ease: "power2.out"
+        }, "-=1")
+        .from(".gs-bg-text", {
+            opacity: 0, scale: 0.9, duration: 2, ease: "power3.out"
+        }, "-=2");
+
+        // --- Mouse Parallax ---
+        const heroContainer = document.querySelector('.hero-container');
+        
+        heroContainer.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            
+            // Main image slight parallax
+            gsap.to(".gs-img-main", { x: -x * 15, y: -y * 15, duration: 1, ease: "power2.out" });
+            
+            // Floating image aggressive parallax (opposite direction)
+            gsap.to(".floating-image-wrapper", { x: x * 40, y: y * 40, duration: 1.5, ease: "power2.out" });
+            gsap.to(".gs-img-float", { x: -x * 20, y: -y * 20, duration: 1.5, ease: "power2.out" });
+            
+            // Background typography subtle shift
+            gsap.to(".gs-bg-text", { x: x * 30, duration: 2, ease: "power2.out" });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fluid Fire Text</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030000; /* Deep charcoal/black */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Cinzel', serif;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 100, 0, 0.5);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+    <div class="hint">Swipe your mouse to blow the flames</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimize performance
+        
+        let width, height;
+        let textCoords = [];
+        let fireParticles = [];
+        let sparks = [];
+        
+        const TEXT = "INFERNO";
+        const FONT_SIZE = 180;
+
+        // Interactive Wind Variables
+        let wind = 0;
+        let targetWind = 0;
+        let lastMouseX = window.innerWidth / 2;
+
+        // Pre-render a highly optimized fire particle for maximum performance
+        // This is a soft radial gradient that blends beautifully with 'lighter' blending mode
+        const pCanvas = document.createElement('canvas');
+        pCanvas.width = 60;
+        pCanvas.height = 60;
+        const pCtx = pCanvas.getContext('2d');
+        const grad = pCtx.createRadialGradient(30, 30, 0, 30, 30, 30);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');     // White hot core
+        grad.addColorStop(0.2, 'rgba(255, 200, 0, 0.8)');     // Yellow body
+        grad.addColorStop(0.6, 'rgba(255, 50, 0, 0.3)');      // Red/Orange edges
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');             // Fade out
+        pCtx.fillStyle = grad;
+        pCtx.fillRect(0, 0, 60, 60);
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            
+            // Extract text pixel data
+            const textCanvas = document.createElement('canvas');
+            textCanvas.width = width; 
+            textCanvas.height = height;
+            const textCtx = textCanvas.getContext('2d');
+            
+            textCtx.fillStyle = '#ffffff';
+            textCtx.font = `900 ${FONT_SIZE}px "Cinzel", serif`;
+            textCtx.textAlign = 'center';
+            textCtx.textBaseline = 'middle';
+            textCtx.fillText(TEXT, width / 2, height / 2);
+            
+            const data = textCtx.getImageData(0, 0, width, height).data;
+            textCoords = [];
+            
+            // Sample the pixels (density controls how solid the fire is)
+            const density = 4;
+            for(let y = 0; y < height; y += density) {
+                for(let x = 0; x < width; x += density) {
+                    if(data[(y * width + x) * 4 + 3] > 128) {
+                        textCoords.push({x, y});
+                    }
+                }
+            }
+            
+            fireParticles = [];
+            sparks = [];
+        }
+
+        class FireParticle {
+            constructor(x, y) {
+                this.x = x + (Math.random() - 0.5) * 4;
+                this.y = y + (Math.random() - 0.5) * 4;
+                // Move generally upwards
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = -(Math.random() * 3 + 1.5);
+                // Size dictates how massive the flames look
+                this.size = Math.random() * 30 + 15;
+                this.life = 1.0;
+                // How fast the flame burns out
+                this.decay = Math.random() * 0.03 + 0.015;
+            }
+
+            update() {
+                // Apply wind to horizontal velocity
+                this.x += this.vx + wind;
+                this.y += this.vy;
+                
+                // Flames shrink as they burn out
+                this.size *= 0.96;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                // Alpha fades out as life drops
+                ctx.globalAlpha = this.life;
+                // Center the pre-rendered image on the x,y coordinate
+                const halfSize = this.size / 2;
+                ctx.drawImage(pCanvas, this.x - halfSize, this.y - halfSize, this.size, this.size);
+            }
+        }
+
+        class Spark {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                // Sparks fly faster and more erratically
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = -(Math.random() * 5 + 4);
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.01;
+            }
+
+            update() {
+                // Sparks get blown by wind much harder than thick flames
+                this.x += this.vx + (wind * 1.5);
+                this.y += this.vy;
+                // Erratic side-to-side jitter
+                this.vx += (Math.random() - 0.5) * 1.5;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = '#FFD700'; // Pure bright gold
+                ctx.fillRect(this.x, this.y, 2, 2);
+            }
+        }
+
+        function render() {
+            // Fill background with solid black to clear previous frame
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+            ctx.fillStyle = '#030000';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw a subtle, dark red glowing base so the text is always legible
+            ctx.fillStyle = 'rgba(100, 10, 0, 0.4)';
+            ctx.font = `900 ${FONT_SIZE}px "Cinzel", serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(TEXT, width / 2, height / 2);
+
+            // Calculate Wind physics
+            targetWind *= 0.9; // Wind naturally dies down if mouse stops
+            wind += (targetWind - wind) * 0.1; // Smooth lerp
+
+            // Spawn new flames continuously from random text pixels
+            // Spawn rate determines the intensity of the inferno
+            for (let i = 0; i < 200; i++) {
+                const randomCoord = textCoords[Math.floor(Math.random() * textCoords.length)];
+                fireParticles.push(new FireParticle(randomCoord.x, randomCoord.y));
+                
+                // 5% chance to spawn a flying spark from this pixel
+                if (Math.random() < 0.05) {
+                    sparks.push(new Spark(randomCoord.x, randomCoord.y));
+                }
+            }
+
+            // CRITICAL: Use 'lighter' blending mode to make overlapping particles combine into blinding white/yellow heat
+            ctx.globalCompositeOperation = 'lighter';
+
+            // Update and draw flames
+            for (let i = fireParticles.length - 1; i >= 0; i--) {
+                let p = fireParticles[i];
+                p.update();
+                p.draw();
+                if (p.life <= 0) {
+                    fireParticles.splice(i, 1);
+                }
+            }
+
+            // Update and draw sparks
+            for (let i = sparks.length - 1; i >= 0; i--) {
+                let s = sparks[i];
+                s.update();
+                s.draw();
+                if (s.life <= 0) {
+                    sparks.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        // Track mouse to generate wind
+        window.addEventListener('mousemove', (e) => {
+            let dx = e.clientX - lastMouseX;
+            lastMouseX = e.clientX;
+            // Cap the max wind strength so it doesn't break the physics
+            targetWind = Math.max(-10, Math.min(10, dx * 0.08));
+        });
+
+        // Touch support for wind
+        window.addEventListener('touchmove', (e) => {
+            let dx = e.touches[0].clientX - lastMouseX;
+            lastMouseX = e.touches[0].clientX;
+            targetWind = Math.max(-10, Math.min(10, dx * 0.08));
+        });
+
+        window.addEventListener('resize', init);
+
+        // Wait for custom font to load before extracting pixels
+        document.fonts.ready.then(() => {
+            init();
+            render();
+        });
+    </script>
+</body>
+</html>

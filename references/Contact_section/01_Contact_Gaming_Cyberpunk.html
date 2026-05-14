@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Contact Section</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --bg-panel: #0a0a0c;
+            --cyan: #00f3ff;
+            --pink: #ff0055;
+            --text-main: #e0e0e0;
+            --text-dim: #666666;
+            --font-display: 'Teko', sans-serif;
+            --font-ui: 'Rajdhani', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Scanlines */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none; z-index: 9999;
+        }
+
+        .contact-container {
+            width: 100%; max-width: 1200px; padding: 4rem 2rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+            position: relative; z-index: 10;
+        }
+
+        /* Left Side */
+        .comm-info {
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        
+        .sys-badge {
+            color: var(--cyan); font-weight: 700; letter-spacing: 4px;
+            text-transform: uppercase; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sys-badge::before { content: '>'; color: var(--pink); animation: blink 1s infinite; }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .heading {
+            font-family: var(--font-display); font-size: 6rem; line-height: 0.9;
+            text-transform: uppercase; margin-bottom: 1.5rem;
+            color: transparent; -webkit-text-stroke: 1px var(--text-main);
+            position: relative;
+        }
+        .heading span { color: var(--cyan); -webkit-text-stroke: 0; text-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
+
+        .desc {
+            font-size: 1.2rem; color: var(--text-dim); line-height: 1.5;
+            margin-bottom: 3rem; max-width: 400px;
+        }
+
+        .server-status {
+            display: flex; flex-direction: column; gap: 1rem;
+            border-left: 2px solid var(--pink); padding-left: 1.5rem;
+        }
+        .status-row { display: flex; justify-content: space-between; max-width: 300px; }
+        .status-label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; }
+        .status-value { color: var(--cyan); font-weight: 700; }
+
+        /* Right Side: Terminal Form */
+        .terminal-form {
+            background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 3rem; position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+        }
+        
+        /* Corner Accents */
+        .terminal-form::before {
+            content: ''; position: absolute; top: -1px; left: -1px;
+            width: 30px; height: 30px;
+            border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
+        }
+
+        .form-title {
+            font-family: var(--font-display); font-size: 2.5rem; color: var(--text-main);
+            text-transform: uppercase; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group { margin-bottom: 2rem; position: relative; }
+        
+        .input-label {
+            display: block; font-size: 0.9rem; color: var(--cyan);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem;
+        }
+
+        .input-control {
+            width: 100%; background: rgba(0, 243, 255, 0.05);
+            border: 1px solid transparent; border-left: 2px solid var(--text-dim);
+            padding: 1rem; color: var(--text-main); font-family: var(--font-ui);
+            font-size: 1.1rem; transition: all 0.3s;
+        }
+        .input-control:focus {
+            outline: none; background: rgba(0, 243, 255, 0.1);
+            border-left-color: var(--cyan); border-right: 2px solid var(--cyan);
+            box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+        
+        textarea.input-control { min-height: 120px; resize: none; }
+
+        /* Cyber Button */
+        .btn-cyber {
+            width: 100%; background: transparent; border: 1px solid var(--pink);
+            color: var(--pink); font-family: var(--font-display); font-size: 2rem;
+            text-transform: uppercase; cursor: pointer; position: relative;
+            padding: 0.5rem 0; overflow: hidden; transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        .btn-cyber::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--pink); z-index: -1; transform: scaleX(0); transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .btn-cyber:hover { color: #000; box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+        .btn-cyber:hover::before { transform: scaleX(1); transform-origin: left; }
+
+        /* Glitch effect on hover for form */
+        .terminal-form:hover {
+            border-color: rgba(255, 0, 85, 0.5);
+            box-shadow: -4px 0 0 rgba(0, 243, 255, 0.5), 4px 0 0 rgba(255, 0, 85, 0.5);
+            transition: box-shadow 0.2s;
+        }
+
+        @media (max-width: 900px) {
+            .contact-container { grid-template-columns: 1fr; gap: 3rem; }
+            .heading { font-size: 4rem; }
+            .terminal-form { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <section class="contact-container">
+        <div class="comm-info">
+            <div class="sys-badge gs-fade">SECURE CHANNEL</div>
+            <h1 class="heading gs-title">
+                COMM<br><span>LINK</span><br>ACTIVE
+            </h1>
+            <p class="desc gs-fade">Transmit your coordinates or request backup. The network is encrypted and monitored 24/7. Awaiting input protocol.</p>
+            
+            <div class="server-status gs-fade">
+                <div class="status-row">
+                    <span class="status-label">Uplink:</span>
+                    <span class="status-value">ESTABLISHED</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Encryption:</span>
+                    <span class="status-value" style="color: var(--pink);">MIL-SPEC-9</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Latency:</span>
+                    <span class="status-value">12ms</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="terminal-form gs-slide">
+            <h2 class="form-title">TRANSMIT_DATA</h2>
+            <form action="#" onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <label class="input-label">/// CALLSIGN [NAME]</label>
+                    <input type="text" class="input-control" required autocomplete="off">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">/// COMMS_FREQ [EMAIL]</label>
+                    <input type="email" class="input-control" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">/// TRANSMISSION_LOG [MESSAGE]</label>
+                    <textarea class="input-control" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-cyber">INITIALIZE UPLOAD</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // GSAP Animations
+        const tl = gsap.timeline();
+
+        tl.from(".gs-fade", {
+            x: -40, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
+        })
+        .from(".gs-title", {
+            y: 50, opacity: 0, duration: 1, ease: "power4.out"
+        }, "-=1")
+        .from(".gs-slide", {
+            x: 50, opacity: 0, duration: 1, ease: "power3.out"
+        }, "-=0.8")
+        .from(".input-group", {
+            y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power2.out"
+        }, "-=0.4")
+        .from(".btn-cyber", {
+            scale: 0.9, opacity: 0, duration: 0.5, ease: "back.out(1.5)"
+        }, "-=0.2");
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Text Cylinder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0A0A0A; --text: #CCFF00; }
+        
+        body {
+            margin: 0; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg); font-family: 'Syne', sans-serif;
+            overflow: hidden;
+            /* Creates the 3D perspective space */
+            perspective: 1000px; 
+        }
+
+        /* The container that holds the cylinder */
+        .stage {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* The rotating ring */
+        .ring {
+            position: relative;
+            width: 300px; height: 100px;
+            transform-style: preserve-3d; /* CRITICAL: Enables 3D space for children */
+            /* Add a slight tilt so we can see it's a 3D ring, not just a flat line */
+            transform: rotateX(-15deg);
+        }
+
+        /* The individual characters */
+        .char {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 6rem; font-weight: 800; color: var(--text);
+            text-transform: uppercase;
+            /* Text stroke to make it look cooler when overlapping */
+            -webkit-text-stroke: 2px var(--text); color: transparent;
+            /* Backface visibility allows us to see the back of the ring */
+            backface-visibility: visible; 
+            /* Subtle glow */
+            text-shadow: 0 0 20px rgba(204, 255, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stage" id="stage">
+        <div class="ring" id="ring">
+            <!-- JavaScript will inject characters here -->
+        </div>
+    </div>
+
+    <script>
+        const ring = document.getElementById('ring');
+        // The text to wrap around the cylinder. Must be long enough to wrap nicely.
+        const text = "AWESOME 3D TEXT CYLINDER • ";
+        const chars = text.split('');
+        const charCount = chars.length;
+        
+        // Calculate the angle between each character
+        const angle = 360 / charCount;
+        
+        // Calculate the radius needed to fit all characters without overlapping
+        // Formula: Radius = (width / 2) / Math.tan(PI / charCount)
+        // Adjusting arbitrarily for visual spacing
+        const radius = 350; 
+
+        chars.forEach((char, i) => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = char;
+            
+            // Core 3D Math: 
+            // 1. Rotate each character around the Y axis
+            // 2. Push it outward by the radius distance
+            span.style.transform = `rotateY(${i * angle}deg) translateZ(${radius}px)`;
+            ring.appendChild(span);
+        });
+
+        // Infinite 3D rotation using GSAP
+        gsap.to(ring, {
+            rotationY: -360, // Spin backwards
+            duration: 15,
+            ease: "none",
+            repeat: -1
+        });
+
+        // Add interactive mouse tilt
+        const stage = document.getElementById('stage');
+        stage.addEventListener('mousemove', (e) => {
+            // Calculate mouse position -1 to 1
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            
+            // Tilt the entire ring up/down based on mouse Y
+            gsap.to(ring, {
+                rotationX: -15 + (-y * 20), // Base tilt -15deg, plus interactive tilt
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
+
+        stage.addEventListener('mouseleave', () => {
+            // Reset to default tilt
+            gsap.to(ring, {
+                rotationX: -15,
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
+    </script>
+</body>
+</html>
